@@ -1,5 +1,6 @@
-# DestinE-DataLake-Usage-Examples-EUMETSAT
-Examples on how to make use of DestinE Data Lake services:
+# DestinE-DataLake-notebooks-Examples-EUMETSAT
+
+Notebooks examples on how to use of DestinE Data Lake services:
 - HDA Usage (will be imported soon)
 - Use Polytope API (will be imported soon)
 - Run a DASK Cluster (will be imported soon)
