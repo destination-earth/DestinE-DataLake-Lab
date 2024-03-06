@@ -1,7 +1,7 @@
 # DestinE-DataLake-notebooks-Examples-EUMETSAT
 
 Notebooks examples on how to use of DestinE Data Lake services:
-- HDA Usage - [https://github.com/destination-earth/DestinE-DataLake-notebooks-examples-EUMETSAT/blob/main/HarmonizedDataAccess_tutorial_notebook.ipynb]
+- [HDA Usage](https://github.com/destination-earth/DestinE-DataLake-notebooks-examples-EUMETSAT/blob/main/HarmonizedDataAccess_tutorial_notebook.ipynb)
 - Use Polytope API (will be imported soon)
 - Run a DASK Cluster (will be imported soon)
 
