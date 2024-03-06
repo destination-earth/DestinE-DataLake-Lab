@@ -1,4 +1,4 @@
-# DestinE-DataLake-notebooks-Examples-EUMETSAT
+# DestinE-DataLake-notebooks-examples-EUMETSAT
 
 Notebooks examples on how to use of DestinE Data Lake services:
 - [HDA Usage](https://github.com/destination-earth/DestinE-DataLake-notebooks-examples-EUMETSAT/blob/main/HarmonizedDataAccess_tutorial_notebook.ipynb)
