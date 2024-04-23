@@ -3,9 +3,9 @@ from lxml import html
 from urllib.parse import parse_qs, urlparse
 
 IAM_URL = "https://auth.destine.eu/"
-CLIENT_ID = "polytope-api-public"
+CLIENT_ID = "dedl-hda"
 REALM = "desp"
-SERVICE_URL = "https://polytope.lumi.apps.dte.destination-earth.eu/"
+SERVICE_URL = "https://hda.data.destination-earth.eu/stac/"
 
 
 class DESPAuth:
