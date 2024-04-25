@@ -1,3 +1,7 @@
+<img src="./img/DestinE-banner.jpg"
+     alt="Destination Earth banner"
+/>
+<img style="float: left; width: 12%" src="./img/EUMETSAT-icon.png"/> 
 # DestinE-DataLake-Lab
 
 Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
