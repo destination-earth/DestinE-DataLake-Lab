@@ -94,6 +94,7 @@ class DEDLAuth:
 
         if response.status_code == 200: 
             dedl_token = response.json()["access_token"]
+            return dedl_token
         else: 
             print(response.json())
             print("Error obtaining DEDL access token")
