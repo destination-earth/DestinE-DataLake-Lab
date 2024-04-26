@@ -4,7 +4,7 @@
 
 # DestinE-DataLake-Lab
 **Author: EUMETSAT** 
- <img style="float: right; width: 12%" src="./img/EUMETSAT-icon.png"/> 
+ <img style="float: left; width: 10%" src="./img/EUMETSAT-icon.png"/> 
 
 Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
 - [Harmonised Data Access](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HDA) (Juypter Notebook examples + Python Tools)
