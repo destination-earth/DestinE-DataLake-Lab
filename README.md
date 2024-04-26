@@ -1,8 +1,12 @@
 <img src="./img/DestinE-banner.jpg"
      alt="Destination Earth banner"
 />
-<img style="float: right; width: 12%" src="./img/EUMETSAT-icon.png"/> 
+
 # DestinE-DataLake-Lab
+<div>
+**Author: EUMETSA** 
+ <img style="float: right; width: 12%" src="./img/EUMETSAT-icon.png"/> 
+</div>
 
 Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
 - Harmonised Data Access (Juypter Notebook examples + Python Tools)
@@ -10,4 +14,8 @@ Destination Earth Data Lake Laboratory, which contains additional information fo
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
 
+
+<br> Ressources: </br>
+DestinE Data Portfolio: https://hda.data.destination-earth.eu/ui/catalog
+Datalake Priority services: https://hda.data.destination-earth.eu/ui/services 
 HDA SWAGGER UI: https://hda.data.destination-earth.eu/docs/
