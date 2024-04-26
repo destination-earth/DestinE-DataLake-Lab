@@ -12,7 +12,7 @@ class DESPAuth:
     def __init__(self, username, password):
         self.username = username
         self.password = password
-
+        
     def get_token(self):
         with requests.Session() as s:
 
@@ -44,7 +44,8 @@ class DESPAuth:
                 raise Exception(error_message)
 
             if login.status_code != 302:
-                raise Exception("Login failed")
+                print("DESP Login failed")
+                return None
             
 
             auth_code = parse_qs(urlparse(login.headers["Location"]).query)['code'][0]
@@ -65,12 +66,13 @@ class DESPAuth:
             
             token = response.json()['access_token']
 
-            return token
-
-
+            return token  
+        
 class DEDLAuth:
-    def __init__(self, desp_access_token):
+    def __init__(self, desp_access_token, username, password):
         self.desp_access_token = desp_access_token
+        self.username = username
+        self.password = password
 
     def get_token(self):
         DEDL_TOKEN_URL='https://identity.data.destination-earth.eu/auth/realms/dedl/protocol/openid-connect/token'
@@ -92,12 +94,33 @@ class DEDLAuth:
 
         if response.status_code == 200: 
             dedl_token = response.json()["access_token"]
-            return dedl_token
         else: 
             print(response.json())
             print("Error obtaining DEDL access token")
-            
 
+    def get_token_dedl(self):
+        DEDL_TOKEN_URL='https://identity.data.destination-earth.eu/auth/realms/dedl/protocol/openid-connect/token'
+        DEDL_CLIENT_ID='hda-public'
+        
+        data = { 
+                "grant_type": "password", 
+                "scope": "openid",
+                "client_id": DEDL_CLIENT_ID,
+                "username" : self.username,
+                "password" : self.password            
+        }
+
+        response = requests.post(DEDL_TOKEN_URL, data=data, headers = {"Content-Type" : "application/x-www-form-urlencoded"})
+        
+        print("Response code:", response.status_code)
+
+        if response.status_code == 200: 
+            dedl_token = response.json()["access_token"]
+            return dedl_token
+        else: 
+            print(response.json())
+            print("Error obtaining DEDL access token")               
+            
 class AuthHandler:
     def __init__(self, username, password):
         self.username = username
@@ -106,12 +129,28 @@ class AuthHandler:
         self.dedl_access_token = None
     
     def get_token(self):
-        # Get DESP auth token
-        desp_auth = DESPAuth(self.username, self.password)
-        self.desp_access_token = desp_auth.get_token()
-        
-        # Get DEDL auth token
-        dedl_auth = DEDLAuth(self.desp_access_token)
-        self.dedl_access_token = dedl_auth.get_token()
-        
-        return self.dedl_access_token
+        # Get DESP auth token   
+        try:
+            desp_auth = DESPAuth(self.username, self.password)    
+            # Try to obtain DESP token
+            self.desp_access_token = desp_auth.get_token()
+        except Exception as e:
+            # Code to handle the exception
+            print("DESP authentication flow failed:", e) 
+            # Token not available from DESP. Try from DEDL instead (local account)
+            dedl_auth = DEDLAuth(self.desp_access_token,self.username, self.password)
+            self.dedl_access_token = dedl_auth.get_token_dedl()                     
+            print("trying with DEDL local authentication") 
+            if(len(self.dedl_access_token)>0):
+                print("DEDL local authentication submitted successfully!")
+            else:
+                print("DEDL local authentication failed!")
+        else: 
+            # Get DEDL auth token
+            dedl_auth = DEDLAuth(self.desp_access_token,self.username, self.password)
+            self.dedl_access_token = dedl_auth.get_token()
+        finally:        
+            return self.dedl_access_token
+    
+ 
+    
