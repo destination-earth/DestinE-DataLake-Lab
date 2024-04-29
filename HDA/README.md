@@ -29,6 +29,6 @@ Further information available in DestinE Data Lake documentation: https://destin
 
 
 >**Additional ressources:**
->DestinE Data Portfolio: https://hda.data.destination-earth.eu/ui/catalog
->DataLake Priority services: https://hda.data.destination-earth.eu/ui/services 
->HDA SWAGGER UI: https://hda.data.destination-earth.eu/docs/
+>- DestinE Data Portfolio: https://hda.data.destination-earth.eu/ui/catalog
+>- DataLake Priority services: https://hda.data.destination-earth.eu/ui/services 
+>- HDA SWAGGER UI: https://hda.data.destination-earth.eu/docs/
