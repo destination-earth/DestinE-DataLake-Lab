@@ -852,7 +852,7 @@ climateDT_scenario = [
   'model': 'IFS-NEMO',
   'resolution': ["high","standard"],
   'dateFrom': '01/01/2020',
-  'dateTo': '01/01/2026'
+  'dateTo': '01/01/2025'
 },
 {
   'activity': 'ScenarioMIP',
@@ -860,6 +860,6 @@ climateDT_scenario = [
   'model': 'ICON',
   'resolution': ["high","standard"],
   'dateFrom': '01/01/2020',
-  'dateTo': '01/01/2026'}
+  'dateTo': '01/01/2025'}
 ]
 
