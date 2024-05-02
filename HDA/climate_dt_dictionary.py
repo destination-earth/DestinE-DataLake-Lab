@@ -858,7 +858,7 @@ climateDT_scenario = [
   'activity': 'ScenarioMIP',
   'experiment': 'ssp3-7.0',
   'model': 'ICON',
-  'resolution': ["high","standard"],
+  'resolution': ["high"],
   'dateFrom': '01/01/2020',
   'dateTo': '01/01/2025'}
 ]
