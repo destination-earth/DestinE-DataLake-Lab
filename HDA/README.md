@@ -13,6 +13,7 @@ Materials to learn how to use Harmonised Data Access API and examples
 - [How to use the HDA API](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/HDA-REST.ipynb)  
 - Discover, access and visualise *Digital twins data* with HDA
   - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/ClimateDT-ParameterPlotter.ipynb)
+  - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/ExtremeDT-ParameterPlotter.ipynb)
   - [Climate Adaptation Digital Twin data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
   - [Extremes event  Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
   - [Extremes event  Digital Twin data - xarray](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
