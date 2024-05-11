@@ -65,8 +65,10 @@ Install required dependencies for this example Notebook:
      pip install cfgrib
      pip install lxml
      pip install conflator==0.1.5
-     pip install ipykernel
+     pip install pystac_client
+     pip install geopandas
      pip install ipywidgets
+     pip install ipykernel
 
 Verify the installation. Open the terminal and run the command:
      
