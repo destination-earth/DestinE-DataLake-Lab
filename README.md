@@ -22,7 +22,7 @@ Further information available in DestinE Data Lake documentation: https://destin
 
 <br>
 
-**DestinE Core Platform Insula Users**
+**DestinE Platform Insula Service Users**
 <br>
 Please perform the following and selecte my_env kernel when running the provided Notebooks<br>
 If you have done already for ECMWF notebooks, make sure to add ipywidgets
@@ -48,8 +48,10 @@ Install required dependencies for this example Notebook:
      pip install cfgrib
      pip install lxml
      pip install conflator==0.1.5
-     pip install ipykernel
+     pip install pystac_client
+     pip install geopandas
      pip install ipywidgets
+     pip install ipykernel
 
 Verify the installation. Open the terminal and run the command:
      
