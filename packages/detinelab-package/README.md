@@ -1,5 +1,5 @@
 # destinelab
-**Current version:** 0.2  
+**Current version:** 0.3  
 **destinelab** is a python package which allows DestinE users for basic interaction with Destination Earth Data Lake (DEDL) services.  
 ## Installation  
 ```
