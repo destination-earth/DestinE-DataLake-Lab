@@ -13,7 +13,9 @@ Materials to learn how to use Harmonised Data Access API and examples
 - [How to use the HDA API](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/HDA-REST.ipynb)  
 - Discover, access and visualise *Digital twins data* with HDA
   - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/ClimateDT-ParameterPlotter.ipynb)
+  - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/ExtremeDT-ParameterPlotter.ipynb)
   - [Climate Adaptation Digital Twin data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
+  - [Climate Adaptation Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb)
   - [Extremes event  Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
   - [Extremes event  Digital Twin data - xarray](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
 - Discover, access and visualise *federated data* with HDA
@@ -63,8 +65,10 @@ Install required dependencies for this example Notebook:
      pip install cfgrib
      pip install lxml
      pip install conflator==0.1.5
-     pip install ipykernel
+     pip install pystac_client
+     pip install geopandas
      pip install ipywidgets
+     pip install ipykernel
 
 Verify the installation. Open the terminal and run the command:
      

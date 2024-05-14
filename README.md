@@ -9,6 +9,7 @@
 Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
 - [Harmonised Data Access](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HDA) (Juypter notebooks examples + Python Tools)
 - [STACK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/STACK) (Juypter Notebook examples on how to use DASK for near data processing)
+- [HOOK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HOOK) (Juypter Notebook examples on how to use HOOK for workflows)
 
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
@@ -22,7 +23,7 @@ Further information available in DestinE Data Lake documentation: https://destin
 
 <br>
 
-**DestinE Core Platform Insula Users**
+**DestinE Platform Insula Service Users**
 <br>
 Please perform the following and selecte my_env kernel when running the provided Notebooks<br>
 If you have done already for ECMWF notebooks, make sure to add ipywidgets
@@ -48,8 +49,10 @@ Install required dependencies for this example Notebook:
      pip install cfgrib
      pip install lxml
      pip install conflator==0.1.5
-     pip install ipykernel
+     pip install pystac_client
+     pip install geopandas
      pip install ipywidgets
+     pip install ipykernel
 
 Verify the installation. Open the terminal and run the command:
      
