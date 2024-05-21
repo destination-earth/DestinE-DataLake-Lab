@@ -843,7 +843,7 @@ climateDT_params = [
   'levelist': ''}
 ]
 
-## Climate DT scenarios to choose from
+## Climate DT scenarios to choose from (mm/dd/yyyy)
 
 climateDT_scenario = [
 {
@@ -852,14 +852,14 @@ climateDT_scenario = [
   'model': 'IFS-NEMO',
   'resolution': ["high","standard"],
   'dateFrom': '01/01/2020',
-  'dateTo': '01/01/2025'
+  'dateTo': '12/30/2039'
 },
 {
   'activity': 'ScenarioMIP',
   'experiment': 'ssp3-7.0',
   'model': 'ICON',
-  'resolution': ["high","standard"],
+  'resolution': ["high"],
   'dateFrom': '01/01/2020',
-  'dateTo': '01/01/2025'}
+  'dateTo': '10/24/2032'}
 ]
 
