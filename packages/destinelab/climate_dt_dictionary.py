@@ -860,6 +860,6 @@ climateDT_scenario = [
   'model': 'ICON',
   'resolution': ["high"],
   'dateFrom': '01/01/2020',
-  'dateTo': '10/24/2032'}
+  'dateTo': '09/30/2033'}
 ]
 
