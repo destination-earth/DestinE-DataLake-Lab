@@ -25,6 +25,18 @@ climateDT_params = [
   'time': 'Hourly',
   'levtype': 'sfc',
   'levelist': ''},
+ {'param': '130',
+  'paramName': 'Temperature',
+  'shortName': 't',
+  'unit': 'K',
+  'encoding': 'instantaneous',
+  'isNemo': '',
+  'isIcon': 'ICON',
+  'stream': 'clte',
+  'type': 'fc',
+  'time': 'Hourly',
+  'levtype': 'sfc',
+  'levelist': ''},
  {'param': '134',
   'paramName': 'Surface pressure',
   'shortName': 'sp',
@@ -247,7 +259,7 @@ climateDT_params = [
   'unit': '(0 - 1)',
   'encoding': 'instantaneous',
   'isNemo': 'IFS-NEMO',
-  'isIcon': 'ICON',
+  'isIcon': '',
   'stream': 'clte',
   'type': 'fc',
   'time': 'Daily',
@@ -259,7 +271,7 @@ climateDT_params = [
   'unit': 'K m**2 kg**-1 s**-1',
   'encoding': 'instantaneous',
   'isNemo': 'IFS-NEMO',
-  'isIcon': 'ICON',
+  'isIcon': '',
   'stream': 'clte',
   'type': 'fc',
   'time': 'Hourly',
@@ -271,7 +283,7 @@ climateDT_params = [
   'unit': 'm**2 s**-2',
   'encoding': 'instantaneous',
   'isNemo': 'IFS-NEMO',
-  'isIcon': 'ICON',
+  'isIcon': '',
   'stream': 'clte',
   'type': 'fc',
   'time': 'Hourly',
@@ -667,7 +679,7 @@ climateDT_params = [
   'unit': 'J m**-2',
   'encoding': 'accumulated',
   'isNemo': 'IFS-NEMO',
-  'isIcon': '',
+  'isIcon': 'ICON',
   'stream': 'clte',
   'type': 'fc',
   'time': 'Hourly',
@@ -860,6 +872,23 @@ climateDT_scenario = [
   'model': 'ICON',
   'resolution': ["high"],
   'dateFrom': '01/01/2020',
-  'dateTo': '09/30/2033'}
+  'dateTo': '09/30/2033'
+}
+{
+  'activity': 'CMIP6',
+  'experiment': 'hist',
+  'model': 'IFS-NEMO',
+  'resolution': ["high","standard"],
+  'dateFrom': '01/01/1990',
+  'dateTo': '12/31/2019'
+},
+{
+  'activity': 'CMIP6',
+  'experiment': 'hist',
+  'model': 'ICON',
+  'resolution': ["high"],
+  'dateFrom': '01/01/1990',
+  'dateTo': '12/31/2019'
+}
 ]
 
