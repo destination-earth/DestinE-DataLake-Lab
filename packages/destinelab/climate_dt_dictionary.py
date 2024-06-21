@@ -873,7 +873,7 @@ climateDT_scenario = [
   'resolution': ["high"],
   'dateFrom': '01/01/2020',
   'dateTo': '09/30/2033'
-}
+},
 {
   'activity': 'CMIP6',
   'experiment': 'hist',
