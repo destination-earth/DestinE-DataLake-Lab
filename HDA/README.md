@@ -48,7 +48,8 @@ Install required dependencies for this example Notebook:
      pip install earthkit-data
      pip install earthkit-maps
      pip install earthkit-regrid  
-     pip install cf-units         
+     pip install cf-units
+     pip install destinelab
      pip install --upgrade polytope-client
      pip install ecmwflibs
      pip install cfgrib
