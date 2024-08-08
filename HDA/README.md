@@ -22,9 +22,6 @@ Materials to learn how to use Harmonised Data Access API and examples
     - [Discover Sentinel-3 OLCI products example](./REST/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb)
   - [Discover and visualise ERA5 products example](./CDS/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb)
 
-**Python script**
-- [Authentification package](https://pypi.org/project/destinelab/)
-
 
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
