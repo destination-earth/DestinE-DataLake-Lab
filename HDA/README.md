@@ -12,15 +12,15 @@ Materials to learn how to use Harmonised Data Access API and examples
 **Notebooks**
 - [How to use the HDA API](./REST/HDA-REST.ipynb)  
 - Discover, access and visualise *Digital twins data* with HDA
-  - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/ClimateDT-ParameterPlotter.ipynb)
-  - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/ExtremeDT-ParameterPlotter.ipynb)
-  - [Climate Adaptation Digital Twin data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
-  - [Climate Adaptation Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb)
-  - [Extremes event  Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
-  - [Extremes event  Digital Twin data - xarray](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
+  - [Plot any Climate DT parameter](./DT_outputs/ClimateDT-ParameterPlotter.ipynb)
+  - [Plot any Extreme DT parameter](./DT_outputs/ExtremeDT-ParameterPlotter.ipynb)
+  - [Climate Adaptation Digital Twin data](./DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
+  - [Climate Adaptation Digital Twin data - timeseries](./DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb)
+  - [Extremes event  Digital Twin data - timeseries](./DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
+  - [Extremes event  Digital Twin data - xarray](./DT_outputs/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
 - Discover, access and visualise *federated data* with HDA
-    - [Discover Sentinel-3 OLCI products example](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb)
-  - [Discover and visualise ERA5 products example](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/CDS/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb)
+    - [Discover Sentinel-3 OLCI products example](./REST/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb)
+  - [Discover and visualise ERA5 products example](./CDS/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb)
 
 **Python script**
 - [Authentification package](https://pypi.org/project/destinelab/)
