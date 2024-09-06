@@ -7,11 +7,13 @@
 <img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
 <br>
 
-Materials to learn how to use Hook Service and examples.
+This folder contains materials for learning how to use Hook Service. 
+
 The Destination Earth Data Lake (DEDL) ‘Hook service’ provides ready-to-use high level serverless workflows and functions preconfigured to efficiently access and manipulate Destination Earth Data Lake (DEDL) data. A growing number of workflows and functions will provide on-demand capabilities for the diverse data analysis needs.
 
 **Notebooks:**
-- [HOOK-provided](): How to discover available workflows and run one example (data-harvest workflow)
+
+- [Tutorial](): How to discover available workflows and run one example (data-harvest workflow)
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
 
