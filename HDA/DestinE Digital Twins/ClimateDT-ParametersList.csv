@@ -47,11 +47,11 @@ param,paramName,shortName,unit,encoding,isNemo,isIcon,isFESOM,stream,type,time,l
 263121,Time-mean vertically-integrated heat content in the upper 300 m,avg_hc300m,J m**-2,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
 263122,Time-mean vertically-integrated heat content in the upper 700 m,avg_hc700m,J m**-2,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
 263124,Time-mean sea surface height,avg_zos,m,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
-263500,Time-mean sea water practical salinity,avg_so,g kg**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72
-263501,Time-mean sea water potential temperature,avg_thetao,K,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72
-263505,Time-mean northward sea water velocity,avg_von,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72
-263506,Time-mean eastward sea water velocity,avg_uoe,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72
-263507,Time-mean upward sea water velocity,avg_wo,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72
+263500,Time-mean sea water practical salinity,avg_so,g kg**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d, 1 to 75 (NEMO), 1 to 72 (FESOM)
+263501,Time-mean sea water potential temperature,avg_thetao,K,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263505,Time-mean northward sea water velocity,avg_von,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263506,Time-mean eastward sea water velocity,avg_uoe,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263507,Time-mean upward sea water velocity,avg_wo,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
 8,Surface runoff,sro,m,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
 9,Sub-surface runoff,ssro,m,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
 144,Snowfall,sf,m of water equivalent,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
