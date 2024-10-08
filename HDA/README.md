@@ -13,13 +13,13 @@ Materials to learn how to use Harmonised Data Access API and examples
 - [How to use the HDA API sending a few HTTP requests, quick-start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-quick-start.ipynb)  
 - [How to use the HDA API sending a few HTTP requests, full-version](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-full-version.ipynb)  
 - [How to use the queryables HDA API to search C3S and Digital Twins data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-Queryables.ipynb)  
-- Discover, access and visualise *Digital twins data* with HDA
-  - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter.ipynb)
-  - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb)
-  - [Climate Adaptation Digital Twin data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
-  - [Climate Adaptation Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb)
-  - [Extremes event  Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
-  - [Extremes event  Digital Twin data - xarray](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
+- *Discover, access and visualise *Digital twins data* with HDA*
+  - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.ipynb)
+  - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.ipynb)
+  - [Climate Adaptation Digital Twin data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb)
+  - [Climate Adaptation Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb)
+  - [Extremes event  Digital Twin data - timeseries](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb)
+  - [Extremes event  Digital Twin data - xarray](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb)
 - Discover, access and visualise *federated data* with HDA
     - [Discover Sentinel-3 OLCI products example](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb)
     - [Discover AVHRR Metop products example](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.ipynb)
