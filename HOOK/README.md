@@ -11,9 +11,11 @@ This folder contains materials for learning how to use Hook Service.
 
 The Destination Earth Data Lake (DEDL) ‘Hook service’ provides ready-to-use high level serverless workflows and functions preconfigured to efficiently access and manipulate Destination Earth Data Lake (DEDL) data. A growing number of workflows and functions will provide on-demand capabilities for the diverse data analysis needs.
 
-**Notebooks:**
+## Notebooks
 
-- [Tutorial](): How to discover available workflows and run one example (data-harvest workflow)
+
+### [Tutorial](): How to discover available workflows and run one example (data-harvest workflow)
+
 
 ```shell
 #The Tutorial.ipynb is executeable as-is, but parameters can be provided from a file .env_tutorial
@@ -99,6 +101,15 @@ HOOK_IS_PRIVATE_STORAGE=False
 #HOOK_OUTPUT_STORAGE_SECRET_KEY=your_secret_key
 
 ```
+
+
+### [DEDL-Hook_access.ipynb](): Simple retrieval of token and listing of workflows
+
+- Launch this noteboook with your DESP credentials and retrieve a token you can use to interact with OnDemand Processing API (Hook API)
+
+
+
+## Further Information
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
 
