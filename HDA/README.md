@@ -11,8 +11,8 @@ Materials to learn how to use Harmonised Data Access API and examples
 
 **Notebooks**
 - [How to use the HDA API sending a few HTTP requests, quick-start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-REST-quick-start.ipynb)
-- [How to use the HDA API sending a few HTTP requests, full-version](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-full-version.ipynb)  
-- [How to use the queryables HDA API to search C3S and Digital Twins data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-Queryables.ipynb)  
+- [How to use the HDA API sending a few HTTP requests, full-version](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-REST-full-version.ipynb)  
+- [How to use the queryables HDA API to search C3S and Digital Twins data](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/REST/HDA-REST-Queryables.ipynb) 
 - *Discover, access and visualise *Digital twins data* with HDA*
   - [Plot any Climate DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.ipynb)
   - [Plot any Extreme DT parameter](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.ipynb)
