@@ -28,7 +28,7 @@ The Destination Earth Data Lake (DEDL) ‘Hook service’ provides ready-to-use 
 ########## SET HOOK_ORDER_NAME ##########
 # This will be added to the order name. e.g. replace XXXX with your name
 
-HOOK_ORDER_NAME=XXXX-20240913-9
+HOOK_ORDER_NAME=XXXX-20241009-1
 
 ########## SET WORKFLOW, COLLECTION_ID and DATA_ID ##########
 # Uncomment HOOK_WORKFLOW (to identify the HOOK to execute)
@@ -67,6 +67,11 @@ HOOK_WORKFLOW=data-harvest
 HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-2.MSI.L1C
 HOOK_DATA_ID=S2A_MSIL1C_20230910T050701_N0509_R019_T47VLH_20230910T074321.SAFE
 HOOK_SOURCE_TYPE=DESP
+#HOOK_SOURCE_TYPE=EXTERNAL
+#HOOK_EXTERNAL_TOKEN_URL=https://identity.XXXX/auth/realms/XXXX/protocol/openid-connect/token
+#HOOK_EXTERNAL_CLIENT_ID=hda_public
+#HOOK_EXTERNAL_USERNAME=
+#HOOK_EXTERNAL_PASSWORD=
 
 #HOOK_WORKFLOW=sen2cor
 #HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-2.MSI.L1C
