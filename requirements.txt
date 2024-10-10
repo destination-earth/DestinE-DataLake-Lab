@@ -1,6 +1,6 @@
 polytope-client
 lxml
-conflator
+conflator==0.1.5
 earthkit-data
 earthkit-maps
 earthkit-regrid
@@ -8,3 +8,5 @@ cf-units
 destinelab >= 0.9
 ipykernel
 ipywidgets
+ecmwflibs
+cfgrib
