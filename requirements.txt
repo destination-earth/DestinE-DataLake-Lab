@@ -5,6 +5,6 @@ earthkit-data
 earthkit-maps
 earthkit-regrid
 cf-units
-destinelab
+destinelab >= 0.9
 ipykernel
 ipywidgets
