@@ -1,3 +1,4 @@
 destinelab >= 0.9
 xarray >= 2024.09.0
 ipykernel 
+ipywidgets
