@@ -5,3 +5,4 @@ ipywidgets
 tqdm
 earthkit-maps
 earthkit-regrid
+cf-units
