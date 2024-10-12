@@ -1,8 +1,9 @@
 destinelab >= 0.9
 xarray >= 2024.09.0
+numpy == 1.26.4
 ipykernel 
 ipywidgets
-tqdm
 earthkit-maps
+earthkit-data
 earthkit-regrid
 cf-units
