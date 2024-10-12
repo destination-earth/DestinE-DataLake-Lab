@@ -3,6 +3,5 @@ xarray >= 2024.09.0
 ipykernel 
 ipywidgets
 tqdm
-earthkit.data
-earthkit.maps
-earthkit.regrid
+earthkit-maps
+earthkit-regrid
