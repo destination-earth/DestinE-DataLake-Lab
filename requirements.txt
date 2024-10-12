@@ -1,12 +1,3 @@
-polytope-client
-lxml
-conflator==0.1.5
-earthkit-data
-earthkit-maps
-earthkit-regrid
-cf-units
 destinelab >= 0.9
-ipykernel
-ipywidgets
-ecmwflibs
-cfgrib
+xarray >= 2024.09.0
+ipykernel 
