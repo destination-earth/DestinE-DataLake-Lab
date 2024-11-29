@@ -45,7 +45,7 @@ Verify the installation:
 
 This should give:
 
-destinelab         0.9
+destinelab         0.11
 
 Install kernel my_env. Run the command:
 
