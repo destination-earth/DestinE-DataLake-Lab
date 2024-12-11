@@ -1,0 +1,11 @@
+name: build-stack
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-notebook.yml
+    with:
+      path_to_notebooks: ./STACK
+      environment_name: datalakelab
