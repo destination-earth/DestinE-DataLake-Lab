@@ -43,7 +43,9 @@ sphinx:
   # A list of local extensions to load by sphinx specified by "name: path" items 
   local_extensions:
     notebook_cards: './extensions'
-  # config:
+  config:
+    exclude_patterns: ["__pycache__*", "**/.git", ".pixi**", "book/**"]
+    #include_patterns: ["**/img"]
     # extensions:
     #   - sphinx_design
     # linkcheck_ignore: ["https://doi.org/*", "https://zenodo.org/badge/*"] # don't run link checker on DOI links since they are immutable

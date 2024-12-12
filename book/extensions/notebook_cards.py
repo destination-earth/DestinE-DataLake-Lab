@@ -17,7 +17,7 @@ def main(app,config):
     if len(path_parents) > 3:
       keys.append(path_parents[2])
   domains = set(domains)
-  domains.remove("book")
+  #domains.remove("book")
   keys = set(keys)
 
   for domain in domains:
