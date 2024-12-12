@@ -1,0 +1,1455 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../../../../../../../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>HDA PySTAC-Client Introduction &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../../../../../../../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../../../../../../../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../../../../../../../../../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../../../../../../../../../../../../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../../../../../../../../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../../../../../../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../../../../../../../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../../../../../../../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../../../../../../../../../../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../../../../../../../../../../../../../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../../../../../../../../../../../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../../../../../../../../../../../../../../../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/PySTAC/HDA-PyStac-Client';</script>
+    <link rel="index" title="Index" href="../../../../../../../../../../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../../../../../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../../../../../../../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../../../../../../../../../../../../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../../../../../../../../../../../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HOOK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HOOK/gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HOOK/Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../HOOK/DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://binder-217-71-193-124.nip.io/v2/gh/destination-earth/DestinE-DataLake-Lab/master?urlpath=lab/tree/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/PySTAC/HDA-PyStac-Client.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../../../../../../../../../../../../../../../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/PySTAC/HDA-PyStac-Client.ipynb&branch=master" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on JupyterHub"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="JupyterHub logo" src="../../../../../../../../../../../../../../../../../_static/images/logo_jupyterhub.svg">
+  </span>
+<span class="btn__text-container">JupyterHub</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../../../../../../../../../../../../../../_sources/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/PySTAC/HDA-PyStac-Client.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>HDA PySTAC-Client Introduction</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">HDA PySTAC-Client Introduction</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtain-dedl-access-token-to-use-the-hda-service">Obtain DEDL Access Token to use the HDA service</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-username-and-password-as-environment-variables-to-be-used-for-dedl-data-access">Set username and password as environment variables to be used for DEDL data access</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#create-pystac-client-object-for-hda-stac-api">Create pystac client object for HDA STAC API</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#query-all-available-collections">Query all available collections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtain-provider-information-for-each-individual-collection">Obtain provider information for each individual collection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-items-of-a-collection">Inspect Items of a Collection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-stac-assets-of-an-item">Inspect STAC assets of an item</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-asset-to-jupyterlab">Download asset to JupyterLab</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><img alt="" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/img/DestinE-banner.jpg?raw=true" /></p>
+<p><strong>Author</strong>: EUMETSAT <br>
+<strong>Copyright</strong>: 2024 EUMETSAT <br>
+<strong>Licence</strong>: MIT <br></p>
+<section class="tex2jax_ignore mathjax_ignore" id="hda-pystac-client-introduction">
+<h1>HDA PySTAC-Client Introduction<a class="headerlink" href="#hda-pystac-client-introduction" title="Link to this heading">#</a></h1>
+<p>This notebook shows the basic use of DestinE Data Lake Harmonised Data Access using pystac-client.
+It will include iterating through Collections and Items, and perform simple spatio-temporal searches.</p>
+<section id="obtain-dedl-access-token-to-use-the-hda-service">
+<h2>Obtain DEDL Access Token to use the HDA service<a class="headerlink" href="#obtain-dedl-access-token-to-use-the-hda-service" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">quiet</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">destinelab</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Note: you may need to restart the kernel to use updated packages.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">import</span> <span class="nn">destinelab</span> <span class="k">as</span> <span class="nn">deauth</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DESP_USERNAME</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please input your DESP username or email: &quot;</span><span class="p">)</span>
+<span class="n">DESP_PASSWORD</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please input your DESP password: &quot;</span><span class="p">)</span>
+
+<span class="n">auth</span> <span class="o">=</span> <span class="n">deauth</span><span class="o">.</span><span class="n">AuthHandler</span><span class="p">(</span><span class="n">DESP_USERNAME</span><span class="p">,</span> <span class="n">DESP_PASSWORD</span><span class="p">)</span>
+<span class="n">access_token</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEDL/DESP Access Token Obtained Successfully&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to Obtain DEDL/DESP Access Token&quot;</span><span class="p">)</span>
+
+<span class="n">auth_headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">access_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Response code: 200
+DEDL/DESP Access Token Obtained Successfully
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="set-username-and-password-as-environment-variables-to-be-used-for-dedl-data-access">
+<h2>Set username and password as environment variables to be used for DEDL data access<a class="headerlink" href="#set-username-and-password-as-environment-variables-to-be-used-for-dedl-data-access" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;EODAG__DEDL__AUTH__CREDENTIALS__USERNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DESP_USERNAME</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;EODAG__DEDL__AUTH__CREDENTIALS__PASSWORD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DESP_PASSWORD</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="create-pystac-client-object-for-hda-stac-api">
+<h1>Create pystac client object for HDA STAC API<a class="headerlink" href="#create-pystac-client-object-for-hda-stac-api" title="Link to this heading">#</a></h1>
+<p>We first connect to an API by retrieving the root catalog, or landing page, of the API with the Client.open function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pystac_client</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="n">HDA_API_URL</span> <span class="o">=</span> <span class="s2">&quot;https://hda.data.destination-earth.eu/stac&quot;</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">Client</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">HDA_API_URL</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">auth_headers</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="query-all-available-collections">
+<h2>Query all available collections<a class="headerlink" href="#query-all-available-collections" title="Link to this heading">#</a></h2>
+<p>As with a static catalog the get_collections function will iterate through the Collections in the Catalog.
+Notice that because this is an API it can get all the Collections through a single call, rather than having to fetch each one individually.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rich.console</span> <span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">import</span> <span class="nn">rich.table</span>
+
+<span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">()</span>
+
+<span class="n">hda_collections</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collections</span><span class="p">()</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="n">rich</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;HDA collections&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span><span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Title&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;violet&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">hda_collections</span><span class="p">:</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">collection</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-style: italic">                                                  HDA collections                                                  </span>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">                                      ID </span>┃<span style="font-weight: bold"> Title                                                                 </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">                      EO.CLMS.DAT.CORINE </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CORINE Land Cover                                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.CLMS.DAT.GLO.DMP300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Dry Matter Productivity 2014-present (raster 300 m), global, 10-dail… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             EO.CLMS.DAT.GLO.FAPAR300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Fraction of Absorbed Photosynthetically Active Radiation 2014-presen… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.CLMS.DAT.GLO.FCOVER300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Fraction of Green Vegetation Cover 2014-present (raster 300 m), glob… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.CLMS.DAT.GLO.GDMP300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Gross Dry Matter Productivity 2014-present (raster 300 m), global, 1… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.CLMS.DAT.GLO.LAI300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Leaf Area Index 2014-present (raster 300 m), global, 10-daily – vers… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.CLMS.DAT.GLO.NDVI300_V1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Normalised Difference Vegetation Index 2014-2020 (raster 300 m), glo… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             EO.CLMS.DAT.GLO.NDVI_1KM_V2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Normalised Difference Vegetation Index 1998-2020 (raster 1 km), glob… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         EO.CLMS.DAT.SENTINEL-2.HRVPP.VI </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> High Resolution Vegetation Phenology and Productivity: Vegetation In… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          EO.DEM.DAT.COP-DEM_GLO-30-DGED </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> COPERNICUS Digital Elevation Model (DEM) 30 meters DGED               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          EO.DEM.DAT.COP-DEM_GLO-30-DTED </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> COPERNICUS Digital Elevation Model (DEM) 30 meters DTED               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          EO.DEM.DAT.COP-DEM_GLO-90-DGED </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> COPERNICUS Digital Elevation Model (DEM) 90 meters DGED               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          EO.DEM.DAT.COP-DEM_GLO-90-DTED </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> COPERNICUS Digital Elevation Model (DEM) 90 meters DTED               </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_EUROPE_AIR_QUALITY_F… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS European air quality forecasts                                   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_EUROPE_AIR_QUALITY_R… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS European air quality reanalyses                                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_ATMOSHERIC_CO… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global atmospheric composition forecasts                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_EMISSION_INVE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global emission inventories                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_FIRE_EMISSION… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global biomass burning emissions based on fire radiative power … </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_GREENHOUSE_GA… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global greenhouse gas reanalysis (EGG4)                          </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_GREENHOUSE_GA… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global greenhouse gas reanalysis (EGG4) monthly averaged fields  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_RADIATIVE_FOR… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global radiative forcings                                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_RADIATIVE_FOR… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global radiative forcing - auxilliary variables                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_REANALYSIS_EA… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global reanalysis (EAC4)                                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GLOBAL_REANALYSIS_EA… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global reanalysis (EAC4) monthly averaged fields                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_GREENHOUSE_GAS_FLUXES </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS global inversion-optimised greenhouse gas fluxes and concentrat… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CAMS_SOLAR_RADIATION_TIME… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CAMS solar radiation time-series                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ECMWF.DAT.CEMS_FIRE_HISTORICAL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Fire danger indices historical data from the Copernicus Emergency Ma… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ECMWF.DAT.CEMS_GLOFAS_FORECAST </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> River discharge and related forecasted data by the European Flood Aw… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     EO.ECMWF.DAT.CEMS_GLOFAS_HISTORICAL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> River discharge and related historical data from the Global Flood Aw… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     EO.ECMWF.DAT.CEMS_GLOFAS_REFORECAST </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Reforecasts of river discharge and related data by the Global Flood … </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ECMWF.DAT.CEMS_GLOFAS_SEASONAL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecasts of river discharge and related data by the Global… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CEMS_GLOFAS_SEASONAL_REFO… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal reforecasts of river discharge and related data from the Gl… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.CO2_DATA_FROM_SATELLITE_S… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Carbon dioxide data from 2002 to present derived from satellite obse… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.DERIVED_GRIDDED_GLACIER_M… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff">                                                                       </span>│
+│<span style="color: #008080; text-decoration-color: #008080">      EO.ECMWF.DAT.DT_CLIMATE_ADAPTATION </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Climate Change Adaptation Digital Twin (Climate Adaptation DT)        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                EO.ECMWF.DAT.DT_EXTREMES </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> DT Weather-Induced Extremes Digital Twin (Extremes DT)                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.ECMWF.DAT.EFAS_FORECAST </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> River discharge and related forecasted data by the European Flood Aw… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.ECMWF.DAT.EFAS_HISTORICAL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> River discharge and related historical data from the European Flood … </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.ECMWF.DAT.EFAS_REFORECAST </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Reforecasts of river discharge and related data by the European Floo… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.ECMWF.DAT.EFAS_SEASONAL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecasts of river discharge and related data by the Europe… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   EO.ECMWF.DAT.EFAS_SEASONAL_REFORECAST </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal reforecasts of river discharge and related data by the Euro… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.ERA5_HOURLY_VARIABLES_ON_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5 hourly data on pressure levels from 1940 to present              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">           EO.ECMWF.DAT.ERA5_LAND_HOURLY </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5-Land hourly data from 1950 to present                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          EO.ECMWF.DAT.ERA5_LAND_MONTHLY </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5-Land monthly averaged data from 1950 to present                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.ERA5_MONTHLY_MEANS_VARIAB… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5 monthly averaged data on pressure levels from 1940 to present    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.GLACIERS_DISTRIBUTION_DAT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Glaciers distribution data from the Randolph Glacier Inventory for y… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.METHANE_DATA_SATELLITE_SE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Methane data from 2002 to present derived from satellite observations </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5 hourly data on single levels from 1940 to present                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ERA5 monthly averaged data on single levels from 1940 to present      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.REANALYSIS_UERRA_EUROPE_S… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> UERRA regional reanalysis for Europe on single levels from 1961 to 2… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SATELLITE_SEA_ICE_CONCENT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sea ice concentration                                                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SATELLITE_SEA_ICE_EDGE_TY… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sea ice edge and type                                                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SATELLITE_SEA_ICE_THICKNE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sea ice thickness                                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_ANOMALI… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast anomalies on pressure levels                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_ANOMALI… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast anomalies on single levels                          </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_DAILY_D… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast subdaily data on pressure levels                    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_DAILY_D… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast daily and subdaily data on single levels            </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_MONTHLY… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast monthly statistics on pressure levels               </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEASONAL_FORECAST_MONTHLY… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Seasonal forecast monthly statistics on single levels                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SEA_LEVEL_DAILY_GRIDDED_D… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sea level gridded data from satellite observations for the global oc… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.ECMWF.DAT.SIS_HYDROLOGY_METEOROLOGY… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Temperature and precipitation climate impact indicators from 1970 to… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.ESA.DAT.SENTINEL-1.L1_GRD </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SENTINEL-1 Level 1 Ground Range Detected (GRD)                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.ESA.DAT.SENTINEL-1.L1_SLC </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SENTINEL-1 Level 1 Single Look Complex (SLC) - EODC store             </span>│
+│<span style="color: #008080; text-decoration-color: #008080">           EO.ESA.DAT.SENTINEL-2.MSI.L1C </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sentinel 2 MSI Level 1C                                               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">           EO.ESA.DAT.SENTINEL-2.MSI.L2A </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Sentinel 2 MSI Level 2-A                                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-3.OL_2_LFR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Land Colour Full Resolution - Sentinel-3                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-3.OL_2_LRR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Land Colour Reduced Resolution - Sentinel-3                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-3.SL_2_LST___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Level 2 Land - SLSTR - Sentinel-3                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-3.SR_2_LAN___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Level 2 Land - SRAL/MWR - Sentinel-3                                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-5P.TROPOMI.L1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SENTINEL-5P TROPOMI Level 1B                                          </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.ESA.DAT.SENTINEL-5P.TROPOMI.L2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SENTINEL-5P TROPOMI Level 2                                           </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.CM.METOP.ASCSZFR02 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 SZF Climate Data Record Release 2 - Metop               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.CM.METOP.ASCSZOR02 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 SZO Climate Data Record Release 2 - Metop               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.CM.METOP.ASCSZRR02 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 SZR Climate Data Record Release 2 - Metop               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                 EO.EUM.DAT.METOP.AMSUL1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> AMSU-A Level 1B - Metop - Global                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.METOP.ASCSZF1B </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 Sigma0 Full Resolution - Metop - Global                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.METOP.ASCSZO1B </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 Sigma0 resampled at 25 km Swath Grid - Metop - Global   </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.METOP.ASCSZR1B </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Level 1 Sigma0 resampled at 12.5 km Swath Grid - Metop - Global </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.EUM.DAT.METOP.AVHRRGACR02 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> AVHRR GAC Atmospheric Motion Vectors Climate Data Record Release 2 -… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                EO.EUM.DAT.METOP.AVHRRL1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> AVHRR Level 1B - Metop - Global                                       </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             EO.EUM.DAT.METOP.GLB-SST-NC </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global L3C AVHRR Sea Surface Temperature (GHRSST) - Metop             </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                 EO.EUM.DAT.METOP.GOMEL1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GOME-2 Level 1B - Metop - Global                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.EUM.DAT.METOP.GOMEL1R03 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GOME-2 Level 1B Fundamental Data Record Release 3 - Metop-A and -B    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">            EO.EUM.DAT.METOP.IASIL1C-ALL </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> IASI Level 1C - All Spectral Samples - Metop - Global                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.METOP.IASSND02 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> IASI Combined Sounding Products - Metop                               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.EUM.DAT.METOP.IASTHR011 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> IASI All Sky Temperature and Humidity Profiles - Climate Data Record… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                EO.EUM.DAT.METOP.LSA-002 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Daily Land Surface Temperature - Metop                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                  EO.EUM.DAT.METOP.MHSL1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> MHS Level 1B - Metop - Global                                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                EO.EUM.DAT.METOP.OSI-104 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Coastal Winds at 12.5 km Swath Grid - Metop                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.EUM.DAT.METOP.OSI-150-A </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT L2 25 km Winds Data Record Release 1 - Metop                    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              EO.EUM.DAT.METOP.OSI-150-B </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT L2 12.5 km Winds Data Record Release 1 - Metop                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                 EO.EUM.DAT.METOP.SOMO12 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Soil Moisture at 12.5 km Swath Grid in NRT - Metop              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                 EO.EUM.DAT.METOP.SOMO25 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ASCAT Soil Moisture at 25 km Swath Grid in NRT - Metop                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                  EO.EUM.DAT.MULT.HIRSL1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> HIRS Level 1B - Metop - Global                                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.SENTINEL-3.AOD </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SLSTR Level 2 Aerosol Optical Depth - Sentinel-3                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.EUM.DAT.SENTINEL-3.FRP </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SLSTR Level 2 Fire Radiative Power - Sentinel 3                       </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.OL_1_EFR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Level 1B Full Resolution - Sentinel-3                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.OL_1_ERR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Level 1B Reduced Resolution - Sentinel-3                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.OL_2_WFR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Level 2 Ocean Colour Full Resolution - Sentinel-3                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.OL_2_WRR___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OLCI Level 2 Ocean Colour Reduced Resolution - Sentinel-3             </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SL_1_RBT___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SLSTR Level 1B Radiances and Brightness Temperatures - Sentinel-3     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SL_2_WST___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SLSTR Level 2 Sea Surface Temperature (SST) - Sentinel-3              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SR_1_SRA_A_ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SRAL Level 1B - Sentinel-3                                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SR_1_SRA_BS </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SRAL Level 1B stack echoes - Sentinel-3                               </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SR_1_SRA___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SRAL Level 1B - Sentinel-3                                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       EO.EUM.DAT.SENTINEL-3.SR_2_WAT___ </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> SRAL Level 2 Altimetry Global - Sentinel-3                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       EO.GSW.DAT.CHANGE </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Occurrence Change Intensity 1984-2020            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       EO.GSW.DAT.EXTENT </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Maximum Water Extent 1984-2021                   </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                   EO.GSW.DAT.OCCURRENCE </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Occurrence 1984-2021                             </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                   EO.GSW.DAT.RECURRENCE </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Recurrence 1984-2021                             </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                  EO.GSW.DAT.SEASONALITY </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Seasonality 2014-2020                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                  EO.GSW.DAT.TRANSITIONS </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Surface Water Transitions 1984-2021                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.GLOBAL_ANALYSISFORECAST_BGC_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Biogeochemistry Analysis and Forecast                    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.GLOBAL_ANALYSISFORECAST_PHY_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Physics Analysis and Forecast                            </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.GLOBAL_ANALYSISFORECAST_WAV_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Waves Analysis and Forecast                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  EO.MO.DAT.GLOBAL_MULTIYEAR_BGC_001_033 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global ocean low and mid trophic levels biomass content hindcast      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.GLOBAL_MULTIYEAR_PHY_ENS_001… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Ensemble Physics Reanalysis                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  EO.MO.DAT.GLOBAL_MULTIYEAR_WAV_001_032 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Waves Reanalysis                                         </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.INSITU_GLO_PHY_TS_OA_MY_013_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean- Delayed Mode gridded CORA- In-situ Observations object… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.INSITU_GLO_PHY_TS_OA_NRT_013… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean- Real time in-situ observations objective analysis       </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.INSITU_GLO_PHY_UV_DISCRETE_N… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean- in-situ Near real time observations of ocean currents   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_BGC_NUTRIENTS_C… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Nutrient and carbon profiles vertical distribution                    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_BIO_BGC_3D_REP_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean 3D Chlorophyll-a concentration, Particulate Backscatter… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_BIO_CARBON_SURF… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Surface Carbon                                           </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_PHY_MYNRT_015_0… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Total (COPERNICUS-GLOBCURRENT), Ekman and Geostrophic current… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_PHY_S_SURFACE_M… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Multi Observation Global Ocean Sea Surface Salinity and Sea Surface … </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_PHY_TSUV_3D_MYN… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Multi Observation Global Ocean 3D Temperature Salinity Height Geostr… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.MULTIOBS_GLO_PHY_W_3D_REP_01… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Observed Ocean Physics 3D Quasi-Geostrophic Currents (OMEGA3D) </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_MY_00… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L3 (d… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_MY_00… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour Plankton and Reflectances MY L3 daily observatio… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_NRT_0… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L3 (d… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_MY_00… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L4 (m… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_MY_00… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour Plankton MY L4 monthly observations               </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_NRT_0… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L4 (m… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SEAICE_GLO_SEAICE_L4_NRT_OBS… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean - Arctic and Antarctic - Sea Ice Concentration, Edge, T… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SEAICE_GLO_SEAICE_L4_NRT_OBS… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean - High Resolution SAR Sea Ice Drift                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SEAICE_GLO_SEAICE_L4_REP_OBS… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Sea Ice Concentration Time Series REPROCESSED (OSI-SAF)  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SEALEVEL_GLO_PHY_L4_NRT_008_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIVED VARIABLES NRT </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  EO.MO.DAT.SEALEVEL_GLO_PHY_MDT_008_063 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GLOBAL OCEAN MEAN DYNAMIC TOPOGRAPHY                                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SST_GLO_SST_L3S_NRT_OBSERVAT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ODYSSEA Global Ocean - Sea Surface Temperature Multi-sensor L3 Obser… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SST_GLO_SST_L4_NRT_OBSERVATI… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean OSTIA Sea Surface Temperature and Sea Ice Analysis       </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SST_GLO_SST_L4_REP_OBSERVATI… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean OSTIA Sea Surface Temperature and Sea Ice Reprocessed    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.SST_GLO_SST_L4_REP_OBSERVATI… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA SST CCI and C3S reprocessed sea surface temperature analyses      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.WAVE_GLO_PHY_SWH_L3_NRT_014_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GLOBAL OCEAN L3 SIGNIFICANT WAVE HEIGHT FROM NRT SATELLITE MEASUREME… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.WAVE_GLO_PHY_SWH_L4_NRT_014_… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GLOBAL OCEAN L4 SIGNIFICANT WAVE HEIGHT FROM NRT SATELLITE MEASUREME… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.WAVE_GLO_WAV_L3_SPC_NRT_OBSE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> GLOBAL OCEAN L3 SPECTRAL PARAMETERS FROM NRT SATELLITE MEASUREMENTS   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> EO.MO.DAT.WIND_GLO_PHY_CLIMATE_L4_MY_0… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Monthly Mean Sea Surface Wind and Stress from Scatterom… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">    EO.MO.DAT.WIND_GLO_PHY_L3_MY_012_005 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Daily Gridded Reprocessed L3 Sea Surface Winds from Sca… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   EO.MO.DAT.WIND_GLO_PHY_L3_NRT_012_002 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Daily Gridded Sea Surface Winds from Scatterometer       </span>│
+│<span style="color: #008080; text-decoration-color: #008080">    EO.MO.DAT.WIND_GLO_PHY_L4_MY_012_006 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Hourly Reprocessed Sea Surface Wind and Stress from Sca… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   EO.MO.DAT.WIND_GLO_PHY_L4_NRT_012_004 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Global Ocean Hourly Sea Surface Wind and Stress from Scatterometer a… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.NASA.DAT.LANDSAT.C2_L1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Landsat Collection 2 Level-1                                          </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               EO.NASA.DAT.LANDSAT.C2_L2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Landsat Collection 2 Level-2                                          </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> STAT.EUSTAT.DAT.GREENHOUSE_GAS_EMISSIO… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat - Greenhouse gas emissions from agriculture                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> STAT.EUSTAT.DAT.POP_AGE_GROUP_SEX_NUTS3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Population on 1 January by age, sex and NUTS 3 region                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       STAT.EUSTAT.DAT.POP_AGE_SEX_NUTS2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Population on 1 January by age, sex and NUTS 2 region                 </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> STAT.EUSTAT.DAT.POP_CHANGE_DEMO_BALANC… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat - Population change - Demographic balance and crude rates a… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> STAT.EUSTAT.DAT.SHARE_ENERGY_FROM_RENE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat - Share of energy from renewable sources                     </span>│
+└─────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+</section>
+<section id="obtain-provider-information-for-each-individual-collection">
+<h2>Obtain provider information for each individual collection<a class="headerlink" href="#obtain-provider-information-for-each-individual-collection" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">table</span> <span class="o">=</span> <span class="n">rich</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;HDA collections | Providers&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Title&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Provider&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;violet&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">hda_collections</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collections</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">hda_collections</span><span class="p">:</span>
+    <span class="n">collection_details</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">provider</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">collection_details</span><span class="o">.</span><span class="n">providers</span><span class="p">)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">collection_details</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">provider</span><span class="p">)</span>
+<span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-style: italic">                                            HDA collections | Providers                                            </span>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">                                                  Title </span>┃<span style="font-weight: bold"> Provider                                               </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">                                      CORINE Land Cover </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Environment Agency,wekeo                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Dry Matter Productivity 2014-present (raster 300 m), … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Fraction of Absorbed Photosynthetically Active Radiat… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Fraction of Green Vegetation Cover 2014-present (rast… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Gross Dry Matter Productivity 2014-present (raster 30… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Leaf Area Index 2014-present (raster 300 m), global, … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Normalised Difference Vegetation Index 2014-2020 (ras… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Normalised Difference Vegetation Index 1998-2020 (ras… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Commission Directorate-General for I… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> High Resolution Vegetation Phenology and Productivity… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> VITO NV,European Union represented by the European Co… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> COPERNICUS Digital Elevation Model (DEM) 30 meters DG… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> COPERNICUS Digital Elevation Model (DEM) 30 meters DT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> COPERNICUS Digital Elevation Model (DEM) 90 meters DG… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> COPERNICUS Digital Elevation Model (DEM) 90 meters DT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                    CAMS European air quality forecasts </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                   CAMS European air quality reanalyses </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          CAMS global atmospheric composition forecasts </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       CAMS global emission inventories </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> CAMS global biomass burning emissions based on fire r… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">           CAMS global greenhouse gas reanalysis (EGG4) </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> CAMS global greenhouse gas reanalysis (EGG4) monthly … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                         CAMS global radiative forcings </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   CAMS global radiative forcing - auxilliary variables </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                          CAMS global reanalysis (EAC4) </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  CAMS global reanalysis (EAC4) monthly averaged fields </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> CAMS global inversion-optimised greenhouse gas fluxes… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       CAMS solar radiation time-series </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Fire danger indices historical data from the Copernic… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> River discharge and related forecasted data by the Eu… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> River discharge and related historical data from the … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Reforecasts of river discharge and related data by th… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal forecasts of river discharge and related dat… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal reforecasts of river discharge and related d… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Carbon dioxide data from 2002 to present derived from… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                                                        </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> copernicus_climate_data_store,wekeo                    </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Climate Change Adaptation Digital Twin (Climate Adapt… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ECMWF,dedt_lumi                                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> DT Weather-Induced Extremes Digital Twin (Extremes DT) </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ECMWF,dedt_lumi                                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> River discharge and related forecasted data by the Eu… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> River discharge and related historical data from the … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Reforecasts of river discharge and related data by th… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal forecasts of river discharge and related dat… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal reforecasts of river discharge and related d… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ERA5 hourly data on pressure levels from 1940 to pres… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             ERA5-Land hourly data from 1950 to present </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   ERA5-Land monthly averaged data from 1950 to present </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ERA5 monthly averaged data on pressure levels from 19… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Glaciers distribution data from the Randolph Glacier … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Methane data from 2002 to present derived from satell… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ERA5 hourly data on single levels from 1940 to present </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ERA5 monthly averaged data on single levels from 1940… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> UERRA regional reanalysis for Europe on single levels… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                                  Sea ice concentration </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                                  Sea ice edge and type </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                                      Sea ice thickness </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         Seasonal forecast anomalies on pressure levels </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">           Seasonal forecast anomalies on single levels </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     Seasonal forecast subdaily data on pressure levels </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal forecast daily and subdaily data on single l… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Seasonal forecast monthly statistics on pressure leve… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  Seasonal forecast monthly statistics on single levels </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Sea level gridded data from satellite observations fo… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Temperature and precipitation climate impact indicato… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> European Centre for Medium-Range Weather Forecasts (E… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         SENTINEL-1 Level 1 Ground Range Detected (GRD) </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> SENTINEL-1 Level 1 Single Look Complex (SLC) - EODC s… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                                Sentinel 2 MSI Level 1C </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                               Sentinel 2 MSI Level 2-A </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          OLCI Land Colour Full Resolution - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       OLCI Land Colour Reduced Resolution - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                      Level 2 Land - SLSTR - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                   Level 2 Land - SRAL/MWR - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                           SENTINEL-5P TROPOMI Level 1B </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                            SENTINEL-5P TROPOMI Level 2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ESA,dedl,creodias,wekeo                                </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Level 1 SZF Climate Data Record Release 2 - Met… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Level 1 SZO Climate Data Record Release 2 - Met… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Level 1 SZR Climate Data Record Release 2 - Met… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       AMSU-A Level 1B - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  ASCAT Level 1 Sigma0 Full Resolution - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Level 1 Sigma0 resampled at 25 km Swath Grid - … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Level 1 Sigma0 resampled at 12.5 km Swath Grid … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> AVHRR GAC Atmospheric Motion Vectors Climate Data Rec… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                        AVHRR Level 1B - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global L3C AVHRR Sea Surface Temperature (GHRSST) - M… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                       GOME-2 Level 1B - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> GOME-2 Level 1B Fundamental Data Record Release 3 - M… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  IASI Level 1C - All Spectral Samples - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                IASI Combined Sounding Products - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> IASI All Sky Temperature and Humidity Profiles - Clim… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                 Daily Land Surface Temperature - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                          MHS Level 1B - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">      ASCAT Coastal Winds at 12.5 km Swath Grid - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     ASCAT L2 25 km Winds Data Record Release 1 - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   ASCAT L2 12.5 km Winds Data Record Release 1 - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Soil Moisture at 12.5 km Swath Grid in NRT - Me… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ASCAT Soil Moisture at 25 km Swath Grid in NRT - Metop </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                         HIRS Level 1B - Metop - Global </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EUMETSAT,eumetsat                                      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       SLSTR Level 2 Aerosol Optical Depth - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        SLSTR Level 2 Fire Radiative Power - Sentinel 3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             OLCI Level 1B Full Resolution - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          OLCI Level 1B Reduced Resolution - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> OLCI Level 2 Ocean Colour Full Resolution - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> OLCI Level 2 Ocean Colour Reduced Resolution - Sentin… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> SLSTR Level 1B Radiances and Brightness Temperatures … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> SLSTR Level 2 Sea Surface Temperature (SST) - Sentine… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat                        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                             SRAL Level 1B - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                SRAL Level 1B stack echoes - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                             SRAL Level 1B - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             SRAL Level 2 Altimetry Global - Sentinel-3 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> eumetsat,dedl,creodias,eumetsat,wekeo                  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Surface Water Occurrence Change Intensity 1984… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">    Global Surface Water Maximum Water Extent 1984-2021 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              Global Surface Water Occurrence 1984-2021 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">              Global Surface Water Recurrence 1984-2021 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             Global Surface Water Seasonality 2014-2020 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             Global Surface Water Transitions 1984-2021 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> EC JRC / Google,dedl,dedl                              </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     Global Ocean Biogeochemistry Analysis and Forecast </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">             Global Ocean Physics Analysis and Forecast </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               Global Ocean Waves Analysis and Forecast </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global ocean low and mid trophic levels biomass conte… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">               Global Ocean Ensemble Physics Reanalysis </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                          Global Ocean Waves Reanalysis </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Mercator Océan International,Copernicus Marine Servic… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean- Delayed Mode gridded CORA- In-situ Obse… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> OceanScope (France),Copernicus Marine Service,cop_mar… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean- Real time in-situ observations objectiv… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Ifremer (France),Copernicus Marine Service,cop_marine  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean- in-situ Near real time observations of … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Ifremer (France),Copernicus Marine Service,cop_marine  </span>│
+│<span style="color: #008080; text-decoration-color: #008080">     Nutrient and carbon profiles vertical distribution </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> LOV (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean 3D Chlorophyll-a concentration, Particul… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> LOV (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                            Global Ocean Surface Carbon </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> LSCE (France),Copernicus Marine Service,cop_marine     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Total (COPERNICUS-GLOBCURRENT), Ekman and Geos… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Multi Observation Global Ocean Sea Surface Salinity a… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CNR (Italy),Copernicus Marine Service,cop_marine       </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Multi Observation Global Ocean 3D Temperature Salinit… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Observed Ocean Physics 3D Quasi-Geostrophic Cu… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CNR (Italy),Copernicus Marine Service,cop_marine       </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ACRI (France),Copernicus Marine Service,cop_marine     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour Plankton and Reflectances MY L3 d… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> BC (Germany),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ACRI (France),Copernicus Marine Service,cop_marine     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ACRI (France),Copernicus Marine Service,cop_marine     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour Plankton MY L4 monthly observatio… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> BC (Germany),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> ACRI (France),Copernicus Marine Service,cop_marine     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean - Arctic and Antarctic - Sea Ice Concent… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> MET Norway,Copernicus Marine Service,cop_marine        </span>│
+│<span style="color: #008080; text-decoration-color: #008080">       Global Ocean - High Resolution SAR Sea Ice Drift </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> DTU Space (Denmark),Copernicus Marine Service,cop_mar… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Sea Ice Concentration Time Series REPROC… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> MET Norway,Copernicus Marine Service,cop_marine        </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIV… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                   GLOBAL OCEAN MEAN DYNAMIC TOPOGRAPHY </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ODYSSEA Global Ocean - Sea Surface Temperature Multi-… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Ifremer (France),Copernicus Marine Service,cop_marine  </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean OSTIA Sea Surface Temperature and Sea Ic… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Met Office (UK),Copernicus Marine Service,cop_marine   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean OSTIA Sea Surface Temperature and Sea Ic… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Met Office (UK),Copernicus Marine Service,cop_marine   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> ESA SST CCI and C3S reprocessed sea surface temperatu… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Met Office (UK),Copernicus Marine Service,cop_marine   </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> GLOBAL OCEAN L3 SIGNIFICANT WAVE HEIGHT FROM NRT SATE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> GLOBAL OCEAN L4 SIGNIFICANT WAVE HEIGHT FROM NRT SATE… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> GLOBAL OCEAN L3 SPECTRAL PARAMETERS FROM NRT SATELLIT… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> CLS (France),Copernicus Marine Service,cop_marine      </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Monthly Mean Sea Surface Wind and Stress… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> KNMI (The Netherlands),Copernicus Marine Service,cop_… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Daily Gridded Reprocessed L3 Sea Surface… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> KNMI (The Netherlands),Copernicus Marine Service,cop_… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Daily Gridded Sea Surface Winds from Sca… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> KNMI (The Netherlands),Copernicus Marine Service,cop_… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Hourly Reprocessed Sea Surface Wind and … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> KNMI (The Netherlands),Copernicus Marine Service,cop_… </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Global Ocean Hourly Sea Surface Wind and Stress from … </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> KNMI (The Netherlands),Copernicus Marine Service,cop_… </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                           Landsat Collection 2 Level-1 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> NASA,USGS,planetary_computer                           </span>│
+│<span style="color: #008080; text-decoration-color: #008080">                           Landsat Collection 2 Level-2 </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> NASA,USGS,planetary_computer                           </span>│
+│<span style="color: #008080; text-decoration-color: #008080">   Eurostat - Greenhouse gas emissions from agriculture </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat,dedl,dedl                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  Population on 1 January by age, sex and NUTS 3 region </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat,dedl,dedl                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">  Population on 1 January by age, sex and NUTS 2 region </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat,dedl,dedl                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080"> Eurostat - Population change - Demographic balance an… </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat,dedl,dedl                                     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">      Eurostat - Share of energy from renewable sources </span>│<span style="color: #d787ff; text-decoration-color: #d787ff"> Eurostat,dedl,dedl                                     </span>│
+└────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+</section>
+<section id="inspect-items-of-a-collection">
+<h2>Inspect Items of a Collection<a class="headerlink" href="#inspect-items-of-a-collection" title="Link to this heading">#</a></h2>
+<p>The main functions for getting items return iterators, where pystac-client will handle retrieval of additional pages when needed. Note that one request is made for the first ten items, then a second request for the next ten.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coll_name</span> <span class="o">=</span> <span class="s1">&#39;EO.ESA.DAT.SENTINEL-1.L1_GRD&#39;</span>
+<span class="n">search</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">collections</span><span class="o">=</span><span class="p">[</span><span class="n">coll_name</span><span class="p">],</span>
+    <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">72.5</span><span class="p">,</span><span class="mf">40.5</span><span class="p">,</span><span class="o">-</span><span class="mi">72</span><span class="p">,</span><span class="mi">41</span><span class="p">],</span>
+    <span class="n">datetime</span><span class="o">=</span><span class="s2">&quot;2023-09-09T00:00:00Z/2023-09-20T23:59:59Z&quot;</span>
+<span class="p">)</span>
+
+<span class="n">coll_items</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">item_collection</span><span class="p">()</span>
+<span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For collection </span><span class="si">{</span><span class="n">coll_name</span><span class="si">}</span><span class="s2"> we found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">coll_items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">For collection EO.ESA.DAT.SENTINEL-<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1.</span>L1_GRD we found <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4</span> items
+</pre>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">coll_items</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>geometry</th>
+      <th>providers</th>
+      <th>datetime</th>
+      <th>start_datetime</th>
+      <th>end_datetime</th>
+      <th>updated</th>
+      <th>description</th>
+      <th>license</th>
+      <th>constellation</th>
+      <th>platform</th>
+      <th>...</th>
+      <th>dedl:productComposition</th>
+      <th>dedl:processorVersion</th>
+      <th>dedl:totalSlices</th>
+      <th>dedl:timeliness</th>
+      <th>dedl:productIdentifier</th>
+      <th>dedl:segmentStartTime</th>
+      <th>dedl:beginningDateTime</th>
+      <th>dedl:datatakeID</th>
+      <th>dedl:sliceProductFlag</th>
+      <th>dedl:uid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>POLYGON ((-72.73724 38.96255, -69.78494 39.365...</td>
+      <td>[{'name': 'dedl', 'description': 'DestineE Dat...</td>
+      <td>2023-09-09T22:43:00.442715Z</td>
+      <td>2023-09-09T22:43:00.442715Z</td>
+      <td>2023-09-09T22:43:25.441630Z</td>
+      <td>2023-09-10T03:08:53.951840Z</td>
+      <td>The [Sentinel-1](https://sentinel.esa.int/web/...</td>
+      <td>proprietary</td>
+      <td>SENTINEL-1</td>
+      <td>A</td>
+      <td>...</td>
+      <td>Slice</td>
+      <td>3.61</td>
+      <td>16</td>
+      <td>Fast-24h</td>
+      <td>/eodata/Sentinel-1/SAR/IW_GRDH_1S/2023/09/09/S...</td>
+      <td>2023-09-09T22:41:16.742000+00:00</td>
+      <td>2023-09-09T22:43:00.442715Z</td>
+      <td>396478</td>
+      <td>False</td>
+      <td>64caac74-8c5b-4f4d-9d3d-2d029b6e1ddc</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>POLYGON ((-73.11689 40.46453, -70.09798 40.866...</td>
+      <td>[{'name': 'dedl', 'description': 'DestineE Dat...</td>
+      <td>2023-09-09T22:43:25.443129Z</td>
+      <td>2023-09-09T22:43:25.443129Z</td>
+      <td>2023-09-09T22:43:50.442045Z</td>
+      <td>2023-09-10T02:57:33.550132Z</td>
+      <td>The [Sentinel-1](https://sentinel.esa.int/web/...</td>
+      <td>proprietary</td>
+      <td>SENTINEL-1</td>
+      <td>A</td>
+      <td>...</td>
+      <td>Slice</td>
+      <td>3.61</td>
+      <td>16</td>
+      <td>Fast-24h</td>
+      <td>/eodata/Sentinel-1/SAR/IW_GRDH_1S/2023/09/09/S...</td>
+      <td>2023-09-09T22:41:16.742000+00:00</td>
+      <td>2023-09-09T22:43:25.443129Z</td>
+      <td>396478</td>
+      <td>False</td>
+      <td>f97e0469-9ecc-466e-9706-f3a0a98a8426</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>POLYGON ((-74.73586 38.73753, -71.84171 39.134...</td>
+      <td>[{'name': 'dedl', 'description': 'DestineE Dat...</td>
+      <td>2023-09-14T22:51:10.454096Z</td>
+      <td>2023-09-14T22:51:10.454096Z</td>
+      <td>2023-09-14T22:51:35.452004Z</td>
+      <td>2023-09-15T01:30:12.125014Z</td>
+      <td>The [Sentinel-1](https://sentinel.esa.int/web/...</td>
+      <td>proprietary</td>
+      <td>SENTINEL-1</td>
+      <td>A</td>
+      <td>...</td>
+      <td>Slice</td>
+      <td>3.61</td>
+      <td>7</td>
+      <td>Fast-24h</td>
+      <td>/eodata/Sentinel-1/SAR/IW_GRDH_1S/2023/09/14/S...</td>
+      <td>2023-09-14T22:49:26.753000+00:00</td>
+      <td>2023-09-14T22:51:10.454096Z</td>
+      <td>397120</td>
+      <td>False</td>
+      <td>e81554b4-5784-4f0b-ad69-ef984b489b52</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>POLYGON ((-75.11328 40.2397, -72.15421 40.6353...</td>
+      <td>[{'name': 'dedl', 'description': 'DestineE Dat...</td>
+      <td>2023-09-14T22:51:35.453501Z</td>
+      <td>2023-09-14T22:51:35.453501Z</td>
+      <td>2023-09-14T22:52:00.452905Z</td>
+      <td>2023-09-15T01:28:26.349235Z</td>
+      <td>The [Sentinel-1](https://sentinel.esa.int/web/...</td>
+      <td>proprietary</td>
+      <td>SENTINEL-1</td>
+      <td>A</td>
+      <td>...</td>
+      <td>Slice</td>
+      <td>3.61</td>
+      <td>7</td>
+      <td>Fast-24h</td>
+      <td>/eodata/Sentinel-1/SAR/IW_GRDH_1S/2023/09/14/S...</td>
+      <td>2023-09-14T22:49:26.753000+00:00</td>
+      <td>2023-09-14T22:51:35.453501Z</td>
+      <td>397120</td>
+      <td>False</td>
+      <td>ac9a45a9-e210-4d84-824c-f1fe12e7a4ca</td>
+    </tr>
+  </tbody>
+</table>
+<p>4 rows × 38 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="inspect-stac-assets-of-an-item">
+<h2>Inspect STAC assets of an item<a class="headerlink" href="#inspect-stac-assets-of-an-item" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rich.table</span>
+
+<span class="n">selected_item</span> <span class="o">=</span> <span class="n">coll_items</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="n">rich</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Assets in STAC Item&quot;</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Asset Key&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Description&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">asset_key</span><span class="p">,</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">asset_key</span><span class="p">,</span> <span class="n">asset</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+
+<span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-style: italic">                                                Assets in STAC Item                                                </span>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> Asset Key                                                                                           </span>┃<span style="font-weight: bold"> Descript… </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080"> downloadLink                                                                                        </span>│ Download  │
+│<span style="color: #008080; text-decoration-color: #008080">                                                                                                     </span>│ link      │
+│<span style="color: #008080; text-decoration-color: #008080"> S1A_IW_GRDH_1SDV_20230914T225135_20230914T225200_050330_060F40_9F54.SAFE-report-20230915T011838.pdf </span>│ S1A_IW_G… │
+│<span style="color: #008080; text-decoration-color: #008080"> calibration-s1a-iw-grd-vh-20230914t225135-20230914t225200-050330-060f40-002.xml                     </span>│ calibrat… │
+│<span style="color: #008080; text-decoration-color: #008080"> calibration-s1a-iw-grd-vv-20230914t225135-20230914t225200-050330-060f40-001.xml                     </span>│ calibrat… │
+│<span style="color: #008080; text-decoration-color: #008080"> noise-s1a-iw-grd-vh-20230914t225135-20230914t225200-050330-060f40-002.xml                           </span>│ noise-s1… │
+│<span style="color: #008080; text-decoration-color: #008080"> noise-s1a-iw-grd-vv-20230914t225135-20230914t225200-050330-060f40-001.xml                           </span>│ noise-s1… │
+│<span style="color: #008080; text-decoration-color: #008080"> rfi-s1a-iw-grd-vh-20230914t225135-20230914t225200-050330-060f40-002.xml                             </span>│ rfi-s1a-… │
+│<span style="color: #008080; text-decoration-color: #008080"> rfi-s1a-iw-grd-vv-20230914t225135-20230914t225200-050330-060f40-001.xml                             </span>│ rfi-s1a-… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1a-iw-grd-vh-20230914t225135-20230914t225200-050330-060f40-002.xml                                 </span>│ s1a-iw-g… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1a-iw-grd-vv-20230914t225135-20230914t225200-050330-060f40-001.xml                                 </span>│ s1a-iw-g… │
+│<span style="color: #008080; text-decoration-color: #008080"> manifest.safe                                                                                       </span>│ manifest… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1a-iw-grd-vh-20230914t225135-20230914t225200-050330-060f40-002.tiff                                </span>│ s1a-iw-g… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1a-iw-grd-vv-20230914t225135-20230914t225200-050330-060f40-001.tiff                                </span>│ s1a-iw-g… │
+│<span style="color: #008080; text-decoration-color: #008080"> logo.png                                                                                            </span>│ logo.png  │
+│<span style="color: #008080; text-decoration-color: #008080"> map-overlay.kml                                                                                     </span>│ map-over… │
+│<span style="color: #008080; text-decoration-color: #008080"> product-preview.html                                                                                </span>│ product-… │
+│<span style="color: #008080; text-decoration-color: #008080"> quick-look.png                                                                                      </span>│ quick-lo… │
+│<span style="color: #008080; text-decoration-color: #008080"> thumbnail.png                                                                                       </span>│ thumbnai… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-calibration.xsd                                                                          </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-measurement.xsd                                                                          </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-noise.xsd                                                                                </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-product.xsd                                                                              </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-quicklook.xsd                                                                            </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-level-1-rfi.xsd                                                                                  </span>│ s1-level… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-map-overlay.xsd                                                                                  </span>│ s1-map-o… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-object-types.xsd                                                                                 </span>│ s1-objec… │
+│<span style="color: #008080; text-decoration-color: #008080"> s1-product-preview.xsd                                                                              </span>│ s1-produ… │
+│<span style="color: #008080; text-decoration-color: #008080"> thumbnail                                                                                           </span>│ Thumbnail │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────┴───────────┘
+</pre>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;thumbnail&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><img src="https://datahub.creodias.eu/odata/v1/Assets(74e634c0-b61a-499b-acea-57168a4981fd)/$value" width="500"/></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">down_uri</span> <span class="o">=</span> <span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;downloadLink&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">href</span>
+<span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download link of asset is </span><span class="si">{</span><span class="n">down_uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Download link of asset is 
+<span style="color: #0000ff; text-decoration-color: #0000ff; text-decoration: underline">https://hda.data.destination-earth.eu/stac/collections/EO.ESA.DAT.SENTINEL-1.L1_GRD/items/S1A_IW_GRDH_1SDV_20230914</span>
+<span style="color: #0000ff; text-decoration-color: #0000ff; text-decoration: underline">T225135_20230914T225200_050330_060F40_9F54/download?provider=dedl</span>
+</pre>
+</div></div>
+</div>
+<section id="download-asset-to-jupyterlab">
+<h3>Download asset to JupyterLab<a class="headerlink" href="#download-asset-to-jupyterlab" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selected_item</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;S1A_IW_GRDH_1SDV_20230914T225135_20230914T225200_050330_060F40_9F54&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;downloadLink&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+
+<style>
+.pystac-summary {
+    cursor: pointer;
+    display: list-item;
+    list-style: revert;
+    margin-bottom: 0 !important;
+
+    .pystac-l {
+        padding-left: 0.5em;
+        color: rgb(64, 128, 128);
+        font-style: italic;
+    }
+}
+.pystac-row {
+    overflow-wrap: break-word;
+    padding-left: .825em;
+
+    .pystac-k {
+        display: inline-block;
+        margin: 0px 0.5em 0px 0px;
+    }
+    .pystac-v {
+        color: rgb(186, 33, 33);
+    }
+}
+.pystac-k {
+    color: rgb(0, 128, 0);
+    font-weight: 700;
+}
+</style>
+<div class="jp-RenderedJSON jp-mod-trusted jp-OutputArea-output">
+    <div class="container" style="line-height: normal;">
+        <ul style="padding: 0px; margin: 0px; list-style: none; display: block;">
+            
+                
+                    
+        <li class="pystac-row">
+            <span class="pystac-k">href</span>
+            <span class="pystac-v">"https://hda.data.destination-earth.eu/stac/collections/EO.ESA.DAT.SENTINEL-1.L1_GRD/items/S1A_IW_GRDH_1SDV_20230914T225135_20230914T225200_050330_060F40_9F54/download?provider=dedl"</span>
+        </li>
+    
+                
+            
+                
+                    
+        <li class="pystac-row">
+            <span class="pystac-k">type</span>
+            <span class="pystac-v">"application/zip"</span>
+        </li>
+    
+                
+            
+                
+                    
+        <li class="pystac-row">
+            <span class="pystac-k">title</span>
+            <span class="pystac-v">"Download link"</span>
+        </li>
+    
+                
+            
+                
+                    
+        <li><details>
+            <summary class="pystac-summary"><span class="pystac-k">alternate</span></summary>
+            <ul style="margin: 0px; padding: 0px 0px 0px 1.75em; list-style: none; display: block;">
+        
+            
+                
+        <li><details>
+            <summary class="pystac-summary"><span class="pystac-k">origin</span></summary>
+            <ul style="margin: 0px; padding: 0px 0px 0px 1.75em; list-style: none; display: block;">
+        
+            
+                
+        <li class="pystac-row">
+            <span class="pystac-k">title</span>
+            <span class="pystac-v">"Origin asset link"</span>
+        </li>
+    
+            
+        
+            
+                
+        <li class="pystac-row">
+            <span class="pystac-k">href</span>
+            <span class="pystac-v">"https://zipper.creodias.eu/odata/v1/Products(ac9a45a9-e210-4d84-824c-f1fe12e7a4ca)/$value"</span>
+        </li>
+    
+            
+        
+    </ul>
+        </details></li>
+    
+            
+        
+    </ul>
+        </details></li>
+    
+                
+            
+                
+                    
+        <li class="pystac-row">
+            <span class="pystac-k">storage:tier</span>
+            <span class="pystac-v">"ONLINE"</span>
+        </li>
+    
+                
+            
+        </ul>
+    </div>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make http request for remote file data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;downloadLink&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">,</span>
+                   <span class="n">headers</span><span class="o">=</span><span class="n">auth_headers</span><span class="p">)</span>
+<span class="n">mtype</span> <span class="o">=</span> <span class="n">selected_item</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;downloadLink&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">media_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># Save file data to local copy</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">selected_item</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">mtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span><span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python_dedl",
+            path: "./book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/PySTAC"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python_dedl'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">HDA PySTAC-Client Introduction</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtain-dedl-access-token-to-use-the-hda-service">Obtain DEDL Access Token to use the HDA service</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-username-and-password-as-environment-variables-to-be-used-for-dedl-data-access">Set username and password as environment variables to be used for DEDL data access</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#create-pystac-client-object-for-hda-stac-api">Create pystac client object for HDA STAC API</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#query-all-available-collections">Query all available collections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtain-provider-information-for-each-individual-collection">Obtain provider information for each individual collection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-items-of-a-collection">Inspect Items of a Collection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-stac-assets-of-an-item">Inspect STAC assets of an item</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-asset-to-jupyterlab">Download asset to JupyterLab</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

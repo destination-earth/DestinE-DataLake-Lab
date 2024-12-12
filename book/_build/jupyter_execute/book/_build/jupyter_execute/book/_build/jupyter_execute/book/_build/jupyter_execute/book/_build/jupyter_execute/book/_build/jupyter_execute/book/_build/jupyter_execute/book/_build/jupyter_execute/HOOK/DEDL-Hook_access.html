@@ -1,0 +1,765 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../../../../../../../../../../../../../../../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Access to Hook services &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/DEDL-Hook_access';</script>
+    <link rel="index" title="Index" href="../../../../../../../../../../../../../../../../../../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../../../../../../../../../../../../../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../../../../../../../../../../../../../../../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../../../../../../../../../../../../../../../../../../../../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HOOK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HOOK/gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HOOK/Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../../../../HOOK/DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://binder-217-71-193-124.nip.io/v2/gh/destination-earth/DestinE-DataLake-Lab/master?urlpath=lab/tree/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/DEDL-Hook_access.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/DEDL-Hook_access.ipynb&branch=master" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on JupyterHub"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="JupyterHub logo" src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/images/logo_jupyterhub.svg">
+  </span>
+<span class="btn__text-container">JupyterHub</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../../../../../../../../../../../../../../../../../../../../../../_sources/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/DEDL-Hook_access.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Access to Hook services</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autehentication-function">Autehentication - function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authetication">Authetication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-a-list-of-avilable-hooks">Get a list of avilable Hooks</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="access-to-hook-services">
+<h1>Access to Hook services<a class="headerlink" href="#access-to-hook-services" title="Link to this heading">#</a></h1>
+<p><strong>Licence</strong>: MIT <br></p>
+<p>This Notebook demonstrates:</p>
+<ul class="simple">
+<li><p>Retrieval of a token appropriate for interaction with the OnDemand Processing API (Hook API)</p></li>
+<li><p>Listing of available Hooks (Processors) using the retrieved token</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install pycurl
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">pycurl</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">JSON</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="autehentication-function">
+<h2>Autehentication - function<a class="headerlink" href="#autehentication-function" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">html</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">urlparse</span>
+
+<span class="n">IAM_URL</span> <span class="o">=</span> <span class="s2">&quot;https://auth.destine.eu/&quot;</span>
+<span class="n">CLIENT_ID</span> <span class="o">=</span> <span class="s2">&quot;dedl-hook&quot;</span>
+<span class="n">REALM</span> <span class="o">=</span> <span class="s2">&quot;desp&quot;</span>
+<span class="n">SERVICE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://odp.data.destination-earth.eu/odata/v1/&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">DESPAuth</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+
+    <span class="k">def</span> <span class="nf">get_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+
+            <span class="c1"># Get the auth url</span>
+            <span class="n">auth_url</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">IAM_URL</span>
+                        <span class="o">+</span> <span class="s2">&quot;/realms/&quot;</span>
+                        <span class="o">+</span> <span class="n">REALM</span>
+                        <span class="o">+</span> <span class="s2">&quot;/protocol/openid-connect/auth&quot;</span><span class="p">,</span>
+                        <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="n">CLIENT_ID</span><span class="p">,</span>
+                            <span class="s2">&quot;redirect_uri&quot;</span><span class="p">:</span> <span class="n">SERVICE_URL</span><span class="p">,</span>
+                            <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;openid&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;response_type&quot;</span><span class="p">:</span> <span class="s2">&quot;code&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">forms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">action</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Login and get auth code</span>
+            <span class="n">login</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">auth_url</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># We expect a 302, a 200 means we got sent back to the login page and there&#39;s probably an error message</span>
+            <span class="k">if</span> <span class="n">login</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">tree</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">login</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">error_message_element</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//span[@id=&quot;input-error&quot;]/text()&#39;</span><span class="p">)</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">error_message_element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">error_message_element</span>
+                    <span class="k">else</span> <span class="s2">&quot;Error message not found&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">login</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">302</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Login failed&quot;</span><span class="p">)</span>
+
+            <span class="n">auth_code</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">login</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Location&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s2">&quot;code&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Use the auth code to get the token</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">IAM_URL</span> <span class="o">+</span> <span class="s2">&quot;/realms/&quot;</span> <span class="o">+</span> <span class="n">REALM</span> <span class="o">+</span> <span class="s2">&quot;/protocol/openid-connect/token&quot;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="n">CLIENT_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;redirect_uri&quot;</span><span class="p">:</span> <span class="n">SERVICE_URL</span><span class="p">,</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">auth_code</span><span class="p">,</span>
+                    <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;authorization_code&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Failed to get token&quot;</span><span class="p">)</span>
+
+            <span class="n">token</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">token</span>
+
+
+<span class="k">class</span> <span class="nc">DEDLAuth</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desp_access_token</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desp_access_token</span> <span class="o">=</span> <span class="n">desp_access_token</span>
+
+    <span class="k">def</span> <span class="nf">get_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">DEDL_TOKEN_URL</span> <span class="o">=</span> <span class="s2">&quot;https://identity.data.destination-earth.eu/auth/realms/dedl/protocol/openid-connect/token&quot;</span>
+        <span class="n">DEDL_CLIENT_ID</span> <span class="o">=</span> <span class="s2">&quot;hda-public&quot;</span>
+        <span class="n">AUDIENCE</span> <span class="o">=</span> <span class="s2">&quot;hda-public&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;urn:ietf:params:oauth:grant-type:token-exchange&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;subject_token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">desp_access_token</span><span class="p">,</span>
+            <span class="s2">&quot;subject_issuer&quot;</span><span class="p">:</span> <span class="s2">&quot;desp-oidc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;subject_token_type&quot;</span><span class="p">:</span> <span class="s2">&quot;urn:ietf:params:oauth:token-type:access_token&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="n">DEDL_CLIENT_ID</span><span class="p">,</span>
+            <span class="s2">&quot;audience&quot;</span><span class="p">:</span> <span class="n">AUDIENCE</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">DEDL_TOKEN_URL</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Response code:&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">dedl_token</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">dedl_token</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error obtaining DEDL access token&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AuthHandler</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desp_access_token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dedl_access_token</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">get_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get DESP auth token</span>
+        <span class="n">desp_auth</span> <span class="o">=</span> <span class="n">DESPAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desp_access_token</span> <span class="o">=</span> <span class="n">desp_auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+
+        <span class="c1"># Get DEDL auth token</span>
+        <span class="n">dedl_auth</span> <span class="o">=</span> <span class="n">DEDLAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">desp_access_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dedl_access_token</span> <span class="o">=</span> <span class="n">dedl_auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dedl_access_token</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="authetication">
+<h2>Authetication<a class="headerlink" href="#authetication" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enter DESP credentials.</span>
+<span class="n">DESP_USERNAME</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please input your DESP username or email: &quot;</span><span class="p">)</span>
+<span class="n">DESP_PASSWORD</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please input your DESP password: &quot;</span><span class="p">)</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="n">AuthHandler</span><span class="p">(</span><span class="n">DESP_USERNAME</span><span class="p">,</span> <span class="n">DESP_PASSWORD</span><span class="p">)</span>
+<span class="n">access_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+
+<span class="c1"># Check the status of the request</span>
+<span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEDL/DESP Access Token Obtained Successfully&quot;</span><span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to Obtain DEDL/DESP Access Token&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="get-a-list-of-avilable-hooks">
+<h2>Get a list of avilable Hooks<a class="headerlink" href="#get-a-list-of-avilable-hooks" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="n">access_token</span><span class="p">}</span>
+<span class="n">service_root_url</span> <span class="o">=</span> <span class="s2">&quot;https://odp.data.destination-earth.eu/odata/v1/&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">service_root_url</span> <span class="o">+</span> <span class="s2">&quot;Workflows&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="c1"># Assuming &#39;result&#39; is a JSON array</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>  <span class="c1"># Print an empty line to separate each item</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autehentication-function">Autehentication - function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authetication">Authetication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-a-list-of-avilable-hooks">Get a list of avilable Hooks</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

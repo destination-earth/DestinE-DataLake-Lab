@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../../../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../../../../../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'book/_build/jupyter_execute/book/_build/jupyter_execute/STACK/ExtremeDT-DataCube-xViewer';</script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../HOOK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../HOOK/gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HOOK/Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../HOOK/DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://binder-217-71-193-124.nip.io/v2/gh/destination-earth/DestinE-DataLake-Lab/master?urlpath=lab/tree/book/book/_build/jupyter_execute/book/_build/jupyter_execute/STACK/ExtremeDT-DataCube-xViewer.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../../../../../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/book/book/_build/jupyter_execute/book/_build/jupyter_execute/STACK/ExtremeDT-DataCube-xViewer.ipynb&branch=master" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on JupyterHub"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="JupyterHub logo" src="../../../../../../../_static/images/logo_jupyterhub.svg">
+  </span>
+<span class="btn__text-container">JupyterHub</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../../../../_sources/book/_build/jupyter_execute/book/_build/jupyter_execute/STACK/ExtremeDT-DataCube-xViewer.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepre-your-environment">Prepre your environment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connect-with-extreme-dt-data-cube">Connect with Extreme DT data cube</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#select-proper-data-cube">Select proper data cube</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#area-of-interest">Area of interest</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-data-for-visualization">Prepare Data for visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convert-units">Convert units</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-style-of-visualization">Define style of visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-style-to-the-data-cube">Add style to the data cube</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-dashboard">Run the dashboard</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><img alt="image.png" src="book/_build/jupyter_execute/book/_build/jupyter_execute/STACK/attachment:image.png" /></p>
+<p><strong>Author:</strong> EUMETSAT<br />
+<strong>Copyright:</strong> 2024 EUMETSAT<br />
+<strong>Licence:</strong> MIT</p>
+<section class="tex2jax_ignore mathjax_ignore" id="create-a-dashboard-based-on-data-cube-populated-with-data-obtained-from-weather-and-geophysical-extremes-digital-twin-dt-extremedt">
+<h1>Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT<a class="headerlink" href="#create-a-dashboard-based-on-data-cube-populated-with-data-obtained-from-weather-and-geophysical-extremes-digital-twin-dt-extremedt" title="Link to this heading">#</a></h1>
+<p><strong>DISCLAIMER</strong><br />
+In order to deal with the code provided within this notebook, it is required to run it on user environment (local one or virtual machine).</p>
+<p><strong>This notebook covers:</strong></p>
+<ul class="simple">
+<li><p>find available data cubes and their urls</p></li>
+<li><p>filter data area of interest</p></li>
+<li><p>create interactive dashboard using xcube - xviewer</p></li>
+</ul>
+<p><strong>Presequites</strong></p>
+<ul class="simple">
+<li><p>Xcube
+Install xcube and create a new environment <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">create</span> <span class="pre">--name</span> <span class="pre">xcube</span> <span class="pre">--channel</span> <span class="pre">conda-forge</span> <span class="pre">xcube</span></code><br />
+OR<br />
+Install xcube in the current environment  <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">install</span> <span class="pre">--channel</span> <span class="pre">conda-forge</span> <span class="pre">xcube</span></code></p></li>
+<li><p>Xarray<br />
+pip <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xarray</span></code><br />
+OR<br />
+conda  <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">xarray</span> <span class="pre">dask</span> <span class="pre">netCDF4</span> <span class="pre">bottleneck</span></code></p></li>
+</ul>
+<section id="prepre-your-environment">
+<h2>Prepre your environment<a class="headerlink" href="#prepre-your-environment" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">xcube.webapi.viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="connect-with-extreme-dt-data-cube">
+<h2>Connect with Extreme DT data cube<a class="headerlink" href="#connect-with-extreme-dt-data-cube" title="Link to this heading">#</a></h2>
+<p><strong>The data cube provides data:</strong></p>
+<ul class="simple">
+<li><p>Four variables</p>
+<ul>
+<li><p>2t - Air temperature at 2 meteres above grond [K]</p></li>
+<li><p>2d - Dew point temperature at 2 meteres above grond [K]</p></li>
+<li><p>sp - Surface pressure [Pa]</p></li>
+</ul>
+</li>
+<li><p>Forecast 2024.04.04-13 + 96 hours for each date</p></li>
+<li><p>Hourly step</p></li>
+<li><p>World</p></li>
+</ul>
+</section>
+<section id="select-proper-data-cube">
+<h2>Select proper data cube<a class="headerlink" href="#select-proper-data-cube" title="Link to this heading">#</a></h2>
+<p>Data cubes on s3 bucket are stored under URL https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube.<br />
+Data cubes are stored in two directories:</p>
+<ul class="simple">
+<li><p>ExtremeDT - the newest one</p></li>
+<li><p>archive - from preicus days</p></li>
+</ul>
+<p><b>File nameing convention:</b><br />
+dt_extreme_YYYYMMDD.zarr/<br />
+YYYYMMDD - is the date when forecast starts (step 0)</p>
+<p><b>Results</b><br />
+After exectution of code below, the list of urls linked to available cubes will be printed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># URL to s3 where  ExtremeDT data cubes are stored</span>
+<span class="n">datacube_url</span> <span class="o">=</span> <span class="s1">&#39;https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube&#39;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">datacube_url</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">zarr_items</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zarr&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zarr/&#39;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">zarr_items</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">zarr_items</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">new_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datacube_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New URL:&quot;</span><span class="p">,</span> <span class="n">new_url</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No .zarr files or directories found.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to fetch contents. Status code:&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ExtremeDT/dt_extreme_20240404.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240404.zarr/
+ExtremeDT/dt_extreme_20240405.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240405.zarr/
+ExtremeDT/dt_extreme_20240406.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240406.zarr/
+ExtremeDT/dt_extreme_20240407.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240407.zarr/
+ExtremeDT/dt_extreme_20240408.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240408.zarr/
+ExtremeDT/dt_extreme_20240410.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240410.zarr/
+ExtremeDT/dt_extreme_20240411.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240411.zarr/
+ExtremeDT/dt_extreme_20240412.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240412.zarr/
+ExtremeDT/dt_extreme_20240413.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/ExtremeDT/dt_extreme_20240413.zarr/
+archive/dt_extreme_20240409.zarr/
+New URL: https://s3.central.data.destination-earth.eu/swift/v1/dedl_datacube/archive/dt_extreme_20240409.zarr/
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://s3.waw3-1.cloudferro.com/swift/v1/s5p_l3/ExtremeDT/dt_extreme_20240412.zarr/&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="area-of-interest">
+<h3>Area of interest<a class="headerlink" href="#area-of-interest" title="Link to this heading">#</a></h3>
+<p>Upload data for selected area and verify what variables are provided. In this case uplaod data for Kenya. List of available variables should be returend.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kenya_bbox</span> <span class="o">=</span> <span class="p">[</span><span class="mf">33.501</span><span class="p">,</span>   <span class="c1"># West</span>
+              <span class="o">-</span><span class="mf">4.677</span><span class="p">,</span>   <span class="c1"># South</span>
+              <span class="mf">41.899</span><span class="p">,</span>   <span class="c1"># East</span>
+              <span class="mf">5.193</span><span class="p">]</span>    <span class="c1"># North</span>
+
+<span class="n">kenya_dt</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">kenya_bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                                            <span class="n">kenya_bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> 
+                                <span class="n">lat</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">kenya_bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> 
+                                            <span class="n">kenya_bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                                                         <span class="p">)</span>
+
+<span class="nb">list</span><span class="p">(</span><span class="n">kenya_dt</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;2d&#39;, &#39;2t&#39;, &#39;sp&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="prepare-data-for-visualization">
+<h2>Prepare Data for visualization<a class="headerlink" href="#prepare-data-for-visualization" title="Link to this heading">#</a></h2>
+<section id="convert-units">
+<h3>Convert units<a class="headerlink" href="#convert-units" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;2t&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">273.15</span>    <span class="c1"># Conversion to Celcius degrees</span>
+<span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">273.15</span>    <span class="c1"># Conversion to Celcius degrees</span>
+<span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">100</span>       <span class="c1"># Conversion to hectoPascals</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;2t&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;°C&#39;</span>
+<span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;°C&#39;</span>
+<span class="n">kenya_dt</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hPa&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="define-style-of-visualization">
+<h2>Define style of visualization<a class="headerlink" href="#define-style-of-visualization" title="Link to this heading">#</a></h2>
+<p>Error message starting with:<br />
+<em><strong>404 GET /viewer/config/config.json (127.0.0.1): xcube viewer has not been been configured
+404 GET /viewer/config/config.json (127.0.0.1) 2.14ms</strong></em><br />
+could occur.<br />
+It is normal and does not affect on proper functioning of xviewer.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">server_config</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;Styles&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;Identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;dt_legend&quot;</span><span class="p">,</span>          <span class="c1"># Style&#39;s name</span>
+            <span class="s2">&quot;ColorMappings&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;2t&quot;</span><span class="p">:</span> <span class="p">{</span>                         <span class="c1"># Variable&#39;s name</span>
+                    <span class="s2">&quot;ValueRange&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>     <span class="c1"># Variable&#39;s values range</span>
+                    <span class="s2">&quot;ColorBar&quot;</span><span class="p">:</span> <span class="s2">&quot;coolwarm&quot;</span>      <span class="c1"># colorbar</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;2d&quot;</span><span class="p">:</span> <span class="p">{</span>                         <span class="c1"># Variable&#39;s name</span>
+                    <span class="s2">&quot;ValueRange&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+                    <span class="s2">&quot;ColorBar&quot;</span><span class="p">:</span> <span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;sp&#39;</span><span class="p">:</span> <span class="p">{</span>                         <span class="c1"># Variable&#39;s name</span>
+                    <span class="s2">&quot;ValueRange&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>    <span class="c1"># Variable&#39;s values range</span>
+                    <span class="s2">&quot;ColorBar&quot;</span><span class="p">:</span> <span class="s2">&quot;viridis&quot;</span>       <span class="c1"># colorbar</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>404 GET /viewer/config/config.json (127.0.0.1): xcube viewer has not been been configured
+404 GET /viewer/config/config.json (127.0.0.1) 2.14ms
+/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/core/schema.py:464: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  dim_name: cube_chunks.get(dim_name, cube.dims[dim_name])
+/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/core/timecoord.py:248: FutureWarning: &#39;S&#39; is deprecated and will be removed in a future version, please use &#39;s&#39; instead.
+  return getattr(timestamp, round_fn)(freq).isoformat() + &#39;Z&#39;
+404 GET /favicon.ico (127.0.0.1) 0.52ms
+404 GET /viewer/config/config.json (127.0.0.1): xcube viewer has not been been configured
+404 GET /viewer/config/config.json (127.0.0.1) 1.51ms
+/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/core/timecoord.py:248: FutureWarning: &#39;S&#39; is deprecated and will be removed in a future version, please use &#39;s&#39; instead.
+  return getattr(timestamp, round_fn)(freq).isoformat() + &#39;Z&#39;
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/77?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/77?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/77?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/77?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/76?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/76?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/78?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/78?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/78?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/64/78?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/76?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/63/76?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/65/75?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/65/75?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception GET /tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/62/75?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;GET&#39;, uri=&#39;/tiles/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d/7/62/75?crs=EPSG%3A3857&amp;vmin=0&amp;vmax=20&amp;cbar=coolwarm&amp;time=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 354, in get
+    await self._call_method(&#39;get&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 139, in get
+    await super().get(datasetId, varName, z, y, x)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/tiles/routes.py&quot;, line 125, in get
+    await self.response.finish(tile)
+tornado.iostream.StreamClosedError: Stream is closed
+Uncaught exception POST /timeseries/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d?aggMethods=mean%2Cstd&amp;startDate=2024-04-12T00%3A00%3A00Z&amp;endDate=2024-04-15T23%3A00%3A00Z (127.0.0.1)
+HTTPServerRequest(protocol=&#39;http&#39;, host=&#39;localhost:8002&#39;, method=&#39;POST&#39;, uri=&#39;/timeseries/ba3aaa64-1bdf-425d-8458-98b819c0e042/2d?aggMethods=mean%2Cstd&amp;startDate=2024-04-12T00%3A00%3A00Z&amp;endDate=2024-04-15T23%3A00%3A00Z&#39;, version=&#39;HTTP/1.1&#39;, remote_ip=&#39;127.0.0.1&#39;)
+Traceback (most recent call last):
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/tornado/web.py&quot;, line 1790, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 357, in post
+    await self._call_method(&#39;post&#39;, *args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/server/webservers/tornado.py&quot;, line 372, in _call_method
+    await method(*args, **kwargs)
+  File &quot;/home/patryk/miniconda3/envs/xcube_env/lib/python3.12/site-packages/xcube/webapi/timeseries/routes.py&quot;, line 122, in post
+    await self.response.finish(dict(result=result))
+tornado.iostream.StreamClosedError: Stream is closed
+</pre></div>
+</div>
+</div>
+</div>
+<section id="add-style-to-the-data-cube">
+<h3>Add style to the data cube<a class="headerlink" href="#add-style-to-the-data-cube" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="n">kenya_dt</span><span class="p">,</span> 
+                   <span class="n">style</span><span class="o">=</span><span class="s2">&quot;dt_legend&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;ba3aaa64-1bdf-425d-8458-98b819c0e042&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="run-the-dashboard">
+<h2>Run the dashboard<a class="headerlink" href="#run-the-dashboard" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>       <span class="c1"># open dashboard in separate tab in browser</span>
+<span class="c1">#viewer.show()      # open dashboard in current Jupyter Notebook</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Server: http://localhost:8002
+Viewer: http://localhost:8002/viewer/?serverUrl=http://localhost:8002
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./book/_build/jupyter_execute/book/_build/jupyter_execute/STACK"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepre-your-environment">Prepre your environment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connect-with-extreme-dt-data-cube">Connect with Extreme DT data cube</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#select-proper-data-cube">Select proper data cube</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#area-of-interest">Area of interest</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-data-for-visualization">Prepare Data for visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convert-units">Convert units</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-style-of-visualization">Define style of visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-style-to-the-data-cube">Add style to the data cube</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-dashboard">Run the dashboard</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

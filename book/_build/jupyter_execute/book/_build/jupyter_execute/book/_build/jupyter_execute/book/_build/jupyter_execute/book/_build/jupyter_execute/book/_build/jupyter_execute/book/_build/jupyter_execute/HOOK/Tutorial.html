@@ -1,0 +1,1090 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../../../../../../../../../../../../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DEDL - Hook Tutorial - Data Harvest (data-harvest) &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../../../../../../../../../../../../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../../../../../../../../../../../../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/Tutorial';</script>
+    <link rel="index" title="Index" href="../../../../../../../../../../../../../../../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../../../../../../../../../../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../../../../../../../../../../../../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../../../../../../../../../../../../../../../../../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HOOK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HOOK/gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HOOK/Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../../../HOOK/DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://binder-217-71-193-124.nip.io/v2/gh/destination-earth/DestinE-DataLake-Lab/master?urlpath=lab/tree/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/Tutorial.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../../../../../../../../../../../../../../../../../../../../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/Tutorial.ipynb&branch=master" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on JupyterHub"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="JupyterHub logo" src="../../../../../../../../../../../../../../../../../../../../../../_static/images/logo_jupyterhub.svg">
+  </span>
+<span class="btn__text-container">JupyterHub</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../../../../../../../../../../../../../../../../../../../_sources/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK/Tutorial.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>DEDL - Hook Tutorial - Data Harvest (data-harvest)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-python-package-requirements-and-import-environment-variables">Install python package requirements and import environment variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authentification-get-token">Authentification - Get token</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-static-variables">Setup static variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-available-workflows">List available workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#select-a-workflow-and-see-parameters">Select a workflow and see parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#order-selected-workflow">Order selected workflow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#name-your-order">Name your order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-output-storage">Define output storage</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#your-user-storage-provided-by-dedl-islet-service">1. - Your user storage (provided by DEDL ISLET service)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#use-temporary-storage">2 - Use temporary storage</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-parameters-and-send-order">Define parameters and send order</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-status-of-the-order">Check The status of the order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#access-workflow-output">Access workflow output</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#private-storage">Private storage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temporary-storage">Temporary storage</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><img alt="" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/img/DestinE-banner.jpg?raw=true" /></p>
+<p><strong>Author</strong>: EUMETSAT <br>
+<strong>Copyright</strong>: 2024 EUMETSAT <br>
+<strong>Licence</strong>: MIT <br></p>
+<section class="tex2jax_ignore mathjax_ignore" id="dedl-hook-tutorial-data-harvest-data-harvest">
+<h1>DEDL - Hook Tutorial - Data Harvest (data-harvest)<a class="headerlink" href="#dedl-hook-tutorial-data-harvest-data-harvest" title="Link to this heading">#</a></h1>
+<p>This notebook demonstrates how to use the Hook service.</p>
+<p>Author: EUMETSAT</p>
+<p>The detailed API and definition of each endpoint and parameters is available in the <strong>OnDemand Processing API OData v1</strong>  OpenAPI documentation found at:
+https://odp.data.destination-earth.eu/odata/docs</p>
+<p>Further documentation is available at:
+https://destine-data-lake-docs.data.destination-earth.eu/en/latest/dedl-big-data-processing-services/Hook-service/Hook-service.html</p>
+<section id="install-python-package-requirements-and-import-environment-variables">
+<h2>Install python package requirements and import environment variables<a class="headerlink" href="#install-python-package-requirements-and-import-environment-variables" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: The destinelab python package (which helps with authentication) is available already if you are using Python DEDL kernel</span>
+<span class="c1"># Otherwise, the destinelab python package can be installed by uncommenting the following line</span>
+
+<span class="c1"># For the importing of environment variables using the load_dotenv(...) command </span>
+<span class="o">%</span><span class="k">pip</span> install python-dotenv
+<span class="c1"># for example code navigating private S3 compatible storage (PRIVATE bucket storage)</span>
+<span class="o">%</span><span class="k">pip</span> install boto3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">import</span> <span class="nn">destinelab</span> <span class="k">as</span> <span class="nn">destinelab</span>
+
+<span class="c1"># Load (optional) notebook specific environment variables from .env_tutorial</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="s2">&quot;./.env_tutorial&quot;</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="authentification-get-token">
+<h2>Authentification - Get token<a class="headerlink" href="#authentification-get-token" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By default users should use their DESP credentials to get an Access_token</span>
+<span class="c1"># This token is added as an Authorisation Header when interacting with the Hook Service API</span>
+
+<span class="c1"># Enter DESP credentials.</span>
+<span class="n">DESP_USERNAME</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please input your DESP username or email: &quot;</span><span class="p">)</span>
+<span class="n">DESP_PASSWORD</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please input your DESP password: &quot;</span><span class="p">)</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">destinelab</span><span class="o">.</span><span class="n">AuthHandler</span><span class="p">(</span><span class="n">DESP_USERNAME</span><span class="p">,</span> <span class="n">DESP_PASSWORD</span><span class="p">)</span>
+
+<span class="n">access_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+
+<span class="c1"># Check the status of the request</span>
+<span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEDL/DESP Access Token Obtained Successfully&quot;</span><span class="p">)</span>
+    <span class="c1"># Save API headers</span>
+    <span class="n">api_headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="n">access_token</span><span class="p">}</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to Obtain DEDL/DESP Access Token&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setup-static-variables">
+<h2>Setup static variables<a class="headerlink" href="#setup-static-variables" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hook service url (ending with odata/v1/ - e.g. https://odp.data.destination-earth.eu/odata/v1/)</span>
+<span class="n">hook_service_root_url</span> <span class="o">=</span> <span class="s2">&quot;https://odp.data.destination-earth.eu/odata/v1/&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="list-available-workflows">
+<h2>List available workflows<a class="headerlink" href="#list-available-workflows" title="Link to this heading">#</a></h2>
+<p>Next we can check what possible workflows are available to us by using method<br />
+<code class="docutils literal notranslate"><span class="pre">https://odp.data.destination-earth.eu/odata/v1/Workflows</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Send request and return json object listing all provided workfows, ordered by Id</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">Workflows?$orderby=Id asc&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span>   
+<span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;List of available DEDL provided Hooks&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])):</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Name:</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Name&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">DisplayName:</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;DisplayName&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>  <span class="c1"># print JSON string</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print result JSON object: containing provided workflow list</span>
+<span class="n">workflow_details</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">workflow_details</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="select-a-workflow-and-see-parameters">
+<h2>Select a workflow and see parameters<a class="headerlink" href="#select-a-workflow-and-see-parameters" title="Link to this heading">#</a></h2>
+<p>If we want to see the details of a specific workflow, showing us the parameters that can be set for that workflow, we can add a filter to the query as follows:</p>
+<p><code class="docutils literal notranslate"><span class="pre">https://odp.data.destination-earth.eu/odata/v1/Workflows?$expand=WorkflowOptions&amp;$filter=(Name</span> <span class="pre">eq</span> <span class="pre">data-harvest)</span></code></p>
+<p><strong>\<span class="math notranslate nohighlight">\(expand=WorkflowOptions** shows all parameters accepted by workflow   
+**\\\)</span>filter=(Name eq data-harvest)</strong> narrows the result to workflow called “data-harvest”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Select workflow : defaults to data-harvest</span>
+<span class="n">workflow</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_WORKFLOW&quot;</span><span class="p">,</span> <span class="s2">&quot;data-harvest&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;workflow: </span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Send request</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">Workflows?$expand=WorkflowOptions&amp;$filter=(Name eq &#39;</span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s2">&#39;)&quot;</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="n">workflow_details</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">workflow_details</span><span class="p">)</span>  <span class="c1"># print formatted workflow_details, a JSON string</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="order-selected-workflow">
+<h2>Order selected workflow<a class="headerlink" href="#order-selected-workflow" title="Link to this heading">#</a></h2>
+<p>The order selected above will now be configured and executed.</p>
+<p>e.g. workflow = “data-harvest”.</p>
+<ul class="simple">
+<li><p>Make an order to ‘harvest data’ using Harmonised Data Access API.</p></li>
+<li><p>i.e. data from an input source can be transferred to a Private bucket or a Temporary storage bucket.</p></li>
+</ul>
+<section id="name-your-order">
+<h3>Name your order<a class="headerlink" href="#name-your-order" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here we set the variable order_name, this will allow us to:</span>
+<span class="c1"># Easily identify the running process (e.g. when checking the status)</span>
+<span class="c1"># order_name is added as a suffix to the order &#39;Name&#39;</span>
+<span class="n">order_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_ORDER_NAME&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Name your order: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;order_name:</span><span class="si">{</span><span class="n">order_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="define-output-storage">
+<h3>Define output storage<a class="headerlink" href="#define-output-storage" title="Link to this heading">#</a></h3>
+<p>In workflow parameters, among others values, storage to retreive the result has to be provided.<br />
+<strong>Two possibilites:</strong></p>
+<ol class="arabic simple">
+<li><p>Use your user storage</p></li>
+<li><p>Use a temporary storage</p></li>
+</ol>
+<section id="your-user-storage-provided-by-dedl-islet-service">
+<h4>1. - Your user storage (provided by DEDL ISLET service)<a class="headerlink" href="#your-user-storage-provided-by-dedl-islet-service" title="Link to this heading">#</a></h4>
+<p>Example using a S3 bucket created with ISLET Storage service  - result will be available in this bucket</p>
+<blockquote>
+<div><p><em>workflow parameter: {“Name”: “output_storage”, “Value”: “PRIVATE”}</em></p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Output storage - Islet service</span>
+
+<span class="c1"># Note: If you want the output to go to your own PRIVATE bucket rather than TEMPORARY storage (expires after 2 weeks),</span>
+<span class="c1">#       i) This Configuration will need to be updated with your output_bucket, output_storage_access_key, output_secret_key, output_prefix</span>
+<span class="c1">#       ii) You will need to change the output_storage in the order to PRIVATE and add the necessary source_ parameters (see workflow options and commented example)</span>
+
+<span class="c1"># URL of the S3 endpoint in the Central Site (or lumi etc.)</span>
+<span class="n">output_storage_url</span> <span class="o">=</span> <span class="s2">&quot;https://s3.central.data.destination-earth.eu&quot;</span>
+<span class="c1"># output_storage_url = &quot;https://s3.lumi.data.destination-earth.eu&quot;</span>
+
+<span class="c1"># Name of the object storage bucket where the results will be stored.</span>
+<span class="n">output_bucket</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_OUTPUT_BUCKET&quot;</span><span class="p">,</span> <span class="s2">&quot;your-bucket-name&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_bucket            : </span><span class="si">{</span><span class="n">output_bucket</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Islet object storage credentials (openstack ec2 credentials)</span>
+<span class="n">output_storage_access_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_OUTPUT_STORAGE_ACCESS_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;your-access-key&quot;</span><span class="p">)</span>
+<span class="n">output_storage_secret_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_OUTPUT_STORAGE_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;your-secret-key&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_storage_access_key: </span><span class="si">{</span><span class="n">output_storage_access_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_storage_secret_key: </span><span class="si">{</span><span class="n">output_storage_secret_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># This is the name of the folder in your output_bucket where the output of the hook will be stored.</span>
+<span class="c1"># Here we concatenate &#39;dedl&#39; with the &#39;workflow&#39; and &#39;order_name&#39;</span>
+<span class="n">output_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;dedl-</span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">order_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_prefix            : </span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="use-temporary-storage">
+<h4>2 - Use temporary storage<a class="headerlink" href="#use-temporary-storage" title="Link to this heading">#</a></h4>
+<p>The result of processing will be stored in shared storage and download link provided in the output product details</p>
+<blockquote>
+<div><p><em>workflow parameter: {“Name”: “output_storage”, “Value”: “TEMPORARY”}</em></p>
+</div></blockquote>
+</section>
+</section>
+<section id="define-parameters-and-send-order">
+<h3>Define parameters and send order<a class="headerlink" href="#define-parameters-and-send-order" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># URL of the STAC server where your collection/item can be downloaded</span>
+<span class="n">stac_hda_api_url</span> <span class="o">=</span> <span class="s2">&quot;https://hda.data.destination-earth.eu/stac&quot;</span>
+
+<span class="c1"># Note: The data (collection_id and data_id) will have been previously discovered and searched for</span>
+
+<span class="c1"># Set collection where the item can be found : defaults to example for data-harvest</span>
+<span class="n">collection_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_COLLECTION_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;EO.ESA.DAT.SENTINEL-2.MSI.L1C&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STAC collection url: </span><span class="si">{</span><span class="n">stac_hda_api_url</span><span class="si">}</span><span class="s2">/collections/</span><span class="si">{</span><span class="n">collection_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set the Item to Retrieve : defaults to example for data-harvest. If Multiple Values, provide comma separated list</span>
+<span class="n">data_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_DATA_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;S2A_MSIL1C_20230910T050701_N0509_R019_T47VLH_20230910T074321.SAFE&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data_id: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">identifier_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_id_element</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">data_id_element</span> <span class="ow">in</span> <span class="n">data_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+
+<span class="c1"># Get boolean value from String, default (False)</span>
+<span class="n">is_private_storage</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_IS_PRIVATE_STORAGE&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;is_private_storage: </span><span class="si">{</span><span class="n">is_private_storage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># we use source_type to add DESP or EXTERNAL specific configuration</span>
+<span class="n">source_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_SOURCE_TYPE&quot;</span><span class="p">,</span> <span class="s2">&quot;DESP&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;source_type: </span><span class="si">{</span><span class="n">source_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">source_type</span> <span class="o">==</span> <span class="s2">&quot;EXTERNAL&quot;</span><span class="p">:</span>
+    <span class="n">EXTERNAL_USERNAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_EXTERNAL_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EXTERNAL_USERNAME&quot;</span><span class="p">)</span>
+    <span class="n">EXTERNAL_PASSWORD</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_EXTERNAL_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;EXTERNAL_PASSWORD&quot;</span><span class="p">)</span>
+    <span class="n">EXTERNAL_TOKEN_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_EXTERNAL_TOKEN_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;EXTERNAL_TOKEN_URL&quot;</span><span class="p">)</span>
+    <span class="n">EXTERNAL_CLIENT_ID</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOOK_EXTERNAL_CLIENT_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;EXTERNAL_CLIENT_ID&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">########## BUILD ORDER BODY : CHOOSE PRIVATE or TEMPORARY output_storage ##########</span>
+
+<span class="c1"># Initialise the order_body</span>
+<span class="n">order_body_custom_bucket</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Tutorial &quot;</span> <span class="o">+</span> <span class="n">workflow</span> <span class="o">+</span> <span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="n">order_name</span><span class="p">,</span>
+    <span class="s2">&quot;WorkflowName&quot;</span><span class="p">:</span> <span class="n">workflow</span><span class="p">,</span>
+    <span class="s2">&quot;IdentifierList&quot;</span><span class="p">:</span> <span class="n">identifier_list</span><span class="p">,</span>
+    <span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">}</span>
+
+
+<span class="c1">##### Configure PRIVATE OR TEMPORARY STORAGE #####</span>
+<span class="k">if</span> <span class="n">is_private_storage</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;##### Preparing Order Body for PRIVATE STORAGE #####&quot;</span><span class="p">)</span>
+    <span class="n">order_body_custom_bucket</span><span class="p">[</span><span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_storage&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;PRIVATE&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_s3_access_key&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">output_storage_access_key</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_s3_secret_key&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">output_storage_secret_key</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_s3_path&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;s3://</span><span class="si">{</span><span class="n">output_bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_s3_endpoint_url&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">output_storage_url</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;##### Preparing Order Body for TEMPORARY STORAGE #####&quot;</span><span class="p">)</span>
+    <span class="n">order_body_custom_bucket</span><span class="p">[</span><span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;output_storage&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;TEMPORARY&quot;</span><span class="p">},</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="c1">##### Configure SOURCE_TYPE and associated parameters #####</span>
+<span class="k">if</span> <span class="n">source_type</span> <span class="o">==</span> <span class="s2">&quot;DESP&quot;</span><span class="p">:</span>
+
+    <span class="c1"># Using DESP credentials is standard way of executing Hooks.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;##### Preparing Order Body for access to DEDL HDA using DESP Credentials #####&quot;</span><span class="p">)</span>
+    <span class="n">order_body_custom_bucket</span><span class="p">[</span><span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_type&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;DESP&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;desp_source_username&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">DESP_USERNAME</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;desp_source_password&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">DESP_PASSWORD</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;desp_source_collection&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">collection_id</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="k">elif</span> <span class="n">source_type</span> <span class="o">==</span> <span class="s2">&quot;EXTERNAL&quot;</span><span class="p">:</span>
+
+    <span class="c1"># Build your order body : Example using EXTERNAL source type and source_catalogue_api_type STAC.</span>
+    <span class="c1"># This would allow you to access products directly from a configured STAC server</span>
+    <span class="c1"># Here we show an example configuration of a STAC server with OIDC security, that could be adapted to your needs (change urls, etc)</span>
+    <span class="c1"># This is shown for example purposes only. The standard way of configuring is with DESP source_type seen above.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;##### Preparing Order Body for access to EXTERNAL STAC Server using EXTERNAL Credentials #####&quot;</span><span class="p">)</span>
+    <span class="n">order_body_custom_bucket</span><span class="p">[</span><span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_type&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;EXTERNAL&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_catalogue_api_url&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">stac_hda_api_url</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_catalogue_api_type&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;STAC&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_token_url&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">EXTERNAL_TOKEN_URL</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_grant_type&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;PASSWORD&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_auth_header_name&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;Authorization&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_username&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">EXTERNAL_USERNAME</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_password&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">EXTERNAL_PASSWORD</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">EXTERNAL_CLIENT_ID</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_client_secret&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;source_catalogue_collection&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">collection_id</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;source_type not equal to DESP or EXTERNAL&quot;</span><span class="p">)</span>
+
+
+
+<span class="c1">########## ADDITIONAL OPTIONS ##########</span>
+
+<span class="n">additional_options</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Checks environment variables for the form HOOK_ADDITIONAL1=&quot;NAME=12345;VALUE=abcdef&quot;</span>
+<span class="k">for</span> <span class="n">env_key</span><span class="p">,</span> <span class="n">env_value</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">env_key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;HOOK_ADDITIONAL&#39;</span><span class="p">):</span>
+        <span class="c1">#print(f&quot;{env_key}: {env_value}&quot;)        </span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">env_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># Extract the name and value</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">value_type</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">additional_options</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value_type</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;addditional_options:</span><span class="si">{</span><span class="n">additional_options</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">additional_options</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding additional_options&quot;</span><span class="p">)</span>
+    <span class="n">order_body_custom_bucket</span><span class="p">[</span><span class="s2">&quot;WorkflowOptions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_options</span><span class="p">)</span>
+
+<span class="c1">########## BUILD ORDER BODY : END ##########</span>
+
+<span class="c1"># Send order</span>
+<span class="n">order_request</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="n">hook_service_root_url</span> <span class="o">+</span> <span class="s2">&quot;BatchOrder/OData.CSC.Order&quot;</span><span class="p">,</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">order_body_custom_bucket</span><span class="p">),</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="c1"># If code = 201, the order has been successfully sent</span>
+
+<span class="c1"># Print order_request JSON object: containing order_request details</span>
+<span class="n">order_reques_details</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">order_request</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">order_reques_details</span><span class="p">)</span>
+
+<span class="n">order_id</span> <span class="o">=</span> <span class="n">order_request</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;Id&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;order &#39;Id&#39; from order_request: </span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It is possible to order multiple product using endpoint:
+<code class="docutils literal notranslate"><span class="pre">https://odp.data.destination-earth.eu/odata/v1/BatchOrder/OData.CSC.Order</span></code></p>
+</section>
+</section>
+<section id="check-the-status-of-the-order">
+<h2>Check The status of the order<a class="headerlink" href="#check-the-status-of-the-order" title="Link to this heading">#</a></h2>
+<p>Possible status values</p>
+<ul class="simple">
+<li><p>queued (i.e. queued for treatment but not started)</p></li>
+<li><p>in_progress (i.e. order being treated)</p></li>
+<li><p>completed (i.e. order is complete and data ready)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ProductionOrders endpoint gives status of orders (only with one item attached)</span>
+<span class="c1"># Otherwise use BatchOrder(XXXX)/Products endpoint to get status of individual items associated with order</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">identifier_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">order_status_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">ProductionOrders&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$filter&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;id eq </span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    <span class="n">order_status_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">order_status_url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">order_status_response</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Get Status of all items of an order in this way</span>
+<span class="n">order_status_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">BatchOrder(</span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">)/Products&quot;</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">order_status_response</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="access-workflow-output">
+<h2>Access workflow output<a class="headerlink" href="#access-workflow-output" title="Link to this heading">#</a></h2>
+<section id="private-storage">
+<h3>Private storage<a class="headerlink" href="#private-storage" title="Link to this heading">#</a></h3>
+<p>Let us now check our private storage using this boto3 script.
+You can also go and check this in the Islet service using the Horizon user interface</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PRIVATE STORAGE: Prints contents of Private Bucket</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+
+<span class="k">if</span> <span class="n">is_private_storage</span><span class="p">:</span>
+
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+        <span class="s2">&quot;s3&quot;</span><span class="p">,</span>
+        <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">output_storage_access_key</span><span class="p">,</span>
+        <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">output_storage_secret_key</span><span class="p">,</span>
+        <span class="n">endpoint_url</span><span class="o">=</span><span class="n">output_storage_url</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">paginator</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="s2">&quot;list_objects_v2&quot;</span><span class="p">)</span>
+    <span class="n">pages</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">output_bucket</span><span class="p">,</span> <span class="n">Prefix</span><span class="o">=</span><span class="n">output_prefix</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">page</span><span class="p">[</span><span class="s2">&quot;Contents&quot;</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No files exist&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="temporary-storage">
+<h3>Temporary storage<a class="headerlink" href="#temporary-storage" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># List order items within a production order</span>
+<span class="c1"># When the output_storage is of type TEMPORARY we can get a DownloadLink from the following code (Can also optionally download items here in code with the flag is_download_products)</span>
+
+<span class="c1"># If TEMPORARY storage</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">is_private_storage</span><span class="p">:</span>
+
+    <span class="c1"># Set to True to download products at the same level as the notebook file. File name will be in format &quot;output-{workflow}-{order_id}-{product_id}.zip&quot;</span>
+    <span class="n">is_download_products</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Get Status of all items of an order in this way</span>
+    <span class="n">product_status_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">BatchOrder(</span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">)/Products&quot;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">product_status_response</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">is_download_products</span><span class="p">:</span>
+
+        <span class="n">is_all_products_completed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># We only attempt to download products when each of the items is in complete status.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])):</span>
+
+            <span class="n">product_id</span> <span class="o">=</span> <span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;Id&quot;</span><span class="p">]</span>
+            <span class="n">product_status</span> <span class="o">=</span> <span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">product_status</span> <span class="o">!=</span> <span class="s2">&quot;completed&quot;</span><span class="p">:</span>
+                <span class="n">is_all_products_completed</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Can download if all products completed</span>
+        <span class="k">if</span> <span class="n">is_all_products_completed</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])):</span>
+
+                <span class="n">product_id</span> <span class="o">=</span> <span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;Id&quot;</span><span class="p">]</span>
+                <span class="n">product_status</span> <span class="o">=</span> <span class="n">product_status_response</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span>
+
+                <span class="c1"># Infer the url of the product</span>
+                <span class="n">url_product</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hook_service_root_url</span><span class="si">}</span><span class="s2">BatchOrder(</span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">)/Product(</span><span class="si">{</span><span class="n">product_id</span><span class="si">}</span><span class="s2">)/$value&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;url_product: </span><span class="si">{</span><span class="n">url_product</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Download the product</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">url_product</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">api_headers</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="n">product_file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;output-</span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">product_id</span><span class="si">}</span><span class="s2">.zip&quot;</span>
+                <span class="nb">open</span><span class="p">(</span><span class="n">product_file_name</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download Complete: product_file_name: </span><span class="si">{</span><span class="n">product_file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status for order:</span><span class="si">{</span><span class="n">order_id</span><span class="si">}</span><span class="s2"> - At least one of the products does not have the status of &#39;completed&#39;.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HOOK"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-python-package-requirements-and-import-environment-variables">Install python package requirements and import environment variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authentification-get-token">Authentification - Get token</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-static-variables">Setup static variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-available-workflows">List available workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#select-a-workflow-and-see-parameters">Select a workflow and see parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#order-selected-workflow">Order selected workflow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#name-your-order">Name your order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-output-storage">Define output storage</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#your-user-storage-provided-by-dedl-islet-service">1. - Your user storage (provided by DEDL ISLET service)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#use-temporary-storage">2 - Use temporary storage</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-parameters-and-send-order">Define parameters and send order</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-status-of-the-order">Check The status of the order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#access-workflow-output">Access workflow output</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#private-storage">Private storage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temporary-storage">Temporary storage</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

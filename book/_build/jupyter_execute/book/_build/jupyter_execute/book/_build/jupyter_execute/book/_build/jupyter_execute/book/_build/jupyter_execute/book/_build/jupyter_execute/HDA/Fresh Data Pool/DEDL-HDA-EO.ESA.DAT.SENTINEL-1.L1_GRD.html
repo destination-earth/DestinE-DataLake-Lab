@@ -1,0 +1,1237 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../../../../../../../../../../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../../../../../../../../../../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../../../../../../../../../../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../../../../../../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../../../../../../../../../../../../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../../../../../../../../../../../../../../../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../../../../../../../../../../../../../../../../../../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/Fresh Data Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD';</script>
+    <link rel="index" title="Index" href="../../../../../../../../../../../../../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../../../../../../../../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../../../../../../../../../../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../../../../../../../../../../../../../../../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HOOK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HOOK/gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HOOK/Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../../../../../../../../../../../../../HOOK/DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://binder-217-71-193-124.nip.io/v2/gh/destination-earth/DestinE-DataLake-Lab/master?urlpath=lab/tree/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/Fresh Data Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../../../../../../../../../../../../../../../../../../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/book/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/Fresh+Data+Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.ipynb&branch=master" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on JupyterHub"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="JupyterHub logo" src="../../../../../../../../../../../../../../../../../../../../_static/images/logo_jupyterhub.svg">
+  </span>
+<span class="btn__text-container">JupyterHub</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../../../../../../../../../../../../../../../../../_sources/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/Fresh Data Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">1. Prerequisites</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#destine-account">1.1 DestinE account</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#libraries">1.2 Libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-data">1.3 Prerequisites data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#work-with-hda">2. Work with HDA</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#api-urls">2.1 API URLs</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#listing-available-collections">2.2 Listing available collections</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authorization">2.3 Authorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-newest-product">2.4 Find newest product</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#download-founded-images">2.5 Download founded images</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#urban-areas-extraction-by-tresholding">4. Urban areas extraction by tresholding</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-and-preprocessing-data">4.1 Reading and preprocessing data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pixel-value-covertion-to-decibels">4.2 Pixel value covertion to decibels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-analysis-and-tresholding">4.3 Data analysis and tresholding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#images-ploting">4.4 Images ploting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cuantitive-analysis">4.5 Cuantitive analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results-download">4.6 Results download</a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><img alt="" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/img/DestinE-banner.jpg?raw=true" /></p>
+<p><b>Author:</b> EUMETSAT<br />
+<b>Copyright:</b> 2024 EUMETSAT<br />
+<b>Licence:</b> MIT</p>
+<section class="tex2jax_ignore mathjax_ignore" id="example-of-using-hda-to-find-and-download-data-for-urban-area-monitoring-using-sentinel-1-data">
+<h1>Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data<a class="headerlink" href="#example-of-using-hda-to-find-and-download-data-for-urban-area-monitoring-using-sentinel-1-data" title="Link to this heading">#</a></h1>
+<p>In this notebook, we will present a simple example of how you can access data from DEDL using HDA and what you can do with it. We will demonstrate how to utilize thresholding techniques and compare the values of VV and VH polarizations to analyze urban areas. As an illustration, we will attempt to download Sentinel-1 images containing data of the urban area of Warsaw (Poland).</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="prerequisites">
+<h1>1. Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h1>
+<section id="destine-account">
+<h2>1.1 DestinE account<a class="headerlink" href="#destine-account" title="Link to this heading">#</a></h2>
+<p>Firstly, to work with HDA we will need account on DestinE Core Service Platfrom website. You can register under this url: https://platform.destine.eu/</p>
+</section>
+<section id="libraries">
+<h2>1.2 Libraries<a class="headerlink" href="#libraries" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">from</span> <span class="nn">rasterio.mask</span> <span class="kn">import</span> <span class="n">mask</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">destinelab</span> <span class="k">as</span> <span class="nn">deauth</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="prerequisites-data">
+<h2>1.3 Prerequisites data<a class="headerlink" href="#prerequisites-data" title="Link to this heading">#</a></h2>
+<p>Before reuqesting some data from DEDL, let’s specify what data we want to obtain. We will define 3 variables:</p>
+<ul class="simple">
+<li><p>Start date and end date,</p></li>
+<li><p>Output directory,</p></li>
+<li><p>Geometry of interesting us area</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">date</span> <span class="pre">and</span> <span class="pre">end</span> <span class="pre">date</span></code> will define our timerange in reuqest. HDA will search only for products that were obtained between those two dates.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Output</span> <span class="pre">directory</span></code> will define directory for downloaded products.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Geometry</span></code> wll define our area of interest. It will be passed as BBOX (Bounding Box), as a list of coordinates - Xmin, Ymin, Xmax, Ymax. All coordinates will be defined in EPSG:4326.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Timerange of data that we want to recieve</span>
+<span class="n">start_date</span> <span class="o">=</span> <span class="s1">&#39;2023-07-01&#39;</span>
+<span class="n">end_date</span> <span class="o">=</span> <span class="s1">&#39;2023-07-07&#39;</span>
+<span class="c1"># Output directory of our desired data</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;sen_1/&#39;</span>
+<span class="c1"># Geometry in form of a BBOX</span>
+<span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20.8510</span><span class="p">,</span> <span class="mf">52.0976</span><span class="p">,</span> <span class="mf">21.2712</span><span class="p">,</span> <span class="mf">52.3345</span><span class="p">,]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="work-with-hda">
+<h1>2. Work with HDA<a class="headerlink" href="#work-with-hda" title="Link to this heading">#</a></h1>
+<p>HDA (Harmonized Data Access) uses STAC protocol, that allows its user access the Earth Observation data, stored in various provides. Thanks to that, HDA serves as an one stream of data, allowing for comfortable work with sattelite imagery.</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="api-urls">
+<h1>2.1 API URLs<a class="headerlink" href="#api-urls" title="Link to this heading">#</a></h1>
+<p>HDA, as all API, is build upon many endpoints. In this notebook we will use only one for collections and searching. Below there are definitions of those endpoints. We will be using the common one site, but you can change it to <code class="docutils literal notranslate"><span class="pre">central</span></code>, <code class="docutils literal notranslate"><span class="pre">lumi</span></code> or <code class="docutils literal notranslate"><span class="pre">leonardo</span></code> if you want.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">COLLECTIONS_URL</span> <span class="o">=</span> <span class="s1">&#39;https://hda.data.destination-earth.eu/stac/collections&#39;</span>
+<span class="n">SEARCH_URL</span> <span class="o">=</span> <span class="s1">&#39;https://hda.data.destination-earth.eu/stac/search&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="listing-available-collections">
+<h1>2.2 Listing available collections<a class="headerlink" href="#listing-available-collections" title="Link to this heading">#</a></h1>
+<p>Firstly lets see to what collections we can get access, while using HDA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_stac_collections</span><span class="p">(</span><span class="n">api_url</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">api_url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">stac_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;collections&#39;</span><span class="p">]</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stac_data</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">collections</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+<span class="n">get_stac_collections</span><span class="p">(</span><span class="n">COLLECTIONS_URL</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;EO.AERIS.DAT.IAGOS&#39;,
+ &#39;EO.CLMS.DAT.CORINE&#39;,
+ &#39;EO.CLMS.DAT.GLO.DMP300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.FAPAR300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.FCOVER300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.GDMP300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.LAI300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.NDVI300_V1&#39;,
+ &#39;EO.CLMS.DAT.GLO.NDVI_1KM_V2&#39;,
+ &#39;EO.CLMS.DAT.SENTINEL-2.HRVPP.VI&#39;,
+ &#39;EO.DEM.DAT.COP-DEM_GLO-30-DGED&#39;,
+ &#39;EO.DEM.DAT.COP-DEM_GLO-30-DTED&#39;,
+ &#39;EO.DEM.DAT.COP-DEM_GLO-90-DGED&#39;,
+ &#39;EO.DEM.DAT.COP-DEM_GLO-90-DTED&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_EUROPE_AIR_QUALITY_FORECASTS&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_EUROPE_AIR_QUALITY_REANALYSES&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_ATMOSHERIC_COMPO_FORECAST&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_EMISSION_INVENTORIES&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_FIRE_EMISSIONS_GFAS&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_GREENHOUSE_GAS_REANALYSIS&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_GREENHOUSE_GAS_REANALYSIS_MONTHLY_AV_FIELDS&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_RADIATIVE_FORCING&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_RADIATIVE_FORCING_AUX&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_REANALYSIS_EAC4&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GLOBAL_REANALYSIS_EAC4_MONTHLY_AV_FIELDS&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_GREENHOUSE_GAS_FLUXES&#39;,
+ &#39;EO.ECMWF.DAT.CAMS_SOLAR_RADIATION_TIMESERIES&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_FIRE_HISTORICAL&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_GLOFAS_FORECAST&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_GLOFAS_HISTORICAL&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_GLOFAS_REFORECAST&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_GLOFAS_SEASONAL&#39;,
+ &#39;EO.ECMWF.DAT.CEMS_GLOFAS_SEASONAL_REFORECAST&#39;,
+ &#39;EO.ECMWF.DAT.CO2_DATA_FROM_SATELLITE_SENSORS_2002_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.DERIVED_GRIDDED_GLACIER_MASS_CHANGE&#39;,
+ &#39;EO.ECMWF.DAT.DT_CLIMATE_ADAPTATION&#39;,
+ &#39;EO.ECMWF.DAT.DT_EXTREMES&#39;,
+ &#39;EO.ECMWF.DAT.EFAS_FORECAST&#39;,
+ &#39;EO.ECMWF.DAT.EFAS_HISTORICAL&#39;,
+ &#39;EO.ECMWF.DAT.EFAS_REFORECAST&#39;,
+ &#39;EO.ECMWF.DAT.EFAS_SEASONAL&#39;,
+ &#39;EO.ECMWF.DAT.EFAS_SEASONAL_REFORECAST&#39;,
+ &#39;EO.ECMWF.DAT.ERA5_HOURLY_VARIABLES_ON_PRESSURE_LEVELS&#39;,
+ &#39;EO.ECMWF.DAT.ERA5_LAND_HOURLY&#39;,
+ &#39;EO.ECMWF.DAT.ERA5_LAND_MONTHLY&#39;,
+ &#39;EO.ECMWF.DAT.ERA5_MONTHLY_MEANS_VARIABLES_ON_PRESSURE_LEVELS&#39;,
+ &#39;EO.ECMWF.DAT.GLACIERS_DISTRIBUTION_DATA_FROM_RANDOLPH_GLACIER_INVENTORY_2000&#39;,
+ &#39;EO.ECMWF.DAT.METHANE_DATA_SATELLITE_SENSORS_2002_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS&#39;,
+ &#39;EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS_MONTHLY_MEANS&#39;,
+ &#39;EO.ECMWF.DAT.REANALYSIS_UERRA_EUROPE_SINGLE_LEVELS&#39;,
+ &#39;EO.ECMWF.DAT.SATELLITE_SEA_ICE_CONCENTRATION&#39;,
+ &#39;EO.ECMWF.DAT.SATELLITE_SEA_ICE_EDGE_TYPE&#39;,
+ &#39;EO.ECMWF.DAT.SATELLITE_SEA_ICE_THICKNESS&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_ANOMALIES_ON_PRESSURE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_ANOMALIES_ON_SINGLE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_DAILY_DATA_ON_PRESSURE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_DAILY_DATA_ON_SINGLE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_MONTHLY_STATISTICS_ON_PRESSURE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEASONAL_FORECAST_MONTHLY_STATISTICS_ON_SINGLE_LEVELS_2017_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SEA_LEVEL_DAILY_GRIDDED_DATA_FOR_GLOBAL_OCEAN_1993_PRESENT&#39;,
+ &#39;EO.ECMWF.DAT.SIS_HYDROLOGY_METEOROLOGY_DERIVED_PROJECTIONS&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-1.L1_GRD&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-1.L1_SLC&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-2.MSI.L1C&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-2.MSI.L2A&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-3.OL_2_LFR___&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-3.OL_2_LRR___&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-3.SL_2_LST___&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-3.SR_2_LAN___&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-5P.TROPOMI.L1&#39;,
+ &#39;EO.ESA.DAT.SENTINEL-5P.TROPOMI.L2&#39;,
+ &#39;EO.EUM.CM.METOP.ASCSZFR02&#39;,
+ &#39;EO.EUM.CM.METOP.ASCSZOR02&#39;,
+ &#39;EO.EUM.CM.METOP.ASCSZRR02&#39;,
+ &#39;EO.EUM.DAT.AMVR02&#39;,
+ &#39;EO.EUM.DAT.GSAL2R02&#39;,
+ &#39;EO.EUM.DAT.METOP.AMSUL1&#39;,
+ &#39;EO.EUM.DAT.METOP.ASCSZF1B&#39;,
+ &#39;EO.EUM.DAT.METOP.ASCSZO1B&#39;,
+ &#39;EO.EUM.DAT.METOP.ASCSZR1B&#39;,
+ &#39;EO.EUM.DAT.METOP.AVHRRGACR02&#39;,
+ &#39;EO.EUM.DAT.METOP.AVHRRL1&#39;,
+ &#39;EO.EUM.DAT.METOP.GLB-SST-NC&#39;,
+ &#39;EO.EUM.DAT.METOP.GOMEL1&#39;,
+ &#39;EO.EUM.DAT.METOP.GOMEL1R03&#39;,
+ &#39;EO.EUM.DAT.METOP.IASIL1C-ALL&#39;,
+ &#39;EO.EUM.DAT.METOP.IASSND02&#39;,
+ &#39;EO.EUM.DAT.METOP.IASTHR011&#39;,
+ &#39;EO.EUM.DAT.METOP.LSA-002&#39;,
+ &#39;EO.EUM.DAT.METOP.MHSL1&#39;,
+ &#39;EO.EUM.DAT.METOP.OSI-104&#39;,
+ &#39;EO.EUM.DAT.METOP.OSI-150-A&#39;,
+ &#39;EO.EUM.DAT.METOP.OSI-150-B&#39;,
+ &#39;EO.EUM.DAT.METOP.SOMO12&#39;,
+ &#39;EO.EUM.DAT.METOP.SOMO25&#39;,
+ &#39;EO.EUM.DAT.MSG.CLM&#39;,
+ &#39;EO.EUM.DAT.MSG.CLM-IODC&#39;,
+ &#39;EO.EUM.DAT.MSG.HRSEVIRI&#39;,
+ &#39;EO.EUM.DAT.MSG.HRSEVIRI-IODC&#39;,
+ &#39;EO.EUM.DAT.MSG.LSA-FRM&#39;,
+ &#39;EO.EUM.DAT.MSG.LSA-LST-CDR&#39;,
+ &#39;EO.EUM.DAT.MSG.LSA-LSTDE&#39;,
+ &#39;EO.EUM.DAT.MSG.MSG15-RSS&#39;,
+ &#39;EO.EUM.DAT.MSG.RSS-CLM&#39;,
+ &#39;EO.EUM.DAT.MULT.HIRSL1&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.AOD&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.FRP&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.OL_1_EFR___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.OL_1_ERR___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.OL_2_WFR___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.OL_2_WRR___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SL_1_RBT___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SL_2_WST___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SR_1_SRA_A_&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SR_1_SRA_BS&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SR_1_SRA___&#39;,
+ &#39;EO.EUM.DAT.SENTINEL-3.SR_2_WAT___&#39;,
+ &#39;EO.GSW.DAT.CHANGE&#39;,
+ &#39;EO.GSW.DAT.EXTENT&#39;,
+ &#39;EO.GSW.DAT.OCCURRENCE&#39;,
+ &#39;EO.GSW.DAT.RECURRENCE&#39;,
+ &#39;EO.GSW.DAT.SEASONALITY&#39;,
+ &#39;EO.GSW.DAT.TRANSITIONS&#39;,
+ &#39;EO.MO.DAT.GLOBAL_ANALYSISFORECAST_BGC_001_028&#39;,
+ &#39;EO.MO.DAT.GLOBAL_ANALYSISFORECAST_PHY_001_024&#39;,
+ &#39;EO.MO.DAT.GLOBAL_ANALYSISFORECAST_WAV_001_027&#39;,
+ &#39;EO.MO.DAT.GLOBAL_MULTIYEAR_BGC_001_033&#39;,
+ &#39;EO.MO.DAT.GLOBAL_MULTIYEAR_PHY_ENS_001_031&#39;,
+ &#39;EO.MO.DAT.GLOBAL_MULTIYEAR_WAV_001_032&#39;,
+ &#39;EO.MO.DAT.INSITU_GLO_PHY_TS_OA_MY_013_052&#39;,
+ &#39;EO.MO.DAT.INSITU_GLO_PHY_TS_OA_NRT_013_002&#39;,
+ &#39;EO.MO.DAT.INSITU_GLO_PHY_UV_DISCRETE_NRT_013_048&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_BGC_NUTRIENTS_CARBON_PROFILES_MYNRT_015_009&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_BIO_BGC_3D_REP_015_010&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_BIO_CARBON_SURFACE_REP_015_008&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_PHY_MYNRT_015_003&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012&#39;,
+ &#39;EO.MO.DAT.MULTIOBS_GLO_PHY_W_3D_REP_015_007&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_MY_009_103&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_MY_009_107&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L3_NRT_009_101&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_MY_009_104&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_MY_009_108&#39;,
+ &#39;EO.MO.DAT.OCEANCOLOUR_GLO_BGC_L4_NRT_009_102&#39;,
+ &#39;EO.MO.DAT.SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001&#39;,
+ &#39;EO.MO.DAT.SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_006&#39;,
+ &#39;EO.MO.DAT.SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009&#39;,
+ &#39;EO.MO.DAT.SEALEVEL_GLO_PHY_L4_NRT_008_046&#39;,
+ &#39;EO.MO.DAT.SEALEVEL_GLO_PHY_MDT_008_063&#39;,
+ &#39;EO.MO.DAT.SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010&#39;,
+ &#39;EO.MO.DAT.SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001&#39;,
+ &#39;EO.MO.DAT.SST_GLO_SST_L4_REP_OBSERVATIONS_010_011&#39;,
+ &#39;EO.MO.DAT.SST_GLO_SST_L4_REP_OBSERVATIONS_010_024&#39;,
+ &#39;EO.MO.DAT.WAVE_GLO_PHY_SWH_L3_NRT_014_001&#39;,
+ &#39;EO.MO.DAT.WAVE_GLO_PHY_SWH_L4_NRT_014_003&#39;,
+ &#39;EO.MO.DAT.WAVE_GLO_WAV_L3_SPC_NRT_OBSERVATIONS_014_002&#39;,
+ &#39;EO.MO.DAT.WIND_GLO_PHY_CLIMATE_L4_MY_012_003&#39;,
+ &#39;EO.MO.DAT.WIND_GLO_PHY_L3_MY_012_005&#39;,
+ &#39;EO.MO.DAT.WIND_GLO_PHY_L3_NRT_012_002&#39;,
+ &#39;EO.MO.DAT.WIND_GLO_PHY_L4_MY_012_006&#39;,
+ &#39;EO.MO.DAT.WIND_GLO_PHY_L4_NRT_012_004&#39;,
+ &#39;EO.NASA.DAT.LANDSAT.C2_L1&#39;,
+ &#39;EO.NASA.DAT.LANDSAT.C2_L2&#39;,
+ &#39;STAT.EUSTAT.DAT.GREENHOUSE_GAS_EMISSION_AGRICULTURE&#39;,
+ &#39;STAT.EUSTAT.DAT.POP_AGE_GROUP_SEX_NUTS3&#39;,
+ &#39;STAT.EUSTAT.DAT.POP_AGE_SEX_NUTS2&#39;,
+ &#39;STAT.EUSTAT.DAT.POP_CHANGE_DEMO_BALANCE_CRUDE_RATES_NUTS3&#39;,
+ &#39;STAT.EUSTAT.DAT.SHARE_ENERGY_FROM_RENEWABLE&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>As you can see, there are many dataset, that can be access using just one single tool - HDA. In this notebook we will use only Sentinel-1 (GRDH) images, so our collection will be <code class="docutils literal notranslate"><span class="pre">EO.ESA.DAT.SENTINEL-1.L1_GRD</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">collections</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EO.ESA.DAT.SENTINEL-1.L1_GRD&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="authorization">
+<h2>2.3 Authorization<a class="headerlink" href="#authorization" title="Link to this heading">#</a></h2>
+<p>As stated before, to use HDA you will need an account on DestinE. Using your credentials, you will be able to generate <code class="docutils literal notranslate"><span class="pre">access</span> <span class="pre">token</span></code>, that will be needed in upcoming requests. In listing collections’ cell you didn’t have to create token, because only more advanced requests (like listing, searching and downloading items) need it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DESP_USERNAME</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please input your DESP username or email: &quot;</span><span class="p">)</span>
+<span class="n">DESP_PASSWORD</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please input your DESP password: &quot;</span><span class="p">)</span>
+
+<span class="n">auth</span> <span class="o">=</span> <span class="n">deauth</span><span class="o">.</span><span class="n">AuthHandler</span><span class="p">(</span><span class="n">DESP_USERNAME</span><span class="p">,</span> <span class="n">DESP_PASSWORD</span><span class="p">)</span>
+<span class="n">access_token</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEDL/DESP Access Token Obtained Successfully&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to Obtain DEDL/DESP Access Token&quot;</span><span class="p">)</span>
+
+<span class="n">auth_headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">access_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="find-newest-product">
+<h2>2.4 Find newest product<a class="headerlink" href="#find-newest-product" title="Link to this heading">#</a></h2>
+<p>After defining all prerequired data and obtaining access token, we can start searching for interesting us products. To do that, we will firstly create body of a POST request with ours parameters. Then, we will send it to HDA and, if request is successful, we will read from response download link.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">search_items</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">search_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span> <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;datetime&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">start_date</span><span class="si">}</span><span class="s1">T00:00:00Z/</span><span class="si">{</span><span class="n">end_date</span><span class="si">}</span><span class="s1">T23:59:59Z&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;collections&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">collection</span><span class="p">],</span>
+        <span class="s1">&#39;bbox&#39;</span><span class="p">:</span> <span class="n">bbox</span>
+    <span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">search_url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">access_token</span><span class="p">)})</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error in search request: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Request successful! Reading data...&quot;</span><span class="p">)</span>
+        <span class="n">products_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;downloadLink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">),</span> <span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;links&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;features&#39;</span><span class="p">,</span> <span class="p">[])]</span>
+        <span class="k">return</span> <span class="n">products_list</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">collections_items</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+    <span class="n">collections_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search_items</span><span class="p">(</span><span class="n">access_token</span><span class="p">,</span> <span class="n">SEARCH_URL</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="download-founded-images">
+<h2>2.5 Download founded images<a class="headerlink" href="#download-founded-images" title="Link to this heading">#</a></h2>
+<p>After obtaining URLs for each interesting us product, we can download it with one request. Product will be downloaded compressed in zip format.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hda_download</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">access_token</span><span class="p">),</span> <span class="s1">&#39;Accept-Encoding&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Downloading dataset...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> <span class="k">as</span> <span class="n">z</span><span class="p">:</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The dataset has been downloaded to: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Request Unsuccessful! Error-Code: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">collections_items</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">collection</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">product_id</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">download_path</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">+</span> <span class="n">product_id</span>
+        <span class="n">hda_download</span><span class="p">(</span><span class="n">access_token</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">download_path</span><span class="p">)</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="urban-areas-extraction-by-tresholding">
+<h1>4. Urban areas extraction by tresholding<a class="headerlink" href="#urban-areas-extraction-by-tresholding" title="Link to this heading">#</a></h1>
+<p>The analysis of Synthetic Aperture Radar (SAR) images enables the detection of variations in radar wave reflections, which is crucial for identifying urbanized areas. SAR images exhibit distinct reflection patterns that allow for the delineation of urban areas, including agglomerations and smaller urban settlements. Urbanized areas stand out in these images primarily due to the intense reflection of radar waves by man-made structures, roads, and other artificial elements of infrastructure, facilitating their clear identification contrasted with natural terrain. Such analysis of areas like the Warsaw agglomeration can serve for monitoring city growth and development, urban planning, assessment of natural and anthropogenic threats, and environmental management. The image clearly depicts the Warsaw agglomeration area, adjacent to the region between the Warsaw and Łódź agglomerations. This space is currently planned for development to connect both agglomerations. In the central part of the frame, there are plans for establishing a large airport complex.</p>
+<section id="reading-and-preprocessing-data">
+<h2>4.1 Reading and preprocessing data<a class="headerlink" href="#reading-and-preprocessing-data" title="Link to this heading">#</a></h2>
+<p>The first step in our analysis will be data reading. The data will be read using the rasterio library from the output folder path provided in the previous section.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Function to find files containing specific substrings (&quot;vv&quot; and &quot;vh&quot;) in their names</span>
+<span class="k">def</span> <span class="nf">find_files_with_names</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="o">*</span><span class="n">names</span><span class="p">):</span>
+    <span class="n">vv_path</span> <span class="o">=</span> <span class="kc">None</span>  
+    <span class="n">vh_path</span> <span class="o">=</span> <span class="kc">None</span>  
+    
+    <span class="c1"># Traverse the directory tree starting at folder_path</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">folder_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dirs</span><span class="p">:</span>  <span class="c1"># Check if there are subdirectories</span>
+            <span class="n">first_subfolder</span> <span class="o">=</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">measurement_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">first_subfolder</span><span class="p">,</span> <span class="s2">&quot;measurement&quot;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">measurement_folder</span><span class="p">):</span>
+                <span class="c1"># Look through the files in the &quot;measurement&quot; folder</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">measurement_folder</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s2">&quot;vv&quot;</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+                        <span class="n">vv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">measurement_folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;vh&quot;</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+                        <span class="n">vh_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">measurement_folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                <span class="k">break</span>  <span class="c1"># Exit after finding the files</span>
+    <span class="k">return</span> <span class="n">vv_path</span><span class="p">,</span> <span class="n">vh_path</span>
+
+<span class="c1"># Find the &quot;vv&quot; and &quot;vh&quot; files in the specified directory</span>
+<span class="n">input_file_vv</span><span class="p">,</span> <span class="n">input_file_vh</span> <span class="o">=</span> <span class="n">find_files_with_names</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;vv&quot;</span><span class="p">,</span> <span class="s2">&quot;vh&quot;</span><span class="p">)</span>
+
+<span class="c1"># Open the &quot;vv&quot; file and read its data and profile</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_file_vv</span><span class="p">)</span> <span class="k">as</span> <span class="n">src_vv</span><span class="p">:</span>
+    <span class="n">vv_band</span> <span class="o">=</span> <span class="n">src_vv</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">profile_vv</span> <span class="o">=</span> <span class="n">src_vv</span><span class="o">.</span><span class="n">profile</span>
+
+<span class="c1"># Open the &quot;vh&quot; file and read its data and profile</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_file_vh</span><span class="p">)</span> <span class="k">as</span> <span class="n">src_vh</span><span class="p">:</span>
+    <span class="n">vh_band</span> <span class="o">=</span> <span class="n">src_vh</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">profile_vh</span> <span class="o">=</span> <span class="n">src_vh</span><span class="o">.</span><span class="n">profile</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pixel-value-covertion-to-decibels">
+<h2>4.2 Pixel value covertion to decibels<a class="headerlink" href="#pixel-value-covertion-to-decibels" title="Link to this heading">#</a></h2>
+<p>After reading the data, we can convert the pixel values to decibels. Data from Sentinel-1 is converted to the decibel scale (dB) to better visualize differences in the intensity of radar wave reflection, which aids in the analysis of urban areas due to their specific reflection characteristics.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convert_to_db</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="c1"># Replace zeros with a small positive value to avoid taking log of zero</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">image</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>  
+
+    <span class="c1"># Calculate dB values</span>
+    <span class="n">image_db</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="c1"># Replace infinite values with the maximum finite value</span>
+    <span class="n">max_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">image_db</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">image_db</span><span class="p">)])</span>  
+    <span class="n">image_db</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">image_db</span><span class="p">)]</span> <span class="o">=</span> <span class="n">max_value</span>  
+
+    <span class="k">return</span> <span class="n">image_db</span>
+
+<span class="n">vv_band_db</span> <span class="o">=</span> <span class="n">convert_to_db</span><span class="p">(</span><span class="n">vv_band</span><span class="p">)</span>
+<span class="n">vh_band_db</span> <span class="o">=</span> <span class="n">convert_to_db</span><span class="p">(</span><span class="n">vh_band</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2710/220689011.py:6: RuntimeWarning: divide by zero encountered in log10
+  image_db = 10 * np.log10(image)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="data-analysis-and-tresholding">
+<h2>4.3 Data analysis and tresholding<a class="headerlink" href="#data-analysis-and-tresholding" title="Link to this heading">#</a></h2>
+<p>The next step involves plotting histograms of the decibel pixel values for both the VV and VH bands. These histograms provide insights into the distribution of radar reflection intensities, aiding in understanding the characteristics of the observed area. The chosen thresholds, 23.5 dB for VV and 21.5 dB for VH, are selected based on prior knowledge or analysis requirements specific to urban areas to segment regions of interest in the images. The thresholding method applied here converts pixel values above the threshold to 1 and those below to 0, aiding in the delineation of features or areas with specific radar reflection characteristics typical of urban environments.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Histogram of VV Image in dB</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">vv_band_db</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;VV dB&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Histogram of VV Image in dB&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Radar Reflection Value (dB)&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Pixels&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Histogram of VH Image in dB</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">vh_band_db</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;VH dB&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Histogram of VH Image in dB&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Radar Reflection Value (dB)&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Pixels&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Function to apply a threshold to an image</span>
+<span class="c1"># Pixels greater than the threshold are set to 1, others to 0</span>
+<span class="k">def</span> <span class="nf">thresholding</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># Define threshold values for VV and VH bands</span>
+<span class="n">threshold_value_vv</span> <span class="o">=</span> <span class="mf">23.5</span>
+<span class="n">threshold_value_vh</span> <span class="o">=</span> <span class="mf">21.5</span>
+
+<span class="c1"># Apply thresholding to the VV and VH band</span>
+<span class="n">vv_band_threshold</span> <span class="o">=</span> <span class="n">thresholding</span><span class="p">(</span><span class="n">vv_band_db</span><span class="p">,</span> <span class="n">threshold_value_vv</span><span class="p">)</span>
+<span class="n">vh_band_threshold</span> <span class="o">=</span> <span class="n">thresholding</span><span class="p">(</span><span class="n">vh_band_db</span><span class="p">,</span> <span class="n">threshold_value_vh</span><span class="p">)</span>
+
+<span class="c1"># Combine the thresholded images using a logical AND operation</span>
+<span class="c1"># The result is 1 where both VV and VH are above their respective thresholds</span>
+<span class="n">combined_threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">vv_band_threshold</span><span class="p">,</span> <span class="n">vh_band_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../../../../../../../../../../../../../../../../../../_images/8b40940d2d73c36a3e2a2382401203f27aa3954ef4b5a5a4792bd1a4381f4cbc.png" src="../../../../../../../../../../../../../../../../../../../../_images/8b40940d2d73c36a3e2a2382401203f27aa3954ef4b5a5a4792bd1a4381f4cbc.png" />
+</div>
+</div>
+</section>
+<section id="images-ploting">
+<h2>4.4 Images ploting<a class="headerlink" href="#images-ploting" title="Link to this heading">#</a></h2>
+<p>Next on the subplots we can visualize the differences in radio signal reflection for various polarization types. By displaying the original and decibel-transformed images for both VV and VH polarizations, we can observe distinct features and intensities in urban areas. Furthermore, by combining information from both polarizations through thresholding, we enhance our ability to mask urbanized regions, providing a more comprehensive understanding of the observed area’s urban characteristics.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a figure with a 3x2 grid of subplots, setting the overall figure size</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span> 
+
+<span class="c1"># Display the original VV image</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vv_band</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original VV Image&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the VV image in decibels</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vv_band_db</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;VV Image in dB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the VV image after thresholding</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vv_band_threshold</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;VV Image after Thresholding&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the original VH image</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vh_band</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original VH Image&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the VH image in decibels</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vh_band_db</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;VH Image in dB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the VH image after thresholding</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vh_band_threshold</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;VH Image after Thresholding&#39;</span><span class="p">)</span>
+
+<span class="c1"># Turn off the axes for all subplots to improve the visual presentation</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="c1"># Show the complete figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../../../../../../../../../../../../../../../../../../_images/7a43df9d38b63bd67c5e4293a6850acd3cb96ca890fe6982a675a8ba7e83d847.png" src="../../../../../../../../../../../../../../../../../../../../_images/7a43df9d38b63bd67c5e4293a6850acd3cb96ca890fe6982a675a8ba7e83d847.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display the combined threshold image using a specific colormap</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">combined_threshold</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;twilight_shifted&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Combined Threshold Image&#39;</span><span class="p">)</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../../../../../../../../../../../../../../../../../../_images/1d117b39f37d395a768b8568839c8041a59a9dc9e901932513a461da3ed5b11c.png" src="../../../../../../../../../../../../../../../../../../../../_images/1d117b39f37d395a768b8568839c8041a59a9dc9e901932513a461da3ed5b11c.png" />
+</div>
+</div>
+<p>This method of data analysis facilitates straightforward masking of urbanized areas. In the processed image, the Warsaw agglomeration is clearly visible on the right side. A star-shaped accumulation of population is apparent in Warsaw along major transportation corridors such as railways and expressways. Smaller urban centers are visible in the image. Furthermore, it can be observed that the number of masked pixels accumulates as we approach the city center, indicating denser urban development in the downtown area compared to the suburbs.</p>
+</section>
+<section id="cuantitive-analysis">
+<h2>4.5 Cuantitive analysis<a class="headerlink" href="#cuantitive-analysis" title="Link to this heading">#</a></h2>
+<p>After processing our satellite images, we can conduct quantitative analysis. The characteristics of the satellite data enable us to analyze individual pixel values, which is crucial for detailed and statistical studies. In our case, having the data thresholded and the size of each pixel being 10x10 meters, we can calculate the percentage and the adequate size of the urbanized area.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the number of urban pixels by summing up the binary values in the combined threshold image</span>
+<span class="n">urban_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">combined_threshold</span><span class="p">)</span>
+
+<span class="c1"># Define the area covered by a single pixel (in square meters)</span>
+<span class="n">pixel_area</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">10</span>  <span class="c1"># Assuming each pixel represents a 10m x 10m area</span>
+
+<span class="c1"># Calculate the total urban area in square meters</span>
+<span class="n">urban_area</span> <span class="o">=</span> <span class="n">urban_pixels</span> <span class="o">*</span> <span class="n">pixel_area</span>
+
+<span class="c1"># Calculate the total number of pixels in the combined threshold image</span>
+<span class="n">total_pixels</span> <span class="o">=</span> <span class="n">combined_threshold</span><span class="o">.</span><span class="n">size</span>
+
+<span class="c1"># Calculate the percentage of urbanized area in the image</span>
+<span class="n">urban_percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">urban_pixels</span> <span class="o">/</span> <span class="n">total_pixels</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="c1"># Convert urban area from square meters to hectares</span>
+<span class="n">urban_area_hectares</span> <span class="o">=</span> <span class="n">urban_area</span> <span class="o">/</span> <span class="mi">10_000</span>  
+
+<span class="c1"># Convert total area from square meters to hectares</span>
+<span class="n">total_area_hectares</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_pixels</span> <span class="o">*</span> <span class="n">pixel_area</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10_000</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Percentage of Urbanized Area: </span><span class="si">{</span><span class="n">urban_percentage</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Urbanized Area: </span><span class="si">{</span><span class="n">urban_area_hectares</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ha&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Image Area: </span><span class="si">{</span><span class="n">total_area_hectares</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ha&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Percentage of Urbanized Area: 12.60%
+Urbanized Area: 557958.76 ha
+Total Image Area: 4427348.42 ha
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="results-download">
+<h2>4.6 Results download<a class="headerlink" href="#results-download" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define output file names</span>
+<span class="n">output_file_db_vv</span> <span class="o">=</span> <span class="s1">&#39;vv_db_urban_warsaw.tif&#39;</span>
+<span class="n">output_file_db_vh</span> <span class="o">=</span> <span class="s1">&#39;vh_db_urban_warsaw.tif&#39;</span>
+<span class="n">output_file_threshold_combined</span> <span class="o">=</span> <span class="s1">&#39;warsaw_urban_threshold_combined.tif&#39;</span>
+
+<span class="c1"># Update the data type in the profile to float32 for dB conversion</span>
+<span class="n">profile_vv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">profile_vh</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Write the result data in dB to the output file</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_file_db_vv</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile_vv</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+    <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vv_band_db</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_file_db_vh</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile_vh</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+    <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vh_band_db</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Update the data type in the VV profile to uint8 for the combined thresholded image</span>
+<span class="n">profile_vv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># Write the combined thresholded image data to the output file</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_file_threshold_combined</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile_vv</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+    <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">combined_threshold</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/patryk/miniconda3/envs/hda/lib/python3.11/site-packages/rasterio/__init__.py:314: NotGeoreferencedWarning: The given matrix is equal to Affine.identity or its flipped counterpart. GDAL may ignore this matrix and save no geotransform without raising an error. This behavior is somewhat driver-specific.
+  dataset = writer(
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python_dedl",
+            path: "./book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/book/_build/jupyter_execute/HDA/Fresh Data Pool"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python_dedl'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">1. Prerequisites</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#destine-account">1.1 DestinE account</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#libraries">1.2 Libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-data">1.3 Prerequisites data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#work-with-hda">2. Work with HDA</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#api-urls">2.1 API URLs</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#listing-available-collections">2.2 Listing available collections</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authorization">2.3 Authorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-newest-product">2.4 Find newest product</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#download-founded-images">2.5 Download founded images</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#urban-areas-extraction-by-tresholding">4. Urban areas extraction by tresholding</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-and-preprocessing-data">4.1 Reading and preprocessing data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pixel-value-covertion-to-decibels">4.2 Pixel value covertion to decibels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-analysis-and-tresholding">4.3 Data analysis and tresholding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#images-ploting">4.4 Images ploting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cuantitive-analysis">4.5 Cuantitive analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results-download">4.6 Results download</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../../../../../../../../../../../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../../../../../../../../../../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

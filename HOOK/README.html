@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Hook Service &#8212; DestinE DataLake Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'HOOK/README';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="HOOK Gallery" href="gallery.html" />
+    <link rel="prev" title="HDA PySTAC-Client Introduction" href="../HDA/PySTAC/HDA-PyStac-Client.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DestinE DataLake Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../README.html">
+                    DestinE-DataLake-Lab
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../STACK/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../STACK/gallery.html">STACK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../STACK/DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../STACK/STACK-Python-Client-Dask.html">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../STACK/ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../STACK/ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../STACK/STACK-Dask-101.html">STACK service - Dask 101</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../HDA/README.html">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOOK</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gallery.html">HOOK - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html">DEDL - Hook Tutorial - Data Harvest (data-harvest)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DEDL-Hook_access.html">Access to Hook services</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/HOOK/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Hook Service</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebooks">Notebooks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tutorial-how-to-discover-available-workflows-and-run-one-example-data-harvest-workflow"><span class="xref myst">Tutorial</span>: How to discover available workflows and run one example (data-harvest workflow)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dedl-hook-access-ipynb-simple-retrieval-of-token-and-listing-of-workflows"><span class="xref myst">DEDL-Hook_access.ipynb</span>: Simple retrieval of token and listing of workflows</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-information">Further Information</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><img alt="Destination Earth banner" src="../_images/DestinE-banner.jpg" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="hook-service">
+<h1>Hook Service<a class="headerlink" href="#hook-service" title="Link to this heading">#</a></h1>
+<p><img alt="../_images/EUMETSAT-icon.png" src="../_images/EUMETSAT-icon.png" /> <strong>Author:</strong> EUMETSAT
+<br></p>
+<p>This folder contains materials for learning how to use Hook Service.</p>
+<p>The Destination Earth Data Lake (DEDL) ‘Hook service’ provides ready-to-use high level serverless workflows and functions preconfigured to efficiently access and manipulate Destination Earth Data Lake (DEDL) data. A growing number of workflows and functions will provide on-demand capabilities for the diverse data analysis needs.</p>
+<section id="notebooks">
+<h2>Notebooks<a class="headerlink" href="#notebooks" title="Link to this heading">#</a></h2>
+<section id="tutorial-how-to-discover-available-workflows-and-run-one-example-data-harvest-workflow">
+<h3><a class="reference internal" href="#"><span class="xref myst">Tutorial</span></a>: How to discover available workflows and run one example (data-harvest workflow)<a class="headerlink" href="#tutorial-how-to-discover-available-workflows-and-run-one-example-data-harvest-workflow" title="Link to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#The Tutorial.ipynb is executeable as-is, but parameters can be provided from a file .env_tutorial</span>
+<span class="c1">#To provide environment parameters from file</span>
+
+<span class="c1"># 1. create a file called .env_tutorial in the same folder as the notebook</span>
+<span class="c1"># 2. paste in the following contents</span>
+<span class="c1"># 3. execute the Tutorial.ipynb notebook which should now pick up the environment variables from file</span>
+
+<span class="c1">########## SET HOOK_ORDER_NAME ##########</span>
+<span class="c1"># This will be added to the order name. e.g. replace XXXX with your name</span>
+
+<span class="nv">HOOK_ORDER_NAME</span><span class="o">=</span>XXXX-20241009-1
+
+<span class="c1">########## SET WORKFLOW, COLLECTION_ID and DATA_ID ##########</span>
+<span class="c1"># Uncomment HOOK_WORKFLOW (to identify the HOOK to execute)</span>
+<span class="c1"># Uncomment HOOK_COLLECTION_ID (to identify the DEDL Collection where the data comes from)</span>
+<span class="c1"># Uncomment HOOK_DATA_ID (to identify the data that is input to the HOOK)</span>
+<span class="c1"># Uncomment HOOK_SOURCE_TYPE (to identify the source_type of the HOOK. Possible values are DESP, EXTERNAL...)</span>
+
+<span class="c1"># DEDL HDA input possible</span>
+
+<span class="c1">#HOOK_WORKFLOW=card_bs</span>
+<span class="c1">#HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-1.L1_GRD</span>
+<span class="c1">#HOOK_DATA_ID=S1A_IW_GRDH_1SDV_20230910T054256_20230910T054321_050261_060CD9_BF21.SAFE</span>
+<span class="c1">#HOOK_SOURCE_TYPE=DESP</span>
+
+<span class="c1">#HOOK_WORKFLOW=lai</span>
+<span class="c1">#HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-2.MSI.L2A</span>
+<span class="c1">#HOOK_DATA_ID=S2A_MSIL2A_20230906T102601_N0509_R108_T32UMA_20230906T164400.SAFE</span>
+<span class="c1">#HOOK_SOURCE_TYPE=DESP</span>
+
+<span class="c1"># INPUT PRODUCT TYPES: SLC, S1_SLC__1S, S2_SLC__1S, S3_SLC__1S, S4_SLC__1S, S5_SLC__1S, S6_SLC__1S, IW_SLC__1S, EW_SLC__1S, WV_SLC__1S</span>
+<span class="c1">#HOOK_WORKFLOW=card_cohinf</span>
+<span class="c1">#HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-1.L1_SLC</span>
+<span class="c1">#HOOK_DATA_ID=S1A_IW_SLC__1SDV_20240121T155314_20240121T155341_052207_064FA6_3AB9</span>
+<span class="c1">#HOOK_ADDITIONAL1=&quot;NAME=card_producttype;VALUE=CARD_COH;VALUE_TYPE=str&quot;</span>
+<span class="c1">#HOOK_DATA_ID=S1A_IW_SLC__1SDV_20230930T172417_20230930T172444_050560_06170F_59DF</span>
+<span class="c1">#HOOK_ADDITIONAL1=&quot;NAME=card_producttype;VALUE=CARD_INF;VALUE_TYPE=str&quot;</span>
+<span class="c1">#HOOK_ADDITIONAL2=&quot;NAME=timespan;VALUE=24;VALUE_TYPE=int&quot;</span>
+<span class="c1">#HOOK_SOURCE_TYPE=DESP</span>
+
+<span class="c1">#HOOK_WORKFLOW=c2rcc</span>
+<span class="c1">#HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-2.MSI.L1C</span>
+<span class="c1">#HOOK_DATA_ID=S2B_MSIL1C_20231001T102739_N0509_R108_T31TGL_20231001T123227</span>
+<span class="c1">#HOOK_SOURCE_TYPE=DESP</span>
+
+<span class="nv">HOOK_WORKFLOW</span><span class="o">=</span>data-harvest
+<span class="nv">HOOK_COLLECTION_ID</span><span class="o">=</span>EO.ESA.DAT.SENTINEL-2.MSI.L1C
+<span class="nv">HOOK_DATA_ID</span><span class="o">=</span>S2A_MSIL1C_20230910T050701_N0509_R019_T47VLH_20230910T074321.SAFE
+<span class="nv">HOOK_SOURCE_TYPE</span><span class="o">=</span>DESP
+<span class="c1">#HOOK_SOURCE_TYPE=EXTERNAL</span>
+<span class="c1">#HOOK_EXTERNAL_TOKEN_URL=https://identity.XXXX/auth/realms/XXXX/protocol/openid-connect/token</span>
+<span class="c1">#HOOK_EXTERNAL_CLIENT_ID=hda_public</span>
+<span class="c1">#HOOK_EXTERNAL_USERNAME=</span>
+<span class="c1">#HOOK_EXTERNAL_PASSWORD=</span>
+
+<span class="c1">#HOOK_WORKFLOW=sen2cor</span>
+<span class="c1">#HOOK_COLLECTION_ID=EO.ESA.DAT.SENTINEL-2.MSI.L1C</span>
+<span class="c1">#HOOK_DATA_ID=S2B_MSIL1C_20231001T102739_N0509_R108_T32TMS_20231001T123227</span>
+<span class="c1">#HOOK_SOURCE_TYPE=DESP</span>
+
+<span class="c1">##### DEDL HDA input NOT possible at the moment. i.e. source_type is not DESP nor EXTERNAL #####</span>
+<span class="c1"># These HOOKs have specific configuration. See below</span>
+
+<span class="c1"># Accesses Creodias Catalogue in the background</span>
+<span class="c1">#HOOK_WORKFLOW=copdem</span>
+<span class="c1">#HOOK_COLLECTION_ID=</span>
+<span class="c1">#HOOK_DATA_ID=S3A_SL_1_RBT____20161110T022134_20161110T022434_20181003T070309_0179_010_374______LR1_R_NT_003.SEN3</span>
+<span class="c1">#HOOK_SOURCE_TYPE=</span>
+
+<span class="c1"># Accesses Creodias Catalogue in the background</span>
+<span class="c1">#HOOK_WORKFLOW=maja</span>
+<span class="c1">#HOOK_COLLECTION_ID=</span>
+<span class="c1">#HOOK_DATA_ID=S2B_MSIL1C_20220429T102549_N0400_R108_T31UGQ_20220429T124017.SAFE</span>
+<span class="c1">#HOOK_SOURCE_TYPE=</span>
+<span class="c1">#HOOK_ADDITIONAL1=&quot;NAME=input_type;VALUE=TIMESPAN;VALUE_TYPE=str&quot;</span>
+<span class="c1">#HOOK_ADDITIONAL2=&quot;NAME=timeseries_end_id;VALUE=S2B_MSIL1C_20220429T102549_N0400_R108_T31UGQ_20220429T124017.SAFE;VALUE_TYPE=str&quot;</span>
+<span class="c1">#HOOK_ADDITIONAL3=&quot;NAME=timespan;VALUE=18;VALUE_TYPE=int&quot;</span>
+
+
+
+<span class="c1">########## SET STORAGE OPTION ##########</span>
+<span class="c1"># If you set HOOK_IS_PRIVATE_STORAGE to True you will need to set the bucket name, access key, and secret key</span>
+<span class="nv">HOOK_IS_PRIVATE_STORAGE</span><span class="o">=</span>False
+<span class="c1">#HOOK_OUTPUT_BUCKET=your_bucket-name</span>
+<span class="c1">#HOOK_OUTPUT_STORAGE_ACCESS_KEY=your_access_key</span>
+<span class="c1">#HOOK_OUTPUT_STORAGE_SECRET_KEY=your_secret_key</span>
+</pre></div>
+</div>
+</section>
+<section id="dedl-hook-access-ipynb-simple-retrieval-of-token-and-listing-of-workflows">
+<h3><a class="reference internal" href="#"><span class="xref myst">DEDL-Hook_access.ipynb</span></a>: Simple retrieval of token and listing of workflows<a class="headerlink" href="#dedl-hook-access-ipynb-simple-retrieval-of-token-and-listing-of-workflows" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Launch this noteboook with your DESP credentials and retrieve a token you can use to interact with OnDemand Processing API (Hook API)</p></li>
+</ul>
+</section>
+</section>
+<section id="further-information">
+<h2>Further Information<a class="headerlink" href="#further-information" title="Link to this heading">#</a></h2>
+<p>Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html</p>
+<blockquote>
+<div><p><strong>Additional ressources:</strong>
+DestinE Data Portfolio: https://hda.data.destination-earth.eu/ui/catalog
+DataLake Priority services: https://hda.data.destination-earth.eu/ui/services
+HDA SWAGGER UI: https://hda.data.destination-earth.eu/docs/</p>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./HOOK"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../HDA/PySTAC/HDA-PyStac-Client.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">HDA PySTAC-Client Introduction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="gallery.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">HOOK Gallery</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebooks">Notebooks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tutorial-how-to-discover-available-workflows-and-run-one-example-data-harvest-workflow"><span class="xref myst">Tutorial</span>: How to discover available workflows and run one example (data-harvest workflow)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dedl-hook-access-ipynb-simple-retrieval-of-token-and-listing-of-workflows"><span class="xref myst">DEDL-Hook_access.ipynb</span>: Simple retrieval of token and listing of workflows</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-information">Further Information</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By DestinE Data Lake Team
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
