@@ -2,9 +2,20 @@ from glob import glob
 from pathlib import Path
 import yaml
 import textwrap
+import re
 
 def clean_f_string(string):
     return '\n'.join([m.lstrip() for m in string.split('\n')])
+
+def get_title_from_nb(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.startswith("# "):  # First Markdown heading
+                return line.lstrip("# ").strip()
+    prettyname = Path(file_path).with_suffix("").name
+    prettyname =  re.sub(r'[^\w\s]', ' ', prettyname)
+    prettyname = prettyname.replace("_", " ")
+    return prettyname
 
 def main(app,config):
   # find all ipynb files in current project
@@ -35,15 +46,12 @@ def main(app,config):
     flist_domain = glob(f"./{domain}/**/*.ipynb", recursive=True)
     grid_cards = []
     for nb in flist_domain:
+      link_to_nb = Path(nb).relative_to(f"./{domain}").with_suffix('.html')
       new_card = f"""
-          :::{{grid-item-card}} title
-          :shadow: md
-          :link: https://example.com
-          :img-top: 
-          description
-          +++
-          footer
+          :::{{grid-item-card}} {get_title_from_nb(nb)}
+          :link: {link_to_nb}
           :::
+
       """
       grid_cards.append(clean_f_string(new_card))
     grid_cards = "\n".join(grid_cards)

@@ -40,25 +40,23 @@ sphinx:
   # A list of extra extensions to load by Sphinx (added to those already used by JB).
   extra_extensions:
     - sphinx_design
+    - sphinx.ext.githubpages
+    - nbsphinx
   # A list of local extensions to load by sphinx specified by "name: path" items 
   local_extensions:
     notebook_cards: './extensions'
+  # sphinx-gallery configuration
+  # sphinx_gallery_conf:
+  #   # path to your example scripts
+  #   examples_dirs:
+  #     - './HDA'
+  #     - './STACK'
+  #     - './HOOK'
+  #   # path to where to save gallery generated output
+  #   gallery_dirs: ['HDA-gallery', 'STACK-gallery', 'HOOK-gallery']
+  #   # specify that examples should be ordered according to filename
+  #   within_subsection_order: FileNameSortKey
   config:
     exclude_patterns: ["__pycache__*", "**/.git", ".pixi**", "book/**"]
-    #include_patterns: ["**/img"]
-    # extensions:
-    #   - sphinx_design
-    # linkcheck_ignore: ["https://doi.org/*", "https://zenodo.org/badge/*"] # don't run link checker on DOI links since they are immutable
-    # nb_execution_raise_on_error: true # raise exception in build if there are notebook errors (this flag is ignored if building on binder)
-    # #html_favicon: notebooks/images/icons/favicon.ico
-    # html_last_updated_fmt: "%-d %B %Y"
-    # html_theme: jupyter_book
-    # html_permalinks_icon: '<i class="fas fa-link"></i>'
-    # html_theme_options:
-    #   navbar_align: left
-    #   show_nav_level: 1
-    #   navigation_depth: 4
-    #   #use_edit_page_button: true
-    #   github_url: https://github.com/esgf2-us/
     
 
