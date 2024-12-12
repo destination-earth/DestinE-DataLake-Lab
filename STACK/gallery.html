@@ -56,6 +56,7 @@
     <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -64,7 +65,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="DestinE Data Lake - Stack Service Dask" href="DEDL_StackService_Dask.html" />
-    <link rel="prev" title="DestinE Harmonised Data Access (HDA)" href="README.html" />
+    <link rel="prev" title="STACK Service" href="README.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -181,48 +182,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
-
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
-
-
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
 
 
@@ -394,64 +355,44 @@
 <div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
 <div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 sd-g-2 sd-g-xs-2 sd-g-sm-2 sd-g-md-2 sd-g-lg-2 docutils">
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-title</div>
-<p class="sd-card-text">description</p>
+DEDL StackService Dask</div>
 </div>
-<div class="sd-card-footer docutils">
-<p class="sd-card-text">footer</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://example.com"><span>https://example.com</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="DEDL_StackService_Dask.html"><span>DEDL_StackService_Dask.html</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-title</div>
-<p class="sd-card-text">description</p>
+STACK Python Client Dask</div>
 </div>
-<div class="sd-card-footer docutils">
-<p class="sd-card-text">footer</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://example.com"><span>https://example.com</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="STACK-Python-Client-Dask.html"><span>STACK-Python-Client-Dask.html</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-title</div>
-<p class="sd-card-text">description</p>
+ExtremeDT DataCube xViewer</div>
 </div>
-<div class="sd-card-footer docutils">
-<p class="sd-card-text">footer</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://example.com"><span>https://example.com</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="ExtremeDT-DataCube-xViewer.html"><span>ExtremeDT-DataCube-xViewer.html</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-title</div>
-<p class="sd-card-text">description</p>
+ExtremeDT DataCube</div>
 </div>
-<div class="sd-card-footer docutils">
-<p class="sd-card-text">footer</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://example.com"><span>https://example.com</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="ExtremeDT-DataCube.html"><span>ExtremeDT-DataCube.html</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-title</div>
-<p class="sd-card-text">description</p>
+STACK Dask 101</div>
 </div>
-<div class="sd-card-footer docutils">
-<p class="sd-card-text">footer</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://example.com"><span>https://example.com</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="STACK-Dask-101.html"><span>STACK-Dask-101.html</span></a></div>
 </div>
 </div>
 </div>
@@ -495,7 +436,7 @@ title</div>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">DestinE Harmonised Data Access (HDA)</p>
+        <p class="prev-next-title">STACK Service</p>
       </div>
     </a>
     <a class="right-next"

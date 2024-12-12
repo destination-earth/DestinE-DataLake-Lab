@@ -2,7 +2,7 @@
      alt="Destination Earth banner"
 />
 
-# DestinE Harmonised Data Access (HDA)
+# STACK Service
 
 <img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
 <br>

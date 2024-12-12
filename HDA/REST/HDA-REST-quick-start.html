@@ -56,6 +56,7 @@
     <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -181,48 +182,8 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../gallery.html">HDA - Gallery</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
-
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../DestinE%20Digital%20Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
-
-
-
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="../EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
-
-
-
-
-
-<li class="toctree-l2"><a class="reference internal" href="../Fresh%20Data%20Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
-
-
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
 
 
@@ -469,10 +430,10 @@
 </div><p>This notebook demonstrates how to use the HDA (Harmonized Data Access) API by sending a few HTTP requests to the API, using Python code.</p>
 <p>Throughout this quickstart notebook, you will learn:</p>
 <ol class="arabic simple">
-<li><p><a class="reference internal" href="#Discover"><span class="xref myst">Discover</span></a>: How to discover <em>DEDL</em> collections and services through HDA.</p></li>
-<li><p><a class="reference internal" href="#Authenticate"><span class="xref myst">Authenticate</span></a>: How to authenticate fro searching and access <em>DEDL</em> collections.</p></li>
-<li><p><a class="reference internal" href="../../search.html"><span class="std std-ref">Search data</span></a>:  How to search <em>DEDL</em> data through HDA.</p></li>
-<li><p><a class="reference internal" href="#Download"><span class="xref myst">Download data</span></a>: How to download <em>DEDL</em> data through HDA.</p></li>
+<li><p><a class="reference internal" href="#discover"><span class="std std-ref">Discover</span></a>: How to discover <em>DEDL</em> collections and services through HDA.</p></li>
+<li><p><a class="reference internal" href="#authenticate"><span class="std std-ref">Authenticate</span></a>: How to authenticate fro searching and access <em>DEDL</em> collections.</p></li>
+<li><p><a class="reference internal" href="#search"><span class="std std-ref">Search data</span></a>:  How to search <em>DEDL</em> data through HDA.</p></li>
+<li><p><a class="reference internal" href="#download"><span class="std std-ref">Download data</span></a>: How to download <em>DEDL</em> data through HDA.</p></li>
 </ol>
 <p>The detailed API and definition of each endpoint and parameters is available in the HDA Swagger UI at:</p>
 <p>https://hda.data.destination-earth.eu/docs/</p>

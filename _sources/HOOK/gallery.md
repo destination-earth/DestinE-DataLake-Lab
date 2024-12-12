@@ -4,23 +4,15 @@
 ::::{grid} 2
 :gutter: 2
 
-:::{grid-item-card} title
-:shadow: md
-:link: https://example.com
-:img-top: 
-description
-+++
-footer
+:::{grid-item-card} Tutorial
+:link: Tutorial.html
 :::
 
 
-:::{grid-item-card} title
-:shadow: md
-:link: https://example.com
-:img-top: 
-description
-+++
-footer
+
+:::{grid-item-card} DEDL Hook access
+:link: DEDL-Hook_access.html
 :::
+
 
 ::::
