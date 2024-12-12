@@ -1,0 +1,62 @@
+title: DestinE DataLake Lab
+author: DestinE Data Lake Team
+
+execute:
+  # To execute notebooks via a Binder instead, replace 'cache' with 'binder'
+  execute_notebooks: "off"
+  timeout: 3600
+  allow_errors: False
+
+parse:
+  myst_enable_extensions: # default extensions to enable in the myst parser. See https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html
+    - amsmath
+    - colon_fence
+    - deflist
+    - dollarmath
+    - html_admonition
+    - html_image
+    - replacements
+    - smartquotes
+    - substitution
+
+#######################################################################################
+# Launch button settings
+launch_buttons:
+  # The interface interactive links will activate ["classic", "jupyterlab"]
+  notebook_interface: jupyterlab
+  # The URL of the BinderHub (e.g., https://mybinder.org)
+  binderhub_url: "https://binder-217-71-193-124.nip.io/"
+  # The URL of the JupyterHub (e.g., https://datahub.berkeley.edu)
+  jupyterhub_url: "https://jupyter.central.data.destination-earth.eu/"  
+
+repository:
+  url: https://github.com/destination-earth/DestinE-DataLake-Lab  # The URL to your book's repository
+  path_to_book: "book"  # A path to your book's folder, relative to the repository root.
+  branch: master  # Which branch of the repository should be used when creating links
+
+#######################################################################################
+# Advanced and power-user settings
+sphinx:
+  # A list of extra extensions to load by Sphinx (added to those already used by JB).
+  extra_extensions:
+    - sphinx_design
+  # A list of local extensions to load by sphinx specified by "name: path" items 
+  local_extensions:
+    notebook_cards: './extensions'
+  # config:
+    # extensions:
+    #   - sphinx_design
+    # linkcheck_ignore: ["https://doi.org/*", "https://zenodo.org/badge/*"] # don't run link checker on DOI links since they are immutable
+    # nb_execution_raise_on_error: true # raise exception in build if there are notebook errors (this flag is ignored if building on binder)
+    # #html_favicon: notebooks/images/icons/favicon.ico
+    # html_last_updated_fmt: "%-d %B %Y"
+    # html_theme: jupyter_book
+    # html_permalinks_icon: '<i class="fas fa-link"></i>'
+    # html_theme_options:
+    #   navbar_align: left
+    #   show_nav_level: 1
+    #   navigation_depth: 4
+    #   #use_edit_page_button: true
+    #   github_url: https://github.com/esgf2-us/
+    
+

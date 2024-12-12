@@ -1,0 +1,10 @@
+
+# pixi environments
+.pixi
+*.egg-info
+
+# Compiled files
+**/__pycache__/
+
+# jupyter book
+book/_build*

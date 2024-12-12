@@ -1,0 +1,17 @@
+[project]
+authors = ["Christoph Reimer <christoph.reimer@eodc.eu>"]
+channels = ["conda-forge"]
+description = "Add a short description here"
+name = "DestinE-DataLake-Lab"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[system-requirements]
+libc = { family="glibc", version="2.26" }
+
+[tasks]
+
+[dependencies]
+python = "3.11.*"
+jupyter-book = ">=1.0.3,<2"
+pydata-sphinx-theme = ">=0.16.0,<0.17"

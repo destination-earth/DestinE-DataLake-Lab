@@ -1,0 +1,57 @@
+
+format: jb-book
+root: README
+parts:
+
+- caption: STACK
+  chapters:
+    - file: STACK/README
+      title: Overview
+    - file: STACK/gallery
+      title: STACK - Gallery
+      sections:
+      - file: STACK/DEDL_StackService_Dask
+      - file: STACK/STACK-Python-Client-Dask
+      - file: STACK/ExtremeDT-DataCube-xViewer
+      - file: STACK/ExtremeDT-DataCube
+      - file: STACK/STACK-Dask-101
+
+
+- caption: HDA
+  chapters:
+    - file: HDA/README
+      title: Overview
+    - file: HDA/gallery
+      title: HDA - Gallery
+      sections:
+      - file: HDA/EODAG/HDA-EODAG-quick-start
+      - file: HDA/EODAG/HDA-EODAG-full-version
+      - file: HDA/DestinE Digital Twins/ExtremeDT-dataAvailability
+      - file: HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter
+      - file: HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter
+      - file: HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series
+      - file: HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE
+      - file: HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES
+      - file: HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series
+      - file: HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___
+      - file: HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1
+      - file: HDA/Fresh Data Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD
+      - file: HDA/Fresh Data Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A
+      - file: HDA/REST/HDA-REST-Queryables
+      - file: HDA/REST/HDA-REST-full-version
+      - file: HDA/REST/HDA-REST-quick-start
+      - file: HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS
+      - file: HDA/PySTAC/HDA-PyStac-Client
+
+
+- caption: HOOK
+  chapters:
+    - file: HOOK/README
+      title: Overview
+    - file: HOOK/gallery
+      title: HOOK - Gallery
+      sections:
+      - file: HOOK/Tutorial
+      - file: HOOK/DEDL-Hook_access
+
+
