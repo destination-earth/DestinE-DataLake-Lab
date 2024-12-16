@@ -1,0 +1,84 @@
+{
+  "type": "Collection",
+  "id": "EO.XXX.YYY.ZZZ",
+  "stac_version": "1.0.0",
+  "description": "Text describing the dataset. This text will be shown in the Overview section of hda catalogue and can be a paragraph of text.",
+  "links": [
+      {
+          "rel": "license",
+          "href": "LICENCE_URL_LINK",
+          "title": "LICENCE_NAME"
+      },
+      {
+          "rel": "cite-as",
+          "href": "DOI_URL",
+          "title": "DOI_DATASET_TITLE"
+      },
+      {
+          "rel": "describedby",
+          "href": "OTHER_DATASET_URL",
+          "title": "DATASET_TITLE"
+      }
+  ],
+  "stac_extensions": [
+      "https://stac-extensions.github.io/scientific/v1.0.0/schema.json"
+  ],
+  "sci:publications": [
+      {
+          "sci:doi": "DOI_CODE",
+          "sci:citation": "DOI_DATASET_TITLE"
+      }
+  ],
+  "title": "DATASET_TITLE",
+  "extent": {
+      "spatial": {
+          "bbox": [
+              [
+                  -31.561261,
+                  27.405827,
+                  44.820775,
+                  71.409109
+              ]
+          ]
+      },
+      "temporal": {
+          "interval": [
+              [
+                  "2024-11-01T00:00:00Z",
+                  "2024-11-30T23:59:59Z"
+              ]
+          ]
+      }
+  },
+  "license": "proprietary",
+  "keywords": [
+      "Satellite Image Interpretation",
+      "Land Cover Change",
+      "geospatial data",
+      "landscape alteration",
+      "Land cover",
+      "European",
+      "Copernicus"
+  ],
+  "providers": [
+      {
+          "name": "PROVIDER_NAME",
+          "roles": [
+              "producer",
+              "processor",
+              "licensor"
+          ],
+          "url": "PROVIDER_URL"
+      }
+  ],
+  "assets": {
+      "thumbnail": {
+          "href": "URL_TO_DATASET_IMAGE",
+          "type": "image/png",
+          "title": "overview",
+          "roles": [
+              "thumbnail"
+          ]
+      }
+  }
+}
