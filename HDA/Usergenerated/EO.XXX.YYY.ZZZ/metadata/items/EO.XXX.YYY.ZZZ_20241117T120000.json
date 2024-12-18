@@ -56,28 +56,28 @@
     ],
     "assets": {
         "20241117.png": {
-            "href": "20241117.png",
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/20241117.png",
             "type": "image/png",
             "roles": [
                 "data"
             ]
         },
         "metadata4.json": {
-            "href": "metadata4.json",
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/metadata4.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "thumbnail.jpg": {
-            "href": "thumbnail.jpg",
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/thumbnail.jpg",
             "type": "image/jpeg",
             "roles": [
                 "thumbnail"
             ]
         },
         "overview.jpg": {
-            "href": "overview.jpg",
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/overview.jpg",
             "type": "image/jpeg",
             "roles": [
                 "overview"

@@ -19,11 +19,13 @@ ITEM_FOLDER_LEVEL_YYYY = "YYYY"
 ITEM_FOLDER_LEVEL_MM = "MM"
 ITEM_FOLDER_LEVEL_DD = "DD"
 
+# If this is false, There will be no upload when generate_item_metadata.py is complete. Set to True to uplad the whole folder
+IS_UPLOAD_S3 = False
 # If this is False, a check is first made to see if the file already exists in the bucket
 IS_OVERWRITE_S3 = False
 S3_ENDPOINT_URL = "https://s3.central.data.destination-earth.eu"
 # Standardised bucket names for usergenerated collections e.g. usergenerated-EO.XXX.YYY.ZZZ. In the code we concatenate with the -EO.XXX.YYY.ZZZ
-S3_USER_GENERATED_BUCKET_PREFIX = "usergenerated"
+S3_USER_GENERATED_BUCKET_PREFIX = "usergenerated-proposal"
 
 
 
