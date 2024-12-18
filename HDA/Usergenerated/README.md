@@ -66,8 +66,8 @@ Here we show the structure of this project which contains a Collection, associat
 
 └── [MY_COLLECTION_ID]                           # e.g. EO.XXX.YYY.ZZZ (HIGH_LEVEL_DATA_TYPE.DATA_PROVIDER.DATATYPE.DATASET_NAME)
     └── metadata
-        ├── [MY_COLLECTION_ID].config.json       # Global configuration that can be used when generating items. This can be overloaded at the item level in item_config.json (see below). e.g. "thumbnail_regex" (to identify thumbnails)
-        ├── [MY_COLLECTION_ID].json              # e.g. EO.XXX.YYY.ZZZ.json A STAC file of type 'Collection' in json format gives an overview of the collection. The name of the file takes the following form [Collection ID].json
+        ├── collection_config.json               # Global configuration that can be used when generating items. This can be overloaded at the item level in item_config.json (see below). e.g. "thumbnail_regex" (to identify thumbnails)
+        ├── collection.json                      # A STAC file of type 'Collection' in json format gives an overview of the collection. The name of the file is simply collection.json
         └── items
             └── ITEM_1_ID.json                   # A STAC file representing individual Items of type 'Feature' in json format gives information on the 'Item'
             └── ITEM_2_ID.json
@@ -89,7 +89,7 @@ Here we show the structure of this project which contains a Collection, associat
 
 
 - Here we give an example of a STAC Collection describing high level information about your data Items
-    - path = MY_COLLECTION_ID/metadata/[MY_COLLECTION_ID].json
+    - path = MY_COLLECTION_ID/metadata/collection.json
 
 ```json
 
@@ -251,28 +251,28 @@ This is an example of a generated Item from this project. This is a possible sta
     ],
     "assets": {
         "metadata1.json": {
-            "href": "metadata1.json",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/metadata1.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "thumbnail.jpg": {
-            "href": "thumbnail.jpg",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/thumbnail.jpg",
             "type": "image/jpeg",
             "roles": [
                 "thumbnail"
             ]
         },
         "overview.jpg": {
-            "href": "overview.jpg",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/overview.jpg",
             "type": "image/jpeg",
             "roles": [
                 "overview"
             ]
         },
         "20241115.png": {
-            "href": "20241115.png",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/20241115.png",
             "type": "image/png",
             "roles": [
                 "data"

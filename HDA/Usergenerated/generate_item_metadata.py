@@ -11,6 +11,7 @@ from shapely.geometry import box, mapping
 from config import (
     APP_LOGGER_NAME,
     IS_OVERWRITE_S3,
+    IS_UPLOAD_S3,
     ITEM_CONFIG_FILE_NAME,
     ITEM_FOLDER_LEVEL,
     ITEM_FOLDER_LEVEL_DD,
@@ -38,10 +39,10 @@ class ItemGenerator:
         self.collection_root = Path(collection_id)
 
         # Path to collection.json STAC file
-        self.collection_path = Path(f"{collection_id}/metadata/{collection_id}.json")
+        self.collection_path = Path(f"{collection_id}/metadata/collection.json")
         # Path to collection level config file, containing global config when generating Item metadata
         self.collection_config_path = Path(
-            f"{collection_id}/metadata/{collection_id}.config.json"
+            f"{collection_id}/metadata/collection_config.json"
         )
         # Path to expected folder where STAC Item (feature) metadata will be generated
         self.items_root = Path(f"{collection_id}/metadata/items")
@@ -131,12 +132,13 @@ class ItemGenerator:
         for item_folder_path in item_folder_paths:
             self.create_item(item_folder_path, collection, collection_config)
 
-        # Upload whole folder to S3
-        self.s3tools.upload_folder_to_s3(
-            str(self.collection_root),
-            S3_ENDPOINT_URL,
-            f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id}",
-        )
+        if IS_UPLOAD_S3:
+            # Upload whole folder to S3
+            self.s3tools.upload_folder_to_s3(
+                str(self.collection_root),
+                S3_ENDPOINT_URL,
+                f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id}",
+            )
 
     def create_item(
         self,
@@ -250,6 +252,9 @@ class ItemGenerator:
 
             # Process each file and add as an asset to the item
             for asset_path in asset_paths:
+
+                asset_href_data_root = Path(*asset_path.parts[1:])
+
                 # Compute the relative href
                 asset_href = asset_path.relative_to(item_folder_path)
                 logger.info(f"asset_href:{asset_href}")
@@ -274,7 +279,7 @@ class ItemGenerator:
                     item.add_asset(
                         key=str(asset_href),
                         asset=pystac.Asset(
-                            href=str(asset_href),
+                            href=str(asset_href_data_root),
                             media_type=media_type,
                             roles=itemhelper.get_asset_role(
                                 media_type, asset_href, thumbnail_regex, overview_regex
