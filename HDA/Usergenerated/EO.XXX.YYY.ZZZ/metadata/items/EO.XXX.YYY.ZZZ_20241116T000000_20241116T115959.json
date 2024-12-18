@@ -1,0 +1,88 @@
+{
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "stac_extensions": [],
+    "id": "EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    10.0,
+                    35.0
+                ],
+                [
+                    10.0,
+                    60.0
+                ],
+                [
+                    -11.0,
+                    60.0
+                ],
+                [
+                    -11.0,
+                    35.0
+                ],
+                [
+                    10.0,
+                    35.0
+                ]
+            ]
+        ]
+    },
+    "bbox": [
+        -11.0,
+        35.0,
+        10.0,
+        60.0
+    ],
+    "properties": {
+        "start_datetime": "2024-11-16T00:00:00Z",
+        "end_datetime": "2024-11-16T11:59:59Z",
+        "datetime": "2024-11-16T00:00:00Z"
+    },
+    "links": [
+        {
+            "rel": "collection",
+            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ",
+            "type": "application/json",
+            "title": "DATASET_TITLE"
+        },
+        {
+            "rel": "self",
+            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959",
+            "type": "application/json"
+        }
+    ],
+    "assets": {
+        "thumbnail.jpg": {
+            "href": "thumbnail.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "thumbnail"
+            ]
+        },
+        "20241116.png": {
+            "href": "20241116.png",
+            "type": "image/png",
+            "roles": [
+                "data"
+            ]
+        },
+        "overview.jpg": {
+            "href": "overview.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "overview"
+            ]
+        },
+        "metadata2.json": {
+            "href": "metadata2.json",
+            "type": "application/json",
+            "roles": [
+                "metadata"
+            ]
+        }
+    },
+    "collection": "EO.XXX.YYY.ZZZ"
+}

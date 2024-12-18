@@ -1,0 +1,9 @@
+pystac
+pystac[validation]
+shapely
+python-magic
+requests
+beautifulsoup4
+netCDF4
+boto3
+python-dotenv

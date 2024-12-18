@@ -1,0 +1,88 @@
+{
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "stac_extensions": [],
+    "id": "EO.XXX.YYY.ZZZ_20241117T120000",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    10.0,
+                    35.0
+                ],
+                [
+                    10.0,
+                    60.0
+                ],
+                [
+                    -13.0,
+                    60.0
+                ],
+                [
+                    -13.0,
+                    35.0
+                ],
+                [
+                    10.0,
+                    35.0
+                ]
+            ]
+        ]
+    },
+    "bbox": [
+        -13.0,
+        35.0,
+        10.0,
+        60.0
+    ],
+    "properties": {
+        "city": "lisbon",
+        "variable": "lst",
+        "datetime": "2024-11-17T12:00:00Z"
+    },
+    "links": [
+        {
+            "rel": "collection",
+            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ",
+            "type": "application/json",
+            "title": "DATASET_TITLE"
+        },
+        {
+            "rel": "self",
+            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241117T120000",
+            "type": "application/json"
+        }
+    ],
+    "assets": {
+        "20241117.png": {
+            "href": "20241117.png",
+            "type": "image/png",
+            "roles": [
+                "data"
+            ]
+        },
+        "metadata4.json": {
+            "href": "metadata4.json",
+            "type": "application/json",
+            "roles": [
+                "metadata"
+            ]
+        },
+        "thumbnail.jpg": {
+            "href": "thumbnail.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "thumbnail"
+            ]
+        },
+        "overview.jpg": {
+            "href": "overview.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "overview"
+            ]
+        }
+    },
+    "collection": "EO.XXX.YYY.ZZZ"
+}
