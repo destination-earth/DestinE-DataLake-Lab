@@ -1,5 +1,0 @@
-{
-    "item_asset_ignore_list": ["item_config.json"],
-    "thumbnail_regex": "^thumbnail",
-    "overview_regex": "^overview"
-}
