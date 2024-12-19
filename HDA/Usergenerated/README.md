@@ -13,7 +13,7 @@
 - The following describes the steps to follow to assure that you provide **data** and **metadata** that is ready to integrate into the HDA.
 
 
-- You will be expected to provide (in a dedicated Bucket e.g. usergenerated-EO.XXX.YYY.ZZZ on your DEDL Islet Storage):
+- You will be expected to provide (in a dedicated Bucket e.g. usergenerated-proposal-EO.XXX.YYY.ZZZ on your DEDL Islet Storage):
     - A root folder whose name is the same as the *collection id* that will be used in HDA. In this project we domonstrate with the collection id **EO.XXX.YYY.ZZZ**. This id will need to have been previously discussed and agreed with the Data Lake review board.
     - The folder should contain
         - a **metadata** subfolder, containing STAC 'Collection' and 'Item' metatdata
@@ -25,7 +25,7 @@
     - Generate preliminary item specific metadata (See item_config.json) that will later be used to generate the final STAC Item metadata.
 - Given you now have a folder e.g. **EO.XXX.YYY.ZZZ** with **Collection** metadata and **data** in the expected structure, the file *generate_item_metadata.py* gives an example of generating the expected Item metadata.
     - generate_item_metadata.py is intended to be a generic python script ready to navigate through the prepared data and then generate STAC Item metadata appropriate for the collection and DEDL HDA.
-    - When this script is launched the last step uploads the prepared data to a private bucket in your Data Lake tenant. The bucket name is standardised and set by the code 'usergenerated-[your collection id]'
+    - When this script is launched the last step uploads the prepared data to a private bucket in your Data Lake tenant. The bucket name is standardised and set by the code 'usergenerated-proposal-[your collection id]'
         - The upload requires that you have created a **.env** file at the root of the project with previously created ec2 credentials (See https://destine-data-lake-docs.data.destination-earth.eu/en/latest/cloud/How-to-generate-ec2-credentials.html)
 
 
