@@ -56,49 +56,49 @@
     ],
     "assets": {
         "thumbnail.jpg": {
-            "href": "thumbnail.jpg",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/thumbnail.jpg",
             "type": "image/jpeg",
             "roles": [
                 "thumbnail"
             ]
         },
         "20241116.png": {
-            "href": "20241116.png",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/20241116.png",
             "type": "image/png",
             "roles": [
                 "data"
             ]
         },
         "overview.jpg": {
-            "href": "overview.jpg",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/overview.jpg",
             "type": "image/jpeg",
             "roles": [
                 "overview"
             ]
         },
         "metadata3b.json": {
-            "href": "metadata3b.json",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3b.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "metadata3a.json": {
-            "href": "metadata3a.json",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3a.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "somesubfolder/metadata3d.json": {
-            "href": "somesubfolder/metadata3d.json",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/somesubfolder/metadata3d.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "somesubfolder/metadata3c.txt": {
-            "href": "somesubfolder/metadata3c.txt",
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/somesubfolder/metadata3c.txt",
             "type": "text/plain",
             "roles": [
                 "metadata"

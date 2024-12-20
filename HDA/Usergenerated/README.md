@@ -13,7 +13,7 @@
 - The following describes the steps to follow to assure that you provide **data** and **metadata** that is ready to integrate into the HDA.
 
 
-- You will be expected to provide (in a dedicated Bucket e.g. usergenerated-EO.XXX.YYY.ZZZ on your DEDL Islet Storage):
+- You will be expected to provide (in a dedicated Bucket e.g. usergenerated-proposal-EO.XXX.YYY.ZZZ on your DEDL Islet Storage):
     - A root folder whose name is the same as the *collection id* that will be used in HDA. In this project we domonstrate with the collection id **EO.XXX.YYY.ZZZ**. This id will need to have been previously discussed and agreed with the Data Lake review board.
     - The folder should contain
         - a **metadata** subfolder, containing STAC 'Collection' and 'Item' metatdata
@@ -25,7 +25,7 @@
     - Generate preliminary item specific metadata (See item_config.json) that will later be used to generate the final STAC Item metadata.
 - Given you now have a folder e.g. **EO.XXX.YYY.ZZZ** with **Collection** metadata and **data** in the expected structure, the file *generate_item_metadata.py* gives an example of generating the expected Item metadata.
     - generate_item_metadata.py is intended to be a generic python script ready to navigate through the prepared data and then generate STAC Item metadata appropriate for the collection and DEDL HDA.
-    - When this script is launched the last step uploads the prepared data to a private bucket in your Data Lake tenant. The bucket name is standardised and set by the code 'usergenerated-[your collection id]'
+    - When this script is launched the last step uploads the prepared data to a private bucket in your Data Lake tenant. The bucket name is standardised and set by the code 'usergenerated-proposal-[your collection id]'
         - The upload requires that you have created a **.env** file at the root of the project with previously created ec2 credentials (See https://destine-data-lake-docs.data.destination-earth.eu/en/latest/cloud/How-to-generate-ec2-credentials.html)
 
 
@@ -66,8 +66,8 @@ Here we show the structure of this project which contains a Collection, associat
 
 └── [MY_COLLECTION_ID]                           # e.g. EO.XXX.YYY.ZZZ (HIGH_LEVEL_DATA_TYPE.DATA_PROVIDER.DATATYPE.DATASET_NAME)
     └── metadata
-        ├── [MY_COLLECTION_ID].config.json       # Global configuration that can be used when generating items. This can be overloaded at the item level in item_config.json (see below). e.g. "thumbnail_regex" (to identify thumbnails)
-        ├── [MY_COLLECTION_ID].json              # e.g. EO.XXX.YYY.ZZZ.json A STAC file of type 'Collection' in json format gives an overview of the collection. The name of the file takes the following form [Collection ID].json
+        ├── collection_config.json               # Global configuration that can be used when generating items. This can be overloaded at the item level in item_config.json (see below). e.g. "thumbnail_regex" (to identify thumbnails)
+        ├── collection.json                      # A STAC file of type 'Collection' in json format gives an overview of the collection. The name of the file is simply collection.json
         └── items
             └── ITEM_1_ID.json                   # A STAC file representing individual Items of type 'Feature' in json format gives information on the 'Item'
             └── ITEM_2_ID.json
@@ -89,7 +89,7 @@ Here we show the structure of this project which contains a Collection, associat
 
 
 - Here we give an example of a STAC Collection describing high level information about your data Items
-    - path = MY_COLLECTION_ID/metadata/[MY_COLLECTION_ID].json
+    - path = MY_COLLECTION_ID/metadata/collection.json
 
 ```json
 
@@ -251,28 +251,28 @@ This is an example of a generated Item from this project. This is a possible sta
     ],
     "assets": {
         "metadata1.json": {
-            "href": "metadata1.json",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/metadata1.json",
             "type": "application/json",
             "roles": [
                 "metadata"
             ]
         },
         "thumbnail.jpg": {
-            "href": "thumbnail.jpg",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/thumbnail.jpg",
             "type": "image/jpeg",
             "roles": [
                 "thumbnail"
             ]
         },
         "overview.jpg": {
-            "href": "overview.jpg",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/overview.jpg",
             "type": "image/jpeg",
             "roles": [
                 "overview"
             ]
         },
         "20241115.png": {
-            "href": "20241115.png",
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/20241115.png",
             "type": "image/png",
             "roles": [
                 "data"
