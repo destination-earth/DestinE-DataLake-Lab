@@ -1,0 +1,39 @@
+name: Update Insula branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-subset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Use the secret here
+          ref: main
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Checkout insula-branch
+        run: |
+          git fetch origin insula-branch
+          git checkout insula-branch
+
+      - name: Copy subset of files
+        run: |
+          git checkout main -- "HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb" 
+          \ "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb" 
+          \ "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb"
+          git add "HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb" 
+          \ "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb" 
+          \ "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb"
+          git commit -m "Sync subset files from main"
+          git push origin insula-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the token as an environment variable
