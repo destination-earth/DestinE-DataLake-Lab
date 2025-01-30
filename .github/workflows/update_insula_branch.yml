@@ -28,15 +28,15 @@ jobs:
       - name: Copy subset of files
         run: |
           git checkout main -- "HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb"\
-          "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
-          "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
-          "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb"\
-          "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
+           "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
+           "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
+           "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb"\
+           "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
           git add "HDA/DestinE Digital Twins/ClimateDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.ipynb"\
-          "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
-          "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
-          "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb" "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb"\
-          "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
+           "HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
+           "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
+           "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb"\
+           "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
           git push origin insula-branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the token as an environment variable
