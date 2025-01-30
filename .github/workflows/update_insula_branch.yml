@@ -37,6 +37,7 @@ jobs:
            "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" "HDA/REST/HDA-REST-quick-start.ipynb"\
            "HDA/DestinE Digital Twins/ExtremeDT-ParameterPlotter.ipynb"\
            "HDA/DestinE Digital Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
+          git commit -m "Sync subset files from main"
           git push origin insula-branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the token as an environment variable
