@@ -28,7 +28,7 @@ The Destination Earth Data Lake (DEDL) ‘Hook service’ provides ready-to-use 
 ########## SET HOOK_ORDER_NAME ##########
 # This will be added to the order name. e.g. replace XXXX with your name
 
-HOOK_ORDER_NAME=XXXX-20241009-1
+HOOK_ORDER_NAME=XXXX-20250212-1
 
 ########## SET WORKFLOW, COLLECTION_ID and DATA_ID ##########
 # Uncomment HOOK_WORKFLOW (to identify the HOOK to execute)
@@ -97,6 +97,32 @@ HOOK_SOURCE_TYPE=DESP
 #HOOK_ADDITIONAL3="NAME=timespan;VALUE=18;VALUE_TYPE=int"
 
 
+########## START : Example Triggering CUSTOM HOOOK - dedl_hello_world ##########
+
+# # This 'Custom Hook' demonstrator expects a file called 'example.data' in the 'source_s3_path' bucket/folder (of the configured source_s3_endpoint)
+# # The text contents of example.data will be converted to Upper Case and output to Private or Temporary Storage
+
+# HOOK_WORKFLOW=dedl_hello_world
+
+# # Needs to be empty
+# HOOK_COLLECTION_ID=
+
+# # This normally contains the ID of a product, but for Custom Hooks we will set it to an arbitrary value 'Custom Hook'
+# HOOK_DATA_ID=Custom Hook
+
+# # Needs to be empty
+# HOOK_SOURCE_TYPE=
+
+# # Setting source_s3_path TO s3://XXXX/dedl_hello_world/input_file_location
+# HOOK_ADDITIONAL1="NAME=source_s3_path;VALUE=s3://XXXX/dedl_hello_world/input_file_location;VALUE_TYPE=str"
+# # Setting source_s3_endpoint_url TO https://s3.central.data.destination-earth.eu
+# HOOK_ADDITIONAL2="NAME=source_s3_endpoint_url;VALUE=https://s3.central.data.destination-earth.eu;VALUE_TYPE=str"
+# # Setting source_s3_access_key TO YYYY (change this to your access_key)
+# HOOK_ADDITIONAL3="NAME=source_s3_access_key;VALUE=YYYY;VALUE_TYPE=str"
+# # Setting source_s3_secret_key TO ZZZZ (change this to your access_key)
+# HOOK_ADDITIONAL4="NAME=source_s3_secret_key;VALUE=ZZZZ;VALUE_TYPE=str"
+
+########## END : Example Triggering CUSTOM HOOOK - dedl_hello_world ##########
 
 ########## SET STORAGE OPTION ##########
 # If you set HOOK_IS_PRIVATE_STORAGE to True you will need to set the bucket name, access key, and secret key
