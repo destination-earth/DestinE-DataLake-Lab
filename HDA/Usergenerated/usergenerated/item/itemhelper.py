@@ -100,7 +100,7 @@ def get_asset_role(
         )
 
 
-def get_item_properties(item_id: str):
+def get_item_properties(item_id: str, collection_id: str):
     """
     item_id expected in form EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959 i.e.  [Collection_ID]_[start_datetime/datetime]_[end_datetime]
     item_id can also take form EO.XXX.YYY.ZZZ_20241116T000000 i.e.  [Collection_ID]_[datetime]
@@ -117,15 +117,23 @@ def get_item_properties(item_id: str):
         # only consider the first element of string before __
         item_id = additional_property_parts[0]
     
+    # remove the collection_id prefix from the item_id, so that we can extract the datetime
+    # e.g. EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959 to 20241115T000000_20241115T235959
+    # Note: We add 1 to the length of the collection_id to account for the following underscore
+    if item_id.startswith(collection_id):
+        item_id = item_id[len(collection_id) + 1:]
+    else:
+        raise ValueError("Item ID does not start with the Collection ID.")
+    
     parts = item_id.split("_")
 
-    # Check if the number of parts is valid
-    if len(parts) not in [2, 3]:
-        raise ValueError("Invalid number of parts in item_id. Expected 2 or 3 parts.")
+    # Check if the number of parts is valid we expect 1 or 2 parts
+    if len(parts) not in [1, 2]:
+        raise ValueError("Invalid number of parts in item_id. Expected 1 or 2 parts.")
 
     # Extract start and end parts safely
-    start = parts[1] if len(parts) >= 2 else None
-    end = parts[2] if len(parts) == 3 else None
+    start = parts[0] if len(parts) >= 1 else None
+    end = parts[1] if len(parts) == 2 else None
 
     properties = {}
     item_datetime: datetime = None

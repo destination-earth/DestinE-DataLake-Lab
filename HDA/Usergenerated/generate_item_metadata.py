@@ -212,7 +212,7 @@ class ItemGenerator:
             )
 
             # Get datetime object and date related properties from the item ID
-            (item_datetime, item_properties) = itemhelper.get_item_properties(item_id)
+            (item_datetime, item_properties) = itemhelper.get_item_properties(item_id, collection_id)
 
             # Update item_properties with additional properties if they exist
             item_properties.update(
