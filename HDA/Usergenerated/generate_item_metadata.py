@@ -17,6 +17,7 @@ from config import (
     ITEM_FOLDER_LEVEL_DD,
     ITEM_FOLDER_LEVEL_MM,
     ITEM_FOLDER_LEVEL_YYYY,
+    ADDITIONAL_PROPERTY_KEYS,
     S3_ENDPOINT_URL,
     S3_USER_GENERATED_BUCKET_PREFIX,
 )
@@ -212,7 +213,7 @@ class ItemGenerator:
             )
 
             # Get datetime object and date related properties from the item ID
-            (item_datetime, item_properties) = itemhelper.get_item_properties(item_id, collection_id)
+            (item_datetime, item_properties) = itemhelper.get_item_properties(item_id, collection_id, confighelper.get_config_value(config_list, ADDITIONAL_PROPERTY_KEYS, True) or [])
 
             # Update item_properties with additional properties if they exist
             item_properties.update(
