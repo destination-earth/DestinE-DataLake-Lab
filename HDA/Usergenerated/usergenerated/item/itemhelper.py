@@ -34,8 +34,10 @@ def get_media_type(file_path):
         ".txt": pystac.MediaType.TEXT,
         ".xml": pystac.MediaType.XML,
         ".pdf": pystac.MediaType.PDF,
+        ".nc": pystac.MediaType.NETCDF,
         # Add more mappings as needed
-        ".nc": pystac.MediaType.NETCDF
+        # e.g. adding text/csv
+        ".csv": "text/csv"
     }
 
     # Get the media type based on the file extension
@@ -76,6 +78,8 @@ def get_asset_role(
         pystac.MediaType.KML,
         pystac.MediaType.ZARR,
         pystac.MediaType.NETCDF,
+        # e.g. if csv files in your data are considered data assets
+        #"text/csv",
     ]
     metadata = [
         pystac.MediaType.GEOJSON,
@@ -84,6 +88,8 @@ def get_asset_role(
         pystac.MediaType.TEXT,
         pystac.MediaType.XML,
         pystac.MediaType.PDF,
+        # e.g. if csv files in your data are considered metadata assets
+        #"text/csv",
     ]
 
     if re.match(thumbnail_regex, asset_href.name):
@@ -100,22 +106,39 @@ def get_asset_role(
         )
 
 
-def get_item_properties(item_id: str, collection_id: str):
+def get_item_properties(item_id: str, collection_id: str, additional_property_keys: list):
     """
     item_id expected in form EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959 i.e.  [Collection_ID]_[start_datetime/datetime]_[end_datetime]
     item_id can also take form EO.XXX.YYY.ZZZ_20241116T000000 i.e.  [Collection_ID]_[datetime]
+    collection_id is the collection_id of the collection that the item belongs to
+    addition_property_keys is a list of additional property keys that correspond to additional property values that can be appended to item folder names and separated with __
 
     We should infer the datetime from the start_datetime element.
     if both are present the start_datetime and end_datetime are set AND the datetime is set from start_datetime
     if just the start_datetime is present then the interval is not set and datetime is set only
     """
 
+    properties = {}
+
     # string suffixed like this are ignored __LISBON
     # these could be picked up in the data preparation step to add additional metadata if necessary
+    # An example mechanism of picking up the suffix metadata is show here, but it will depend on the structure of your item data
     if '__' in item_id:
         additional_property_parts = item_id.split("__")
         # only consider the first element of string before __
         item_id = additional_property_parts[0]
+        # Check for expected additional properties in the folder name (separated by suffix __)
+        # Activated by giving a list of additional property keys in collection_config.json e.g. additional_property_keys: ["key1", "key2", "key3"]
+        if len(additional_property_keys) > 0:
+
+            if len(additional_property_parts[1:]) != len(additional_property_keys):
+                raise ValueError("Number of additional properties does not match the number of additional property keys.")
+            
+            additional_properties = dict(zip(additional_property_keys, additional_property_parts[1:]))
+            properties.update(additional_properties)
+
+
+
     
     # remove the collection_id prefix from the item_id, so that we can extract the datetime
     # e.g. EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959 to 20241115T000000_20241115T235959
@@ -135,7 +158,7 @@ def get_item_properties(item_id: str, collection_id: str):
     start = parts[0] if len(parts) >= 1 else None
     end = parts[1] if len(parts) == 2 else None
 
-    properties = {}
+
     item_datetime: datetime = None
 
     # e.g. EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959 there is a start and end

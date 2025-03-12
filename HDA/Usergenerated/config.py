@@ -18,6 +18,10 @@ ITEM_FOLDER_LEVEL = "item_folder_level"
 ITEM_FOLDER_LEVEL_YYYY = "YYYY"
 ITEM_FOLDER_LEVEL_MM = "MM"
 ITEM_FOLDER_LEVEL_DD = "DD"
+# optional config at the collection level (i.e. in collection_config.json) to indicate the keys of additional properties found in suffix of the item folder
+# e.g "additional_property_keys": ["model", "period_type"] would indicate that we are expecting item folders to end with the suffix __somemodelname__someperiodtype
+# these additional properties are extracted and added to the properties key of the item.
+ADDITIONAL_PROPERTY_KEYS = "additional_property_keys"
 
 # If this is false, There will be no upload when generate_item_metadata.py is complete. Set to True to uplad the whole folder
 IS_UPLOAD_S3 = False

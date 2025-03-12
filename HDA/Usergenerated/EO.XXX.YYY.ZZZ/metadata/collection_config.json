@@ -3,5 +3,6 @@
     "item_asset_ignore_list": ["item_config.json"],
     "item_folder_level": "DD",
     "thumbnail_regex": "^thumbnail",
-    "overview_regex": "^overview"
+    "overview_regex": "^overview",
+    "additional_property_keys": []
 }
