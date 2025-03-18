@@ -29,8 +29,8 @@ param,paramName,shortName,unit,encoding,stream,type,levtype,step,levelist
 132,V component of wind,v,m s**-1,instantaneous,oper,fc,pl,0/1/to/96,1/2/3/5/7/10/20/30/50/70/100/150/200/250/300/400/500/700/850/925/1000
 133,Specific humidity,q,kg kg**-1,instantaneous,oper,fc,pl,0/1/to/96,1/2/3/5/7/10/20/30/50/70/100/150/200/250/300/400/500/700/850/925/1000
 157,Relative humidity,r,%,instantaneous,oper,fc,pl,0/1/to/96,1/2/3/5/7/10/20/30/50/70/100/150/200/250/300/400/500/700/850/925/1000
-228246,100 metre U wind component,100u,m s**-1,instantaneous,oper,fc,hl,0/1/to/96,100
-228247,100 metre V wind component,100v,m s**-1,instantaneous,oper,fc,hl,0/1/to/96,100
+131,100 metre U wind component,u,m s**-1,instantaneous,oper,fc,hl,0/1/to/96,100
+132,100 metre V wind component,v,m s**-1,instantaneous,oper,fc,hl,0/1/to/96,100
 228058,Averaged total lightning flash density in the last 6 hours,litota6,km**-2 day**-1,mean,oper,fc,sfc,0-6/6-12/to/90-96,
 142,Large-scale precipitation,lsp,m,accumulated,oper,fc,sfc,0-1/1-2/to/95-96,
 144,Snowfall,sf,m of water equivalent,accumulated,oper,fc,sfc,0-1/1-2/to/95-96,
