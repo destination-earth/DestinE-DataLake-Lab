@@ -1,4 +1,4 @@
-destinelab == 0.11
+destinelab >= 1.1
 xarray >= 2024.09.0
 numpy == 1.26.4
 ipykernel 
