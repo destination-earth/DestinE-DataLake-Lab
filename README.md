@@ -53,4 +53,6 @@ Install kernel my_env. Run the command:
 
 Select the kernel my_env from the top-right menu of these notebooks.
 
+![Last Commit](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/insula-branch)
+
 Users who already have a previous version of the 'my_env' environment installed, should delete the kernel before running the steps above. To delete the my_env kernel please run the following command: 'jupyter kernelspec uninstall my_env' from a terminal window.
