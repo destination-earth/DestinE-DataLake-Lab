@@ -5,5 +5,8 @@ python-magic
 requests
 beautifulsoup4
 netCDF4
-boto3
+#An issue has been identified with the latest version of boto3, we are therefore pinning to a specific version
+#boto3
+boto3==1.35.99
+botocore==1.35.99
 python-dotenv
