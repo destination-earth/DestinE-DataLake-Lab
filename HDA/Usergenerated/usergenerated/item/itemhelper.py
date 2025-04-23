@@ -79,7 +79,7 @@ def get_asset_role(
         pystac.MediaType.ZARR,
         pystac.MediaType.NETCDF,
         # e.g. if csv files in your data are considered data assets
-        #"text/csv",
+        "text/csv",
     ]
     metadata = [
         pystac.MediaType.GEOJSON,
@@ -149,6 +149,13 @@ def get_item_properties(item_id: str, collection_id: str, additional_property_ke
         raise ValueError("Item ID does not start with the Collection ID.")
     
     parts = item_id.split("_")
+
+    # Normally additional metadata would be added at the end of the item folder e.g. EO.AAA.BBB.CCC_CCC_CCC_20110101T070000_20111231T220000__META1__META2
+    # However, your situation might diverge from this. Here we show how you could modify the code to adapt to your item folder naming
+    # For example, your item folder might be in the form EO.AAA.BBB.CCC_CCC_CCC-META1-META2_20110101T070000_20111231T220000)
+    # This would mean the variable 'parts' would equal ["META1-META2", "20110101T070000", "20111231T220000"] at this stage
+    # To remove the first element from this list leaving just dates we could uncomment the following line ["20110101T070000","20111231T220000"]
+    # parts = parts[1:]
 
     # Check if the number of parts is valid we expect 1 or 2 parts
     if len(parts) not in [1, 2]:
