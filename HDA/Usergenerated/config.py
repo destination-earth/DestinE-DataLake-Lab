@@ -10,6 +10,9 @@ APP_LOGGER_FILE_TRUNCATE_SIZE = 10 * 1024 * 1024
 APP_LOGGER_FILE_BACKUP_COUNT = 5
 APP_LOGGER_LEVEL = logging.INFO
 
+# HDA uses stac version 1.0.0 for the moment.
+STAC_VERSION = "1.0.0"
+
 ITEM_CONFIG_FILE_NAME = "item_config.json"
 
 # expected config at collection level to indicate at what level to find Item Folders
