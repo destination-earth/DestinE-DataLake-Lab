@@ -4,7 +4,6 @@ import json
 import pystac
 from datetime import datetime
 from pathlib import Path
-import pystac.utils
 from shapely.geometry import box, mapping
 
 
@@ -20,9 +19,10 @@ from config import (
     ADDITIONAL_PROPERTY_KEYS,
     S3_ENDPOINT_URL,
     S3_USER_GENERATED_BUCKET_PREFIX,
+    STAC_VERSION,
 )
 
-import usergenerated.logging_config # import must come before other modules in this project so that logging setup correctly
+import usergenerated.logging_config  # import must come before other modules in this project so that logging setup correctly
 from usergenerated import datetools
 from usergenerated.config import confighelper
 from usergenerated.item import itemhelper
@@ -31,10 +31,25 @@ from usergenerated.s3tools import S3Tools
 
 class ItemGenerator:
 
-    def __init__(self, collection_id: str):
+    def __init__(self, collection_id: str, overide_bucket_name: str = None):
+        """
+        Class to generate STAC Item metadata for a given collection.
 
+        The class is initialized with the collection ID that you have been provided with (Case-sensitive, use UpperCase) e.g. 'EO.XXX.YYY.ZZZ-ZZZ'
+
+        An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
+        If not provided, the bucket_name is assumed to be 'usergenerated-proposal-[collection_id]' e.g. 'usergenerated-proposal-EO.XXX.YYY.ZZZ-ZZZ'
+
+        """
         # instance collection_id
         self.collection_id = collection_id
+
+        if "-" in collection_id:
+            raise ValueError(
+                "collection_id cannot contain a dash ('-'). Only underscores ('_') are permitted in a dedl Collection ID."
+            )
+
+        self.overide_bucket_name = overide_bucket_name
 
         # Path to root of all collection related data: used when uploading to S3 bucket
         self.collection_root = Path(collection_id)
@@ -134,11 +149,20 @@ class ItemGenerator:
             self.create_item(item_folder_path, collection, collection_config)
 
         if IS_UPLOAD_S3:
+
+            # Default expected bucket name (Case-sensitive) is usergenerated-proposal-[collection_id]
+            bucket_name = f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id}"
+
+            # An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
+            # Only needed if the bucket_name you have been provided with does not follow the naming convention
+            if self.overide_bucket_name:
+                bucket_name = self.overide_bucket_name
+
             # Upload whole folder to S3
             self.s3tools.upload_folder_to_s3(
                 str(self.collection_root),
                 S3_ENDPOINT_URL,
-                f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id}",
+                bucket_name,
             )
 
     def create_item(
@@ -213,7 +237,14 @@ class ItemGenerator:
             )
 
             # Get datetime object and date related properties from the item ID
-            (item_datetime, item_properties) = itemhelper.get_item_properties(item_id, collection_id, confighelper.get_config_value(config_list, ADDITIONAL_PROPERTY_KEYS, True) or [])
+            (item_datetime, item_properties) = itemhelper.get_item_properties(
+                item_id,
+                collection_id,
+                confighelper.get_config_value(
+                    config_list, ADDITIONAL_PROPERTY_KEYS, True
+                )
+                or [],
+            )
 
             # Update item_properties with additional properties if they exist
             item_properties.update(
@@ -234,6 +265,8 @@ class ItemGenerator:
                 geometry = None
 
             ####################
+
+            pystac.set_stac_version(STAC_VERSION)
 
             # Create the STAC item
             item = pystac.Item(
@@ -324,5 +357,6 @@ if __name__ == "__main__":
     collection_id = "EO.XXX.YYY.ZZZ"
 
     # Initialise ItemGenerator to create Item (Feature) metadata associated with the Collection and Data
+    # Note: a second argument can be provided to overide the bucket name (only necessary if it does not follow the case-sensitive naming convention) 'usergenerated-proposal-[collection_id]'
     item_generator = ItemGenerator(collection_id)
     item_generator.run()
