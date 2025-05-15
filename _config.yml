@@ -1,5 +1,10 @@
 title: DestinE DataLake Lab
 author: DestinE Data Lake Team
+logo: https://hda.data.destination-earth.eu/ui/images/destination_earth_logo_W.svg
+
+html:
+  home_page_in_navbar: true
+  favicon: https://hda.data.destination-earth.eu/ui/images/favicon.svg
 
 execute:
   # To execute notebooks via a Binder instead, replace 'cache' with 'binder'
@@ -25,14 +30,16 @@ launch_buttons:
   # The interface interactive links will activate ["classic", "jupyterlab"]
   notebook_interface: jupyterlab
   # The URL of the BinderHub (e.g., https://mybinder.org)
-  binderhub_url: "https://binder-217-71-193-124.nip.io/"
+  binderhub_url: "https://binder-217-71-193-124.nip.io"
   # The URL of the JupyterHub (e.g., https://datahub.berkeley.edu)
-  jupyterhub_url: "https://jupyter.central.data.destination-earth.eu/"  
+  #jupyterhub_url: "https://jupyter.central.data.destination-earth.eu/"  
 
 repository:
   url: https://github.com/destination-earth/DestinE-DataLake-Lab  # The URL to your book's repository
   #path_to_book: "book"  # A path to your book's folder, relative to the repository root.
   branch: notebook-gallery  # Which branch of the repository should be used when creating links
+
+collapse_navbar: true
 
 #######################################################################################
 # Advanced and power-user settings
@@ -58,5 +65,7 @@ sphinx:
   #   within_subsection_order: FileNameSortKey
   config:
     exclude_patterns: ["__pycache__*", "**/.git", ".pixi**", "book/**"]
+    html_static_path: ["_stactic"]
+    html_css_files: ["custom.css"]
     
 

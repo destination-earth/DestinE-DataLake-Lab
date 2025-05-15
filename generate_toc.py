@@ -62,7 +62,8 @@ def run_toc_generation():
   return toc_template.format(root_doc="README", toc_entries=toc_items)
 
 if __name__ == '__main__':
-  toc_file = f"./book/_toc.yml"
+  #toc_file = f"./book/_toc.yml"
+  toc_file = f"./_toc.yml"
   toc = run_toc_generation()
   Path(toc_file).write_text(toc)
 

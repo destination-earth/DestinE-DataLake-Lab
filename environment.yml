@@ -26,6 +26,7 @@ dependencies:
   - rioxarray
   - ipywidgets
   - ipyleaflet=0.17.3
+  - python-graphviz
   - pip:
       - pystac_client
       - rich
