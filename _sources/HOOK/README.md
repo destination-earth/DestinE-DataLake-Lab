@@ -4,6 +4,11 @@
 
 # Hook Service
 
+`````{admonition} Beta Version
+:class: warning
+Please be aware that this is a pre-release version of the DestinE-DataLake-Lab notebook gallery.
+`````
+
 <img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
 <br>
 

@@ -16,8 +16,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -27,22 +27,23 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=f53a0057" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
@@ -65,8 +66,8 @@
     <link rel="icon" href="https://hda.data.destination-earth.eu/ui/images/favicon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT" href="ExtremeDT-DataCube-xViewer.html" />
-    <link rel="prev" title="DestinE Data Lake - Stack Service Dask" href="DEDL_StackService_Dask.html" />
+    <link rel="next" title="STACK service - Dask 101" href="STACK-Dask-101.html" />
+    <link rel="prev" title="STACK Gallery" href="gallery.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -170,40 +171,67 @@
                 </a>
             </li>
         </ul>
-        <p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="README.html">Overview</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="gallery.html">STACK - Gallery</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">STACK service - Python Client Dask</a></li>
-
-<li class="toctree-l2"><a class="reference internal" href="ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="STACK-Dask-101.html">STACK service - Dask 101</a></li>
-</ul>
-</details></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">HDA</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../HDA/README.html">Overview</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../HDA/gallery.html">HDA - Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
 
 
 
-<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/ClimateDT-ParameterPlotter.html">DEDL - HDA Climate DT Parameter Plotter - Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/ExtremeDT-ParameterPlotter.html">DEDL - HDA Extreme DT Parameter Plotter - Tutorial</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.html">Destination Earth - Climate Change Adaptation Digital Twin Series Plot- Data Access using DEDL HDA</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.html">Destination Earth - Weather-Induced Extremes Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE.html">Destination Earth - Climate Change Adaptation Digital Twin - Data Access using DEDL HDA</a></li>
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../HDA/CDS_data/DEDL-HDA-EO.ECMWF.DAT.REANALYSIS_ERA5_SINGLE_LEVELS.html">Destination Earth - ERA5 hourly data on single levels from 1940 to present - Data Access using DEDL HDA</a></li>
 
 
 
 
-<li class="toctree-l2"><a class="reference internal" href="../HDA/PySTAC/HDA-PyStac-Client.html">HDA PySTAC-Client Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-quick-start.html">DEDL - EODAG - A quick start with DEDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EODAG/HDA-EODAG-full-version.html">DEDL - EODAG - DestinE Data Lake Provider (DEDL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.METOP.AVHRRL1.html">Destination Earth - AVHRR Level 1B Metop Global - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.html">Destination Earth - OLCI Level 1B Reduced Resolution - Sentinel-3 - Data Access using DEDL HDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh_Data_Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-1.L1_GRD.html">Example of Using HDA to Find and Download Data for Urban Area Monitoring Using Sentinel-1 Data</a></li>
 
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/Fresh_Data_Pool/DEDL-HDA-EO.ESA.DAT.SENTINEL-2.MSI.L2A.html">Example of how to use HDA to find and download data for conducting monitoring of Śniadrwy lake</a></li>
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-full-version.html">DEDL - HDA Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-Queryables.html">DEDL - HDA Tutorial - Queryables</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../HDA/REST/HDA-REST-quick-start.html">DEDL - HDA Tutorial - quick start</a></li>
 </ul>
 </details></li>
 </ul>
@@ -216,6 +244,19 @@
 </ul>
 </details></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">STACK</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Overview</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="gallery.html">STACK - Gallery</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">STACK service - Python Client Dask</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="STACK-Dask-101.html">STACK service - Dask 101</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ExtremeDT-DataCube.html">Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ExtremeDT-DataCube-xViewer.html">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DEDL_StackService_Dask.html">DestinE Data Lake - Stack Service Dask</a></li>
+</ul>
+</details></li>
+</ul>
 
     </div>
 </nav></div>
@@ -223,9 +264,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -281,24 +327,6 @@
     <img alt="Binder logo" src="../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li><a href="https://jupyter.central.data.destination-earth.eu/hub/user-redirect/git-pull?repo=https%3A//github.com/destination-earth/DestinE-DataLake-Lab&urlpath=lab/tree/DestinE-DataLake-Lab/STACK/STACK-Python-Client-Dask.ipynb&branch=notebook-gallery" target="_blank"
-   class="btn btn-sm dropdown-item"
-   title="Launch on JupyterHub"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  
-    <img alt="JupyterHub logo" src="../_static/images/logo_jupyterhub.svg">
-  </span>
-<span class="btn__text-container">JupyterHub</span>
 </a>
 </li>
       
@@ -426,7 +454,8 @@
                   
   <p><img alt="" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/img/DestinE-banner.jpg?raw=true" /></p>
 <p><strong>Licence</strong>: MIT <br></p>
-<a class="reference internal image-reference" href="https://docs.dask.org/en/latest/_images/dask_horizontal.svg"><img alt="Dask logo" class="align-right" src="https://docs.dask.org/en/latest/_images/dask_horizontal.svg" style="width: 25%;" /></a>
+<a class="reference internal image-reference" href="https://docs.dask.org/en/latest/_images/dask_horizontal.svg"><img alt="Dask logo" class="align-right" src="https://docs.dask.org/en/latest/_images/dask_horizontal.svg" style="width: 25%;" />
+</a>
 <section class="tex2jax_ignore mathjax_ignore" id="stack-service-python-client-dask">
 <h1>STACK service - Python Client Dask<a class="headerlink" href="#stack-service-python-client-dask" title="Link to this heading">#</a></h1>
 </section>
@@ -446,7 +475,8 @@ Please make sure Python DEDL kernel is used.
 </div>
 <p>DestinE Data Lake utilises a deployment of <a class="reference external" href="https://gateway.dask.org/">Dask Gateway</a> on each location (bridge) in the data lake. Dask Gateway provides a secure, multi-tenant server for managing Dask clusters. It allows users to launch and use Dask clusters in a shared, centrally managed cluster environment, without requiring users to have direct access to the underlying cluster backend (e.g. Kubernetes, Hadoop/YARN, HPC Job queues, etc…).</p>
 <p>Dask Gateway exposes a REST API to spawn clusters on demand. The overall architecture of Dask Gateway is depicted hereafter.</p>
-<a class="reference internal image-reference" href="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true"><img alt="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true" style="width: 60%;" /></a>
+<a class="reference internal image-reference" href="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true"><img alt="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true" src="https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/STACK/img/DEDL_Dask_multicloud.png?raw=true" style="width: 60%;" />
+</a>
 <section id="dedl-dask-gateway">
 <h2>DEDL Dask Gateway<a class="headerlink" href="#dedl-dask-gateway" title="Link to this heading">#</a></h2>
 <p><strong>Central Site</strong></p>
@@ -463,16 +493,16 @@ Please make sure Python DEDL kernel is used.
 <p>In the following, please enter your DESP username and password. Again, the password will only be saved for the duration of this user session and will be remove as soon as the notebook/kernel is closed.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask_gateway.auth</span> <span class="kn">import</span> <span class="n">GatewayAuth</span>
-<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
-<span class="kn">from</span> <span class="nn">destinelab</span> <span class="kn">import</span> <span class="n">AuthHandler</span> <span class="k">as</span> <span class="n">DESP_AuthHandler</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dask_gateway.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayAuth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">destinelab</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthHandler</span> <span class="k">as</span> <span class="n">DESP_AuthHandler</span>
 
-<span class="k">class</span> <span class="nc">DESPAuth</span><span class="p">(</span><span class="n">GatewayAuth</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DESPAuth</span><span class="p">(</span><span class="n">GatewayAuth</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_handler</span> <span class="o">=</span> <span class="n">DESP_AuthHandler</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please input your DESP password: &quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_handler</span><span class="o">.</span><span class="n">get_token</span><span class="p">()</span>
     
-    <span class="k">def</span> <span class="nf">pre_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">headers</span><span class="p">,</span> <span class="kc">None</span>
 </pre></div>
@@ -481,7 +511,7 @@ Please make sure Python DEDL kernel is used.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rich.prompt</span> <span class="kn">import</span> <span class="n">Prompt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rich.prompt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Prompt</span>
 <span class="n">myAuth</span> <span class="o">=</span> <span class="n">DESPAuth</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">Prompt</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;Username&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -503,7 +533,7 @@ Please input your DESP password:  ········
 <p>The <a class="reference external" href="https://github.com/destination-earth/DestinE_EUMETSAT_DEDL_Stack_Client">DEDL Stack Client is a Python</a> library to facilitate the use of Stack Service Dask. The main objective is to provide an abstraction layer to interact with the various clusters on each DEDL bridge. Computations can be directed to the different Dask clusters by making use of a context manager as given in the following.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dedl_stack_client.dask</span> <span class="kn">import</span> <span class="n">DaskMultiCluster</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dedl_stack_client.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">DaskMultiCluster</span>
 
 <span class="n">myDEDLClusters</span> <span class="o">=</span> <span class="n">DaskMultiCluster</span><span class="p">(</span><span class="n">auth</span><span class="o">=</span><span class="n">myAuth</span><span class="p">)</span>
 <span class="n">myDEDLClusters</span><span class="o">.</span><span class="n">new_cluster</span><span class="p">()</span>
@@ -536,9 +566,9 @@ In the following we will make use of <code class="docutils literal notranslate">
 <img alt="https://docs.dask.org/en/latest/_images/map-reduce-task-scheduling.svg" src="https://docs.dask.org/en/latest/_images/map-reduce-task-scheduling.svg" />
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span> <span class="k">as</span> <span class="n">wait</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span> <span class="k">as</span> <span class="n">wait</span>
 
-<span class="k">def</span> <span class="nf">apply_myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">wait</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
 </pre></div>
@@ -634,12 +664,13 @@ In the following we will make use of <code class="docutils literal notranslate">
 <h2>Use Case example: Pakistan Flood 2022<a class="headerlink" href="#use-case-example-pakistan-flood-2022" title="Link to this heading">#</a></h2>
 <p><strong>The complete use case is available on GitHub via https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022.</strong></p>
 <p>The use case demonstrates the multi-cloud capabilities of DEDL following the paradigm of data proximate computing. Data of the <strong>Global Flood Monitoring (GFM)</strong> service as well as <strong>Climate DT outputs, simulated by utilising ERA5 data</strong> have been use for flood risk assessment.</p>
-<a class="reference internal image-reference" href="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true"><img alt="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true" src="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true"><img alt="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true" src="https://github.com/destination-earth/DestinE_EUMETSAT_PakistanFlood_2022/blob/main/img/DEDL_FloodUC_dataflow.png?raw=true" style="width: 35%;" />
+</a>
 <p>Data is stored as datacubes (zarr format) at Central Site and at LUMI bridge in object storage.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">s3fs</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">s3fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -691,8 +722,8 @@ In the following we will make use of <code class="docutils literal notranslate">
 <p>So far we haven’t computed anything, so lets do the computation now on the Dask cluster.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rich.console</span> <span class="kn">import</span> <span class="n">Console</span>
-<span class="kn">from</span> <span class="nn">rich.prompt</span> <span class="kn">import</span> <span class="n">Prompt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.prompt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Prompt</span>
 <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">()</span>
 
 <span class="n">flooded_area</span> <span class="o">=</span> <span class="n">myDEDLClusters</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">flooded_area_</span><span class="p">,</span> <span class="n">sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -710,7 +741,7 @@ In the following we will make use of <code class="docutils literal notranslate">
 <p>Preprocess GFM data at <strong>Central Site</strong> for visualiation</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preprocess_dataset</span><span class="p">(</span><span class="n">data_array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">preprocess_dataset</span><span class="p">(</span><span class="n">data_array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">data_array</span> <span class="o">=</span> <span class="n">data_array</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
     <span class="n">steps</span> <span class="o">=</span> <span class="mi">500</span> <span class="o">//</span> <span class="n">data_array</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
     <span class="n">coarsened</span> <span class="o">=</span> <span class="n">data_array</span><span class="o">.</span><span class="n">coarsen</span><span class="p">({</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">steps</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">steps</span><span class="p">},</span> <span class="n">boundary</span><span class="o">=</span><span class="s1">&#39;trim&#39;</span><span class="p">)</span>
@@ -736,7 +767,7 @@ In the following we will make use of <code class="docutils literal notranslate">
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="n">flood_prep</span> <span class="o">=</span> <span class="n">myDEDLClusters</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">flood_prep_</span><span class="p">,</span> <span class="n">sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">flood_prep</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">flood_prep</span> <span class="o">=</span> <span class="n">flood_prep</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EPSG:3857&quot;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -747,17 +778,17 @@ In the following we will make use of <code class="docutils literal notranslate">
 <p>Visualise flood data on map.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap</span>
-<span class="kn">from</span> <span class="nn">attr</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">leafmap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">attr</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Extent</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Extent</span><span class="p">:</span>
     <span class="n">min_x</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">min_y</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">max_x</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">max_y</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">crs</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="k">def</span> <span class="nf">get_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">min_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_y</span><span class="p">]),</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">min_x</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">max_x</span><span class="p">]))</span>
 
@@ -791,9 +822,9 @@ In the following we will make use of <code class="docutils literal notranslate">
 Secondly we compute the average rainfall for August 2022 (monthly mean) at global scale.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
-<span class="k">def</span> <span class="nf">accum_rain_predictions</span><span class="p">(</span><span class="n">rain_data</span><span class="p">,</span> <span class="n">startdate</span><span class="p">,</span> <span class="n">enddate</span><span class="p">,</span> <span class="n">extent</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">accum_rain_predictions</span><span class="p">(</span><span class="n">rain_data</span><span class="p">,</span> <span class="n">startdate</span><span class="p">,</span> <span class="n">enddate</span><span class="p">,</span> <span class="n">extent</span><span class="p">):</span>
     <span class="n">rain_</span> <span class="o">=</span> <span class="n">rain_data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">startdate</span><span class="p">,</span> <span class="n">enddate</span><span class="p">),</span>
                           <span class="n">latitude</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">extent</span><span class="o">.</span><span class="n">max_y</span><span class="p">,</span> <span class="n">extent</span><span class="o">.</span><span class="n">min_y</span><span class="p">),</span>
                           <span class="n">longitude</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">extent</span><span class="o">.</span><span class="n">min_x</span><span class="p">,</span> <span class="n">extent</span><span class="o">.</span><span class="n">max_x</span><span class="p">))</span>
@@ -817,8 +848,8 @@ Secondly we compute the average rainfall for August 2022 (monthly mean) at globa
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">acc_rain_reproject</span><span class="p">(</span><span class="n">rain</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">rasterio.enums</span> <span class="kn">import</span> <span class="n">Resampling</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">acc_rain_reproject</span><span class="p">(</span><span class="n">rain</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampling</span>
     <span class="n">rain</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_nodata</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">rain</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rain</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="s1">&#39;EPSG:3857&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">bilinear</span><span class="p">)</span>
@@ -843,8 +874,8 @@ Secondly we compute the average rainfall for August 2022 (monthly mean) at globa
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap</span>
-<span class="kn">from</span> <span class="nn">localtileserver</span> <span class="kn">import</span> <span class="n">get_leaflet_tile_layer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">leafmap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">localtileserver</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_leaflet_tile_layer</span>
 
 <span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">roi_extent</span><span class="o">.</span><span class="n">get_center</span><span class="p">(),</span>
                 <span class="n">zoom</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
@@ -912,20 +943,20 @@ Secondly we compute the average rainfall for August 2022 (monthly mean) at globa
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="DEDL_StackService_Dask.html"
+       href="gallery.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">DestinE Data Lake - Stack Service Dask</p>
+        <p class="prev-next-title">STACK Gallery</p>
       </div>
     </a>
     <a class="right-next"
-       href="ExtremeDT-DataCube-xViewer.html"
+       href="STACK-Dask-101.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Create a dashboard based on Data Cube populated with data obtained from Weather and Geophysical Extremes Digital Twin (DT) - ExtremeDT</p>
+        <p class="prev-next-title">STACK service - Dask 101</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1003,8 +1034,8 @@ By DestinE Data Lake Team
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
