@@ -4,6 +4,11 @@
 
 # DestinE-DataLake-Lab
 
+`````{admonition} Beta Version
+:class: warning
+Please be aware that this is a pre-release version of the DestinE-DataLake-Lab notebook gallery.
+`````
+
 <img style="float:left; width:5%" src="./img/EUMETSAT-icon.png"/> **Author:** EUMETSAT
 
 Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
