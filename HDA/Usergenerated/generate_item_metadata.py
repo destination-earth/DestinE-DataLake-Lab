@@ -82,7 +82,7 @@ class ItemGenerator:
 
         ##### Load and Validate the Collection #####
         collection = confighelper.load_and_validate_collection(
-            self.collection_path, self.collection_id
+            self.collection_path, self.collection_id, save_reordered_collection=False
         )
 
         ###### load the collection config #####
@@ -147,6 +147,9 @@ class ItemGenerator:
         # Iterate over Item folders to create Item files
         for item_folder_path in item_folder_paths:
             self.create_item(item_folder_path, collection, collection_config)
+
+        # Assure that item assets are always ordered consistently
+        confighelper.sort_item_assets_in_folder(self.items_root)
 
         if IS_UPLOAD_S3:
 
