@@ -55,18 +55,18 @@
         }
     ],
     "assets": {
+        "20241115.png": {
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/20241115.png",
+            "type": "image/png",
+            "roles": [
+                "data"
+            ]
+        },
         "metadata1.json": {
             "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/metadata1.json",
             "type": "application/json",
             "roles": [
                 "metadata"
-            ]
-        },
-        "thumbnail.jpg": {
-            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/thumbnail.jpg",
-            "type": "image/jpeg",
-            "roles": [
-                "thumbnail"
             ]
         },
         "overview.jpg": {
@@ -76,11 +76,11 @@
                 "overview"
             ]
         },
-        "20241115.png": {
-            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/20241115.png",
-            "type": "image/png",
+        "thumbnail.jpg": {
+            "href": "data/2024/11/15/EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959/thumbnail.jpg",
+            "type": "image/jpeg",
             "roles": [
-                "data"
+                "thumbnail"
             ]
         }
     },
