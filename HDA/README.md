@@ -1,12 +1,10 @@
-<img src="../img/DestinE-banner.jpg"
-     alt="Destination Earth banner"
-/>
+---
+title: "DestinE Harmonised Data Access (HDA)"
+author: "Author: EUMETSAT"
+---
 
-# DestinE Harmonised Data Access (HDA)
-
-<img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
+<img style="float:left; width:5%" src="../../img/EUMETSAT-icon.png"/>  
 <br>
-
 Materials to learn how to use Harmonised Data Access API and examples 
 
 **Notebooks**

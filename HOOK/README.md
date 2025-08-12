@@ -1,10 +1,9 @@
-<img src="../img/DestinE-banner.jpg"
-     alt="Destination Earth banner"
-/>
+---
+title: "Hook Service"
+author: "Author: EUMETSAT"
+---
 
-# Hook Service
-
-<img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
+<img style="float:left; width:5%" src="../../img/EUMETSAT-icon.png"/>  
 <br>
 
 This folder contains materials for learning how to use Hook Service. 

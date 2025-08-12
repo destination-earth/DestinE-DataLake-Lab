@@ -1,10 +1,9 @@
-<img src="../img/DestinE-banner.jpg"
-     alt="Destination Earth banner"
-/>
+---
+title: "STACK Service"
+author: "Author: EUMETSAT"
+---
 
-# DestinE Harmonised Data Access (HDA)
-
-<img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/> **Author:** EUMETSAT 
+<img style="float:left; width:5%" src="../../img/EUMETSAT-icon.png"/>  
 <br>
 
 Materials to learn how to use **STACK** service and examples 

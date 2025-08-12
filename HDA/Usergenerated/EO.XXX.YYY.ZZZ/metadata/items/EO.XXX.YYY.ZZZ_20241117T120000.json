@@ -69,18 +69,18 @@
                 "metadata"
             ]
         },
-        "overview.jpg": {
-            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/overview.jpg",
-            "type": "image/jpeg",
-            "roles": [
-                "overview"
-            ]
-        },
         "thumbnail.jpg": {
             "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/thumbnail.jpg",
             "type": "image/jpeg",
             "roles": [
                 "thumbnail"
+            ]
+        },
+        "overview.jpg": {
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/overview.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "overview"
             ]
         }
     },

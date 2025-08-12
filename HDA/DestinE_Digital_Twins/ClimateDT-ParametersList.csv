@@ -1,0 +1,72 @@
+param,paramName,shortName,unit,encoding,isNemo,isIcon,isFESOM,stream,type,time,levtype,levelist
+78,Total column cloud liquid water,tclw,kg m**-2,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+79,Total column cloud ice water,tciw,kg m**-2,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+130,Temperature,t,K,instantaneous,,ICON,,clte,fc,Hourly,sfc,
+134,Surface pressure,sp,Pa,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+137,Total column vertically-integrated water vapour,tcwv,kg m**-2,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+141,Snow depth,sd,m of water equivalent,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+148,Charnock,chnk,Numeric,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+151,Mean sea level pressure,msl,Pa,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+159,Boundary layer height,blh,m,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+164,Total cloud cover,tcc,(0 - 1),instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+165,10 metre U wind component,10u,m s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+166,10 metre V wind component,10v,m s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+167,2 metre temperature,2t,K,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+168,2 metre dewpoint temperature,2d,K,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+186,Low cloud cover,lcc,(0 - 1),instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+187,Medium cloud cover,mcc,(0 - 1),instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+188,High cloud cover,hcc,(0 - 1),instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+235,Skin temperature,skt,K,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+228164,Total cloud cover,tcc,%,instantaneous,,ICON,,clte,fc,Hourly,sfc,
+260048,Total precipitation rate,tprate,kg m**-2 s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+129,Geopotential,z,m**2 s**-2,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,sfc,
+172,Land-sea mask,lsm,(0 - 1),instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,sfc,
+60,Potential vorticity,pv,K m**2 kg**-1 s**-1,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+129,Geopotential,z,m**2 s**-2,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+130,Temperature,t,K,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+131,U component of wind,u,m s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+132,V component of wind,v,m s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+133,Specific humidity,q,kg kg**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+135,Vertical velocity,w,Pa s**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+157,Relative humidity,r,%,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+246,Specific cloud liquid water content,clwc,kg kg**-1,instantaneous,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,pl,1000/925/850/700/600/500/400/300/250/200/150/100/70/50/30/20/10/5/1
+28141,Snow depth water equivalent,sd,kg m**-2,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sol,1/2/3/4/5
+228246,100 metre U wind component,100u,m s**-1,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,hl,100
+228247,100 metre V wind component,100v,m s**-1,instantaneous,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,hl,100
+263000,Time-mean sea ice thickness,avg_sithick,m,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263001,Time-mean sea ice area fraction,avg_siconc,Fraction,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263003,Time-mean eastward sea ice velocity,avg_siue,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263004,Time-mean northward sea ice velocity,avg_sivn,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263008,Time-mean sea ice volume per unit area,avg_sivol,m**3 m**-2,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263009,Time-mean snow volume over sea ice per unit area,avg_snvol,m**3 m**-2,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263021,Time-mean X-component of sea ice velocity,avg_six,m s**-1,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263022,Time-mean Y-component of sea ice velocity,avg_siy,m s**-1,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263100,Time-mean sea surface practical salinity,avg_sos,g kg**-1,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263101,Time-mean sea surface temperature,avg_tos,K,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263114,Time-mean ocean mixed layer depth defined by sigma theta 0.03 kg m-3,avg_mlotst030,m,mean,,ICON,,clte,fc,Daily,o2d,
+263121,Time-mean vertically-integrated heat content in the upper 300 m,avg_hc300m,J m**-2,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263122,Time-mean vertically-integrated heat content in the upper 700 m,avg_hc700m,J m**-2,mean,IFS-NEMO,,IFS-FESOM,clte,fc,Daily,o2d,
+263124,Time-mean sea surface height,avg_zos,m,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o2d,
+263500,Time-mean sea water practical salinity,avg_so,g kg**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d, 1 to 75 (NEMO), 1 to 72 (FESOM)
+263501,Time-mean sea water potential temperature,avg_thetao,K,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263505,Time-mean northward sea water velocity,avg_von,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263506,Time-mean eastward sea water velocity,avg_uoe,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+263507,Time-mean upward sea water velocity,avg_wo,m s**-1,mean,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Daily,o3d,1 to 75 (NEMO), 1 to 72 (FESOM)
+8,Surface runoff,sro,m,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+9,Sub-surface runoff,ssro,m,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+144,Snowfall,sf,m of water equivalent,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+146,Surface sensible heat flux,sshf,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+147,Surface latent heat flux,slhf,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+169,Surface short-wave (solar) radiation downwards,ssrd,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+175,Surface long-wave (thermal) radiation downwards,strd,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+176,Surface net short-wave (solar) radiation,ssr,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+177,Surface net long-wave (thermal) radiation,str,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+178,Top net short-wave (solar) radiation,tsr,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+179,Top net long-wave (thermal) radiation,ttr,J m**-2,accumulated,IFS-NEMO,ICON,IFS-FESOM,clte,fc,Hourly,sfc,
+180,Time-integrated eastward turbulent surface stress,ewss,N m**-2 s,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+181,Time-integrated northward turbulent surface stress,nsss,N m**-2 s,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+182,Evaporation,e,m of water equivalent,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+212,TOA incident short-wave (solar) radiation,tisr,J m**-2,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+228,Total precipitation,tp,m,accumulated,IFS-NEMO,,IFS-FESOM,clte,fc,Hourly,sfc,
+260654,Time-integrated eastward turbulent surface stress due to surface roughness,etsssr,N m**-2 s,accumulated,,ICON,,clte,fc,Hourly,sfc,
+260655,Time-integrated northward turbulent surface stress due to surface roughness,ntsssr,N m**-2 s,accumulated,,ICON,,clte,fc,Hourly,sfc,

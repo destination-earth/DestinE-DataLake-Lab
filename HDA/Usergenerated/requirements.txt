@@ -1,6 +1,5 @@
 pystac
 pystac[validation]
-pystac[orjson]
 shapely
 python-magic
 requests

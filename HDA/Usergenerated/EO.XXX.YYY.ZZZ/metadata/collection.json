@@ -23,7 +23,6 @@
   "stac_extensions": [
       "https://stac-extensions.github.io/scientific/v1.0.0/schema.json"
   ],
-  "dedl:short_description": "Short Text describing the dataset. This text will be shown with title when discovering Collections.",
   "sci:publications": [
       {
           "sci:doi": "DOI_CODE",

@@ -55,25 +55,18 @@
         }
     ],
     "assets": {
+        "thumbnail.jpg": {
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/thumbnail.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "thumbnail"
+            ]
+        },
         "20241116.png": {
             "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/20241116.png",
             "type": "image/png",
             "roles": [
                 "data"
-            ]
-        },
-        "metadata3a.json": {
-            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3a.json",
-            "type": "application/json",
-            "roles": [
-                "metadata"
-            ]
-        },
-        "metadata3b.json": {
-            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3b.json",
-            "type": "application/json",
-            "roles": [
-                "metadata"
             ]
         },
         "overview.jpg": {
@@ -83,9 +76,16 @@
                 "overview"
             ]
         },
-        "somesubfolder/metadata3c.txt": {
-            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/somesubfolder/metadata3c.txt",
-            "type": "text/plain",
+        "metadata3b.json": {
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3b.json",
+            "type": "application/json",
+            "roles": [
+                "metadata"
+            ]
+        },
+        "metadata3a.json": {
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/metadata3a.json",
+            "type": "application/json",
             "roles": [
                 "metadata"
             ]
@@ -97,11 +97,11 @@
                 "metadata"
             ]
         },
-        "thumbnail.jpg": {
-            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/thumbnail.jpg",
-            "type": "image/jpeg",
+        "somesubfolder/metadata3c.txt": {
+            "href": "data/2024/11/16/EO.XXX.YYY.ZZZ_20241116T120000_20241116T235959/somesubfolder/metadata3c.txt",
+            "type": "text/plain",
             "roles": [
-                "thumbnail"
+                "metadata"
             ]
         }
     },
