@@ -75,8 +75,34 @@ def check_collection_fields(
         print("Collection passed all field checks.")
 
 
+def cleanup_json_file(file_path):
+    try:
+        # Open and load the original JSON data
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Clean up the 'links' field if present
+        if "links" in data and isinstance(data["links"], list):
+            data["links"] = [
+                link
+                for link in data["links"]
+                if link.get("rel") not in ["root", "self"]
+            ]
+
+        # Re-save the data with indentation
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+        print(f"Reindented JSON file saved to: {file_path}")
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        print(f"Error processing file: {e}")
+
+
 def load_and_validate_collection(
-    collection_path, expected_collection_id, save_reordered_collection: bool = False
+    collection_path,
+    expected_collection_id,
+    save_reordered_collection: bool = False,
+    is_compare_expected_id: bool = True,
 ):
     """
     Load and validate a STAC collection from a JSON file.
@@ -116,7 +142,7 @@ def load_and_validate_collection(
                 "links",
                 "keywords",
                 "stac_extensions",
-                "providers"
+                "providers",
             ]
 
             ##########################################################################
@@ -131,7 +157,7 @@ def load_and_validate_collection(
                 )
 
             # Check that the collection.id matches the expected_collection_id
-            if collection.id != expected_collection_id:
+            if is_compare_expected_id and collection.id != expected_collection_id:
                 raise ValueError(
                     f"The collection.id: '{collection.id}' from the Collection file does not correspond to the expected_collection_id:'{expected_collection_id}'"
                 )
@@ -146,6 +172,8 @@ def load_and_validate_collection(
                 # Save the reordered collection to a new file
                 collection.set_self_href("collection_reordered.json")
                 collection.save_object()
+
+                cleanup_json_file("collection_reordered.json")
 
             logger.info(f"Successfully validated stac collection: {collection.id}")
         else:
