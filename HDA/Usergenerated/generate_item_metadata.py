@@ -326,11 +326,11 @@ class ItemGenerator:
 
             # Set collection and item self links
             collection.set_self_href(
-                f"https://hda.data.destination-earth.eu/stac/collections/{collection_id}"
+                f"https://hda.data.destination-earth.eu/stac/v2/collections/{collection_id}"
             )
             item.set_collection(collection)
             item.set_self_href(
-                f"https://hda.data.destination-earth.eu/stac/collections/{collection_id}/items/{item_id}"
+                f"https://hda.data.destination-earth.eu/stac/v2/collections/{collection_id}/items/{item_id}"
             )
 
             # Ensure the items_root directory exists
