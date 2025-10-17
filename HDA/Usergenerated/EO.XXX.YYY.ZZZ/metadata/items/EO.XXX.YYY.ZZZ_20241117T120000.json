@@ -44,13 +44,13 @@
     "links": [
         {
             "rel": "collection",
-            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ",
+            "href": "https://hda.data.destination-earth.eu/stac/v2/collections/EO.XXX.YYY.ZZZ",
             "type": "application/json",
             "title": "DATASET_TITLE"
         },
         {
             "rel": "self",
-            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241117T120000",
+            "href": "https://hda.data.destination-earth.eu/stac/v2/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241117T120000",
             "type": "application/json"
         }
     ],
