@@ -44,13 +44,13 @@
     "links": [
         {
             "rel": "collection",
-            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ",
+            "href": "https://hda.data.destination-earth.eu/stac/v2/collections/EO.XXX.YYY.ZZZ",
             "type": "application/json",
             "title": "DATASET_TITLE"
         },
         {
             "rel": "self",
-            "href": "https://hda.data.destination-earth.eu/stac/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241117T120000",
+            "href": "https://hda.data.destination-earth.eu/stac/v2/collections/EO.XXX.YYY.ZZZ/items/EO.XXX.YYY.ZZZ_20241117T120000",
             "type": "application/json"
         }
     ],
@@ -69,18 +69,18 @@
                 "metadata"
             ]
         },
-        "thumbnail.jpg": {
-            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/thumbnail.jpg",
-            "type": "image/jpeg",
-            "roles": [
-                "thumbnail"
-            ]
-        },
         "overview.jpg": {
             "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/overview.jpg",
             "type": "image/jpeg",
             "roles": [
                 "overview"
+            ]
+        },
+        "thumbnail.jpg": {
+            "href": "data/2024/11/17/EO.XXX.YYY.ZZZ_20241117T120000/thumbnail.jpg",
+            "type": "image/jpeg",
+            "roles": [
+                "thumbnail"
             ]
         }
     },
