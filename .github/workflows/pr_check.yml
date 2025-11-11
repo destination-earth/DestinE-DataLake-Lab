@@ -1,0 +1,37 @@
+name: Validate Notebooks
+
+on:
+  pull_request:
+    branches: [ main, staging]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: List changed notebooks
+        id: changes
+        run: |
+          FILES=$(git diff --name-only origin/main...HEAD | grep ".ipynb" || true)
+          {
+            echo 'CHANGED<<EOF'
+            echo "$FILES"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate notebooks
+        if: contains(steps.changes.outputs.CHANGED, '.ipynb')
+        run: |
+          echo "${{ steps.changes.outputs.CHANGED }}" > changed_files.txt
+          while IFS= read -r nb; do
+            echo "Validating: $nb"
+            python .github/scripts/validate_notebook.py "$nb"
+          done < changed_files.txt
