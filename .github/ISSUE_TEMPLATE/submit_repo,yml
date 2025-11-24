@@ -1,0 +1,20 @@
+name: "Add New Cookbook"
+description: "Submit a repository to be added to the gallery"
+labels: ["add-repo"]
+assignees: []
+body:
+  - type: input
+    id: repo_url
+    attributes:
+      label: "Repository URL"
+      description: "Paste the link to your repository"
+      placeholder: "https://github.com/username/repo"
+    validations:
+      required: true
+  - type: input
+    id: root_path
+    attributes:
+      label: "Cookbook Title in capital letters"
+      placeholder: "COOKBOOKNAME"
+    validations:
+      required: true
