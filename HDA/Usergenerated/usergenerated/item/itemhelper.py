@@ -236,7 +236,7 @@ def get_datetime_from_folder_path(
     Normally an attempt will be made to extract the YYYYMMDD from the folder hierarchy.
     This should normally correspond to the ITEM id and can be used as a Sanity check.
 
-    In Degraded mode an attempt to get the datetime is done only using the root folder that can correspond to YYYY
+    In Simplified mode an attempt to get the datetime is done only using the root folder that can correspond to YYYY
     In this case the Item > properties > datetime will be considered to by YYYY0101
 
     """
@@ -283,7 +283,7 @@ def get_datetime_from_folder_path(
 
 def get_item_date_overide(config_list):
     """
-    In degraded mode it is possible to set an Item > properties > datetime using global configuration in collection_config.json
+    In simplified mode it is possible to set an Item > properties > datetime using global configuration in collection_config.json
     """
 
     # find overide for item at item or collection level

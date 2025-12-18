@@ -128,7 +128,7 @@ AWS_SECRET_ACCESS_KEY="[Replace with your credentials secret_access_key]"
 {
     "id": "EO.XXX.YYY.ZZZ",
     "item_asset_ignore_list": ["item_config.json"],
-    "item_folder_level": "NONE",         # This means we are in degraded mode and any folders found directly in the root of the data folder become STAC ITEMs
+    "item_folder_level": "NONE",         # This means we are in simplified mode and any folders found directly in the root of the data folder become STAC ITEMs
     "thumbnail_regex": "^thumbnail",
     "overview_regex": "^overview",
     "additional_property_keys": []
