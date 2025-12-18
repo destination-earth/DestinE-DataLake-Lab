@@ -14,6 +14,8 @@ APP_LOGGER_LEVEL = logging.INFO
 STAC_VERSION = "1.0.0"
 
 ITEM_CONFIG_FILE_NAME = "item_config.json"
+# optional field that determines if teh item_config.json file is optional or not in ITEM folders: values true or false
+ITEM_CONFIG_OPTIONAL = "item_config_optional"
 
 # expected config at collection level to indicate at what level to find Item Folders
 ITEM_FOLDER_LEVEL = "item_folder_level"
@@ -21,6 +23,9 @@ ITEM_FOLDER_LEVEL = "item_folder_level"
 ITEM_FOLDER_LEVEL_YYYY = "YYYY"
 ITEM_FOLDER_LEVEL_MM = "MM"
 ITEM_FOLDER_LEVEL_DD = "DD"
+# NONE means that we are in a 'simplified' process, any root folder in the data folder becomes an item. Considered not standard - would need approval from DEDL Support
+ITEM_FOLDER_LEVEL_NONE = "NONE"
+
 # optional config at the collection level (i.e. in collection_config.json) to indicate the keys of additional properties found in suffix of the item folder
 # e.g "additional_property_keys": ["model", "period_type"] would indicate that we are expecting item folders to end with the suffix __somemodelname__someperiodtype
 # these additional properties are extracted and added to the properties key of the item.

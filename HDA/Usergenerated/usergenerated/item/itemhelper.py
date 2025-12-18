@@ -5,6 +5,9 @@ import re
 import magic
 from datetime import datetime
 
+from config import ITEM_FOLDER_LEVEL, ITEM_FOLDER_LEVEL_DD, ITEM_FOLDER_LEVEL_MM
+from usergenerated.config import confighelper
+
 
 def get_media_type(file_path):
     """
@@ -37,7 +40,8 @@ def get_media_type(file_path):
         ".nc": pystac.MediaType.NETCDF,
         # Add more mappings as needed
         # e.g. adding text/csv
-        ".csv": "text/csv"
+        ".csv": "text/csv",
+        ".npy": "application/x-npy"
     }
 
     # Get the media type based on the file extension
@@ -80,6 +84,7 @@ def get_asset_role(
         pystac.MediaType.NETCDF,
         # e.g. if csv files in your data are considered data assets
         "text/csv",
+        "application/x-npy"
     ]
     metadata = [
         pystac.MediaType.GEOJSON,
@@ -89,7 +94,7 @@ def get_asset_role(
         pystac.MediaType.XML,
         pystac.MediaType.PDF,
         # e.g. if csv files in your data are considered metadata assets
-        #"text/csv",
+        # "text/csv",
     ]
 
     if re.match(thumbnail_regex, asset_href.name):
@@ -106,7 +111,9 @@ def get_asset_role(
         )
 
 
-def get_item_properties(item_id: str, collection_id: str, additional_property_keys: list):
+def get_item_properties(
+    item_id: str, collection_id: str, additional_property_keys: list
+):
     """
     item_id expected in form EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959 i.e.  [Collection_ID]_[start_datetime/datetime]_[end_datetime]
     item_id can also take form EO.XXX.YYY.ZZZ_20241116T000000 i.e.  [Collection_ID]_[datetime]
@@ -123,7 +130,7 @@ def get_item_properties(item_id: str, collection_id: str, additional_property_ke
     # string suffixed like this are ignored __LISBON
     # these could be picked up in the data preparation step to add additional metadata if necessary
     # An example mechanism of picking up the suffix metadata is show here, but it will depend on the structure of your item data
-    if '__' in item_id:
+    if "__" in item_id:
         additional_property_parts = item_id.split("__")
         # only consider the first element of string before __
         item_id = additional_property_parts[0]
@@ -132,22 +139,23 @@ def get_item_properties(item_id: str, collection_id: str, additional_property_ke
         if len(additional_property_keys) > 0:
 
             if len(additional_property_parts[1:]) != len(additional_property_keys):
-                raise ValueError("Number of additional properties does not match the number of additional property keys.")
-            
-            additional_properties = dict(zip(additional_property_keys, additional_property_parts[1:]))
+                raise ValueError(
+                    "Number of additional properties does not match the number of additional property keys."
+                )
+
+            additional_properties = dict(
+                zip(additional_property_keys, additional_property_parts[1:])
+            )
             properties.update(additional_properties)
 
-
-
-    
     # remove the collection_id prefix from the item_id, so that we can extract the datetime
     # e.g. EO.XXX.YYY.ZZZ_20241115T000000_20241115T235959 to 20241115T000000_20241115T235959
     # Note: We add 1 to the length of the collection_id to account for the following underscore
     if item_id.startswith(collection_id):
-        item_id = item_id[len(collection_id) + 1:]
+        item_id = item_id[len(collection_id) + 1 :]
     else:
         raise ValueError("Item ID does not start with the Collection ID.")
-    
+
     parts = item_id.split("_")
 
     # Normally additional metadata would be added at the end of the item folder e.g. EO.AAA.BBB.CCC_CCC_CCC_20110101T070000_20111231T220000__META1__META2
@@ -164,7 +172,6 @@ def get_item_properties(item_id: str, collection_id: str, additional_property_ke
     # Extract start and end parts safely
     start = parts[0] if len(parts) >= 1 else None
     end = parts[1] if len(parts) == 2 else None
-
 
     item_datetime: datetime = None
 
@@ -210,3 +217,84 @@ def guess_mime_type_advanced(file_path):
     """
     mime = magic.Magic(mime=True)
     return mime.from_file(file_path)
+
+
+def is_valid_year(year_str: str, min_year: int = 1700, max_year: int = 2200) -> bool:
+    """
+    Check string is a year in a reasonable range
+    """
+    if not (year_str.isdigit() and len(year_str) == 4):
+        return False
+    year = int(year_str)
+    return min_year <= year <= max_year
+
+
+def get_datetime_from_folder_path(
+    item_folder_path_parts, collection_config, item_id, collection_id
+):
+    """
+    Normally an attempt will be made to extract the YYYYMMDD from the folder hierarchy.
+    This should normally correspond to the ITEM id and can be used as a Sanity check.
+
+    In Simplified mode an attempt to get the datetime is done only using the root folder that can correspond to YYYY
+    In this case the Item > properties > datetime will be considered to by YYYY0101
+
+    """
+
+    # The standard folder structure is "EO.XXX.YYY.ZZZ/data/YYYY/MM/DD/ITEM"
+
+    year_from_folder_path = item_folder_path_parts[2]
+
+    # month folder will only be present if items at MM or DD level or not specified (default DD)
+    if (
+        not collection_config[ITEM_FOLDER_LEVEL]
+        or collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_MM
+        or collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_DD
+    ):
+        month_from_folder_path = item_folder_path_parts[3]
+    else:
+        month_from_folder_path = "01"
+
+    # day folder will only be present if items at DD level or not specified (default DD)
+    if (
+        not collection_config[ITEM_FOLDER_LEVEL]
+        or collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_DD
+    ):
+        day_from_folder_path = item_folder_path_parts[4]
+    else:
+        day_from_folder_path = "01"
+
+    print(
+        f"item_id:{item_id}, collection_id:{collection_id}, "
+        f"year_from_folder_path:{year_from_folder_path}, "
+        f"month_from_folder_path:{month_from_folder_path}, "
+        f"day_from_folder_path:{day_from_folder_path}"
+    )
+
+    # Convert date components to a datetime object
+    datetime_from_folder_path = datetime(
+        int(year_from_folder_path),
+        int(month_from_folder_path),
+        int(day_from_folder_path),
+    )
+
+    return datetime_from_folder_path
+
+
+def get_item_date_overide(config_list):
+    """
+    In simplified mode it is possible to set an Item > properties > datetime using global configuration in collection_config.json
+    """
+
+    # find overide for item at item or collection level
+    item_date_overide = confighelper.get_config_value(
+        config_list, "item_date_overide", True
+    )
+
+    if item_date_overide:
+        # If there is an overide, use it.
+        return datetime.strptime(item_date_overide, "%Y%m%d")
+
+    else:
+
+        return None
