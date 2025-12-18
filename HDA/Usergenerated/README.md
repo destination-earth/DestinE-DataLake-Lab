@@ -92,3 +92,68 @@ AWS_SECRET_ACCESS_KEY="[Replace with your credentials secret_access_key]"
 
 
 
+# metadata > collection-config.json
+
+## Options
+
+```python
+
+# The file collection_config.json found in the path EO.XXX.YYY.ZZZ/metadata/collection_config.json
+# Defines at a high level
+
+{
+    "id": "EO.XXX.YYY.ZZZ",                         # Collection ID
+    "item_asset_ignore_list": ["item_config.json"], # Any files to ignore in the ITEM folders when generating metadata
+    "item_config_optional": false,                  # Optional field: false by default. Determines whether the item_config.json file in ITEM folders is optional or not.
+    "item_folder_level": "DD",                      # Where to exptect the ITEM folders. Possible values (YYYY, MM, DD, NONE)
+    "thumbnail_regex": "^thumbnail",                # Regex of files in the ITEM folder that represent the 'thumbnail' of the Item (if any)
+    "overview_regex": "^overview",                  # Regex of files in the ITEM folder that represent the 'overview' of the Item (if any)
+    "additional_property_keys": []                  # List of property keys that are suffixed to the ITEM folder name using double underscores __
+}
+
+
+```
+
+## NEW : Simple Process - ONLY with agreement of DEDL Support - Considered not standard
+
+- A 'Simplified' structure is possible - but only with the agreement of DEDL Support
+    - To do so. Set "item_folder_level": NONE (in the collection_config.json file)
+    - Activating this process means: naming standards can be ignored
+      - With the downside that STAC ITEM
+        - datetime are not determined from ITEM folder name
+        - additional filters can not be determined from the ITEM folder name
+
+```python
+
+{
+    "id": "EO.XXX.YYY.ZZZ",
+    "item_asset_ignore_list": ["item_config.json"],
+    "item_folder_level": "NONE",         # This means we are in degraded mode and any folders found directly in the root of the data folder become STAC ITEMs
+    "thumbnail_regex": "^thumbnail",
+    "overview_regex": "^overview",
+    "additional_property_keys": []
+}
+
+```
+
+- Any folders at the root of the data folder will now become STAC Items
+  - All files contained in any subfolders become assets of that item
+  - The Item > properties > datetime associated with these items can be set at several levels (in the following order)
+    - "item_date_overide" set in collection_config.json will set that datetime globally for all ITEMS
+    - if the first level folder found in data is in the form YYYY we use YYYY0101 as the STAC ITEM > properties > datetime
+    - if none of the above we use the current day as the datetime for that STAC ITEM (date of generation of metadata)
+
+```python
+
+{
+    "id": "EO.XXX.YYY.ZZZ",
+    "item_asset_ignore_list": ["item_config.json"],
+    "item_folder_level": "NONE",         # This means we are in a 'simplified mode' and any folders found directly in the root of the data folder become STAC ITEMs
+    "item_date_overide": "20240101",     # This YYYYMMDD will be used to set the STAC ITEM > properties > datetime
+    "thumbnail_regex": "^thumbnail",
+    "overview_regex": "^overview",
+    "additional_property_keys": [],
+    "bbox": [-10.0, 35.0, 10.0, 60.0]    # An Optional bbox can be set at the collection level here, and will be applied to ALL items
+}
+
+```

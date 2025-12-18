@@ -191,7 +191,7 @@ def load_and_validate_collection(
     return None
 
 
-def load_config(config_file_path: Path):
+def load_config(config_file_path: Path, is_config_file_optional: bool=False):
     """
     Load and return the configuration data from a JSON file.
 
@@ -206,7 +206,12 @@ def load_config(config_file_path: Path):
     """
     # Check if the config file exists
     if not config_file_path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_file_path}")
+        if is_config_file_optional:
+            # It's ok not to have a config file
+            print(f"Optional Config file not found: {config_file_path}. Returning empty dictionary.")
+            return {}
+        else:
+            raise FileNotFoundError(f"Config file not found: {config_file_path}")
 
     # logger.info(f"{os.path.join(ROOT_DIR, config_file_path)}")
 
