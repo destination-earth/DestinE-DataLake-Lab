@@ -5,12 +5,11 @@ import logging
 import re
 import os
 from collections import OrderedDict
+from typing import List, Dict, Any, Optional
 
 from config import APP_LOGGER_NAME, ROOT_DIR
 
-from typing import List, Dict, Any
 from pystac import Collection
-from pathlib import Path
 from pystac.validation import JsonSchemaSTACValidator, set_validator
 from pystac.validation.schema_uri_map import DefaultSchemaUriMap
 from pystac.errors import STACValidationError
@@ -24,24 +23,27 @@ logger = logging.getLogger(APP_LOGGER_NAME)
 
 # Custom StacIO to log read operations
 class LoggingStacIO(pystac.StacIO.default().__class__):
-    def read_text(self, uri):
-        print(f"STAC IO is reading from: {uri}")
+    """Custom STAC IO class for logging read operations."""
+
+    def read_text(self, uri: str) -> str:
+        """Log STAC file read operations."""
+        logger.debug(f"STAC IO is reading from: {uri}")
         return super().read_text(uri)
 
 
 pystac.StacIO.set_default(lambda: LoggingStacIO())
 
 
-def print_validation_errors(e: STACValidationError, max_depth=2):
+def print_validation_errors(e: STACValidationError, max_depth: int = 2) -> None:
     """
     Recursively print all validation errors with their JSON path.
 
-    Parameters:
-    - e: The STACValidationError raised during validation.
-    - max_depth: How deeply to walk nested contexts (e.g. context-of-context).
+    Args:
+        e: The STACValidationError raised during validation
+        max_depth: How deeply to walk nested contexts (e.g. context-of-context)
     """
 
-    def walk_errors(errors, depth=0):
+    def walk_errors(errors: list, depth: int = 0) -> None:
         for err in errors:
             indent = "  " * depth
             loc = "/".join(map(str, err.path)) or "(root)"
@@ -55,11 +57,20 @@ def print_validation_errors(e: STACValidationError, max_depth=2):
 
 
 def check_collection_fields(
-    collection_dict: Dict, required_fields: List[str], require_non_null: bool = True
+    collection_dict: Dict[str, Any],
+    required_fields: List[str],
+    require_non_null: bool = True,
 ) -> None:
     """
-    Checks for presence (and optional non-nullness) of fields in a PySTAC Collection.
-    Raises ValueError if any issues are found.
+    Check for presence (and optional non-nullness) of fields in a PySTAC Collection.
+    
+    Args:
+        collection_dict: The collection dictionary to check
+        required_fields: List of required field names
+        require_non_null: Whether fields must be non-null
+        
+    Raises:
+        ValueError: If any required fields are missing or null
     """
     issues = []
 
@@ -75,7 +86,13 @@ def check_collection_fields(
         print("Collection passed all field checks.")
 
 
-def cleanup_json_file(file_path):
+def cleanup_json_file(file_path: str) -> None:
+    """
+    Clean up a JSON file by removing self and root links and re-indenting.
+    
+    Args:
+        file_path: Path to the JSON file to clean up
+    """
     try:
         # Open and load the original JSON data
         with open(file_path, "r", encoding="utf-8") as f:
@@ -99,25 +116,23 @@ def cleanup_json_file(file_path):
 
 
 def load_and_validate_collection(
-    collection_path,
-    expected_collection_id,
+    collection_path: Path,
+    expected_collection_id: str,
     save_reordered_collection: bool = False,
     is_compare_expected_id: bool = True,
-):
+) -> Optional[Collection]:
     """
     Load and validate a STAC collection from a JSON file.
-    Also checks the expected_collection_id
-    and optionally saves a reordered version of the collection.
 
-    Parameters:
-    collection_path (str): The path to the JSON file containing the STAC collection.
-    expected_collection_id (str): The expected ID of the collection.
-    save_reordered_collection (bool): If True, saves a reordered version of the collection.
+    Args:
+        collection_path: Path to the JSON file containing the STAC collection
+        expected_collection_id: Expected ID of the collection
+        save_reordered_collection: If True, saves a reordered version
+        is_compare_expected_id: If True, validates that collection ID matches expected
 
     Returns:
-    pystac.Collection: The loaded and validated STAC collection, or None if loading or validation fails.
+        The loaded and validated STAC collection, or None if loading/validation fails
     """
-
     # Set the STAC version to 1.0.0
     set_stac_version("1.0.0")
 
@@ -125,7 +140,7 @@ def load_and_validate_collection(
         with open(collection_path, "r", encoding="utf-8") as f:
             collection_dict = json.load(f)
 
-        collection: pystac.Collection = pystac.Collection.from_dict(collection_dict)
+        collection: Collection = Collection.from_dict(collection_dict)
         print(f"PySTAC version: {get_stac_version()}")
 
         if collection is not None:
@@ -145,24 +160,23 @@ def load_and_validate_collection(
                 "providers",
             ]
 
-            ##########################################################################
-
             # Check Obligatory fields which should not have null values
             check_collection_fields(collection_dict, important_fields)
 
             # Check that the collection.id matches the expected format
             if not bool(re.fullmatch(r"[A-Z._]+", collection.id)):
                 raise ValueError(
-                    f"The collection.id: '{collection.id}' from the Collection file does not match the expected format. It should only contain uppercase letters, dots, and underscores. e.g. 'EO.AAA.DAT.BBB_CCC'"
+                    f"The collection.id: '{collection.id}' from the Collection file does not match "
+                    f"the expected format. It should only contain uppercase letters, dots, and underscores. "
+                    f"e.g. 'EO.AAA.DAT.BBB_CCC'"
                 )
 
             # Check that the collection.id matches the expected_collection_id
             if is_compare_expected_id and collection.id != expected_collection_id:
                 raise ValueError(
-                    f"The collection.id: '{collection.id}' from the Collection file does not correspond to the expected_collection_id:'{expected_collection_id}'"
+                    f"The collection.id: '{collection.id}' from the Collection file does not correspond "
+                    f"to the expected_collection_id:'{expected_collection_id}'"
                 )
-
-            ##########################################################################
 
             # Check that the collection is valid against any jsonschemas
             collection.validate()
@@ -172,7 +186,6 @@ def load_and_validate_collection(
                 # Save the reordered collection to a new file
                 collection.set_self_href("collection_reordered.json")
                 collection.save_object()
-
                 cleanup_json_file("collection_reordered.json")
 
             logger.info(f"Successfully validated stac collection: {collection.id}")
@@ -191,29 +204,33 @@ def load_and_validate_collection(
     return None
 
 
-def load_config(config_file_path: Path, is_config_file_optional: bool=False):
+def load_config(
+    config_file_path: Path, is_config_file_optional: bool = False
+) -> Dict[str, Any]:
     """
-    Load and return the configuration data from a JSON file.
+    Load and return configuration data from a JSON file.
 
-    Parameters:
-    config_file_path (Path): The path to the configuration file.
+    Args:
+        config_file_path: Path to the configuration file
+        is_config_file_optional: If True, returns empty dict if file not found
 
     Returns:
-    dict: The configuration data loaded from the file.
+        Dictionary containing the configuration data
 
     Raises:
-    FileNotFoundError: If the config file does not exist.
+        FileNotFoundError: If the config file does not exist and is not optional
     """
     # Check if the config file exists
     if not config_file_path.exists():
         if is_config_file_optional:
             # It's ok not to have a config file
-            print(f"Optional Config file not found: {config_file_path}. Returning empty dictionary.")
+            logger.info(
+                f"Optional Config file not found: {config_file_path}. "
+                f"Returning empty dictionary."
+            )
             return {}
         else:
             raise FileNotFoundError(f"Config file not found: {config_file_path}")
-
-    # logger.info(f"{os.path.join(ROOT_DIR, config_file_path)}")
 
     # Load the JSON data from the config file
     with open(config_file_path, "r", encoding="utf-8") as f:
@@ -222,16 +239,24 @@ def load_config(config_file_path: Path, is_config_file_optional: bool=False):
     return config_data
 
 
-def get_config_value(config_list, search_key, is_search_key_optional: bool = False):
+def get_config_value(
+    config_list: List[Dict[str, Any]],
+    search_key: str,
+    is_search_key_optional: bool = False,
+) -> Optional[Any]:
     """
-    Retrieve the value from the configuration list based on the search key.
+    Retrieve a value from a configuration list based on the search key.
 
-    Parameters:
-    config_list (list): A list of dictionaries containing configuration key-value pairs.
-    search_key (str): The key to search for in the configuration list.
+    Args:
+        config_list: List of dictionaries containing configuration key-value pairs
+        search_key: The key to search for in the configuration list
+        is_search_key_optional: If True, returns None instead of raising error
 
     Returns:
-    The value associated with the search key if found, otherwise None.
+        The value associated with the search key if found, otherwise None
+
+    Raises:
+        KeyError: If the key is not found and is not optional
     """
     for config in config_list:
         if search_key in config:
@@ -245,11 +270,12 @@ def get_config_value(config_list, search_key, is_search_key_optional: bool = Fal
 
 def sort_item_assets_in_folder(folder_path: str) -> None:
     """
-    Iterates through all JSON files in a folder, sorts asset keys in STAC Items,
-    and writes the updated content back to the original file.
+    Iterate through all JSON files in a folder and sort asset keys in STAC Items.
+
+    Writes the updated content back to the original file with assets sorted alphabetically.
 
     Args:
-        folder_path (str): The path to the folder containing STAC Item JSON files.
+        folder_path: Path to the folder containing STAC Item JSON files
     """
     for root, _, files in os.walk(folder_path):
         for file in files:
@@ -262,7 +288,7 @@ def sort_item_assets_in_folder(folder_path: str) -> None:
                     data = json.load(f)
 
                 if data.get("type") == "Feature" and "assets" in data:
-                    # original_keys = list(data["assets"].keys())
+                    # Sort assets alphabetically
                     data["assets"] = OrderedDict(sorted(data["assets"].items()))
 
                     with open(file_path, "w", encoding="utf-8") as f:
@@ -270,6 +296,6 @@ def sort_item_assets_in_folder(folder_path: str) -> None:
 
                     print(f"✔ Sorted assets in: {file_path}")
                 else:
-                    print(f"ℹSkipped (not a STAC Item): {file_path}")
+                    logger.debug(f"Skipped (not a STAC Item): {file_path}")
             except Exception as e:
-                print(f"Error processing {file_path}: {e}")
+                logger.error(f"Error processing {file_path}: {e}")
