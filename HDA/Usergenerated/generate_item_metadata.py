@@ -5,6 +5,7 @@ import pystac
 from datetime import datetime
 from pathlib import Path
 from shapely.geometry import box, mapping
+from typing import List, Dict, Any, Optional
 
 
 from config import (
@@ -29,19 +30,28 @@ from usergenerated import datetools
 from usergenerated.config import confighelper
 from usergenerated.item import itemhelper
 from usergenerated.s3tools import S3Tools
+from usergenerated.env_utils import validate_aws_credentials
 
 
 class ItemGenerator:
 
-    def __init__(self, collection_id: str, overide_bucket_name: str = None):
+    def __init__(self, collection_id: str, overide_bucket_name: Optional[str] = None) -> None:
         """
         Class to generate STAC Item metadata for a given collection.
 
-        The class is initialized with the collection ID that you have been provided with (Case-sensitive, use UpperCase) e.g. 'EO.XXX.YYY.ZZZ-ZZZ'
+        The class is initialized with the collection ID that you have been provided with 
+        (Case-sensitive, use UpperCase) e.g. 'EO.XXX.YYY.ZZZ-ZZZ'
 
         An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
-        If not provided, the bucket_name is assumed to be 'usergenerated-proposal-[collection_id]' e.g. 'usergenerated-proposal-EO.XXX.YYY.ZZZ-ZZZ'
+        If not provided, the bucket_name is assumed to be 'usergenerated-proposal-[collection_id]' 
+        e.g. 'usergenerated-proposal-EO.XXX.YYY.ZZZ-ZZZ'
 
+        Args:
+            collection_id: The collection identifier to process
+            overide_bucket_name: Optional override for the S3 bucket name
+
+        Raises:
+            ValueError: If collection_id contains dash or credentials are not set
         """
         # instance collection_id
         self.collection_id = collection_id
@@ -67,20 +77,81 @@ class ItemGenerator:
         # Path to expected data folder which is used to generate the Item metadata
         self.data_root = Path(f"{collection_id}/data")
 
-        ##### Initialise S3Tools object to handle S3 interaction
+        ##### Initialise S3Tools object to handle S3 interaction #####
 
         self.is_overwrite_s3 = IS_OVERWRITE_S3
-        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-
-        if not self.aws_access_key_id or not self.aws_secret_access_key:
-            raise ValueError("Bucket Credentials not set in .env file")
+        self.aws_access_key_id, self.aws_secret_access_key = validate_aws_credentials()
 
         self.s3tools = S3Tools(
             self.aws_access_key_id, self.aws_secret_access_key, self.is_overwrite_s3
         )
 
-    def run(self):
+    def _get_item_folders_by_level(
+        self, folder_level: str
+    ) -> List[Path]:
+        """
+        Retrieve item folder paths based on the specified folder level configuration.
+        
+        Args:
+            folder_level: The folder level configuration (YYYY, MM, DD, or NONE)
+            
+        Returns:
+            List of Path objects pointing to item folders
+            
+        Raises:
+            ValueError: If an unexpected folder level configuration is provided
+        """
+        item_folder_paths: List[Path] = []
+
+        if folder_level == ITEM_FOLDER_LEVEL_DD:
+            # Navigate: data/YYYY/MM/DD/items
+            for year_folder in self.data_root.iterdir():
+                if year_folder.is_dir():
+                    for month_folder in year_folder.iterdir():
+                        if month_folder.is_dir():
+                            for day_folder in month_folder.iterdir():
+                                if day_folder.is_dir():
+                                    for item_folder in day_folder.iterdir():
+                                        if item_folder.is_dir():
+                                            item_folder_paths.append(item_folder)
+
+        elif folder_level == ITEM_FOLDER_LEVEL_MM:
+            # Navigate: data/YYYY/MM/items
+            for year_folder in self.data_root.iterdir():
+                if year_folder.is_dir():
+                    for month_folder in year_folder.iterdir():
+                        if month_folder.is_dir():
+                            for item_folder in month_folder.iterdir():
+                                if item_folder.is_dir():
+                                    item_folder_paths.append(item_folder)
+
+        elif folder_level == ITEM_FOLDER_LEVEL_YYYY:
+            # Navigate: data/YYYY/items
+            for year_folder in self.data_root.iterdir():
+                if year_folder.is_dir():
+                    for item_folder in year_folder.iterdir():
+                        if item_folder.is_dir():
+                            item_folder_paths.append(item_folder)
+
+        elif folder_level == ITEM_FOLDER_LEVEL_NONE:
+            # Any folders at the root of data become items (simplified process)
+            for item_folder in self.data_root.iterdir():
+                if item_folder.is_dir():
+                    item_folder_paths.append(item_folder)
+
+        else:
+            raise ValueError(
+                f"Unexpected ITEM_FOLDER_LEVEL configuration: '{folder_level}'. "
+                f"Expected values: {ITEM_FOLDER_LEVEL_YYYY}, {ITEM_FOLDER_LEVEL_MM}, "
+                f"{ITEM_FOLDER_LEVEL_DD}, or {ITEM_FOLDER_LEVEL_NONE}"
+            )
+
+        return item_folder_paths
+
+    def run(self) -> None:
+        """
+        Main entry point to generate STAC Item metadata for the collection.
+        """
 
         ##### Load and Validate the Collection #####
         collection = confighelper.load_and_validate_collection(
@@ -94,67 +165,14 @@ class ItemGenerator:
         collection_config = confighelper.load_config(self.collection_config_path)
         logger.debug(f"collection_config:{collection_config}")
 
-        # List to store the folder names found in YYYY/MM/DD folders (i.e. the folders at this level represent Items)
-        item_folder_paths = []
-
-        # ITEM Folders are expected by defulat to be in a folder representing a day DD
+        # ITEM Folders are expected by default to be in a folder representing a day DD
         if ITEM_FOLDER_LEVEL not in collection_config:
             collection_config[ITEM_FOLDER_LEVEL] = ITEM_FOLDER_LEVEL_DD
 
-        # Determine at which level Item folders are found in the structure YYYY/MM/DD and get list of item_folder_paths.
-        # If not defined in collection_config default is DD
-        if collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_DD:
-
-            # Iterate over 'data' root folder : expecting YYYY folders
-            for year_folder in self.data_root.iterdir():
-                if year_folder.is_dir():
-                    # Iterate over YYYY folders : expecting MM folders
-                    for month_folder in year_folder.iterdir():
-                        if month_folder.is_dir():
-                            # Iterate over MM folders : expecting DD folders
-                            for day_folder in month_folder.iterdir():
-                                if day_folder.is_dir():
-                                    # Iterate over DD folders : expecting Item folders
-                                    for item_folder in day_folder.iterdir():
-                                        if item_folder.is_dir():
-                                            # Add the item folder to the list
-                                            item_folder_paths.append(item_folder)
-
-        elif collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_MM:
-            # Iterate over 'data' root folder : expecting YYYY folders
-            for year_folder in self.data_root.iterdir():
-                if year_folder.is_dir():
-                    # Iterate over YYYY folders : expecting MM folders
-                    for month_folder in year_folder.iterdir():
-                        if month_folder.is_dir():
-                            # Iterate over MM folders : expecting Item folders
-                            for item_folder in month_folder.iterdir():
-                                if item_folder.is_dir():
-                                    # Add the item folder to the list
-                                    item_folder_paths.append(item_folder)
-
-        # Iterate over the YYYY/MM/DD structure in the data folder : expecting item folders according to configuration
-        elif collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_YYYY:
-            # Iterate over 'data' root folder : expecting YYYY folders
-            for year_folder in self.data_root.iterdir():
-                if year_folder.is_dir():
-                    # Iterate over YYYY folders : expecting Item folders
-                    for item_folder in year_folder.iterdir():
-                        if item_folder.is_dir():
-                            # Add the item folder to the list
-                            item_folder_paths.append(item_folder)
-
-        elif collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_NONE:
-            # We will consider that any folders at the root of the data folder become items
-            for item_folder in self.data_root.iterdir():
-                if item_folder.is_dir():
-                    # Add the item folder to the list
-                    item_folder_paths.append(item_folder)
-
-        else:
-            raise ValueError(
-                "Unexpected configuration for ITEM_FOLDER_LEVEL. expected values YYYY, MM, DD or NONE"
-            )
+        # Get list of item folder paths based on the configured level
+        item_folder_paths = self._get_item_folders_by_level(
+            collection_config[ITEM_FOLDER_LEVEL]
+        )
 
         self.is_simplified_process = (
             collection_config[ITEM_FOLDER_LEVEL] == ITEM_FOLDER_LEVEL_NONE
@@ -175,8 +193,8 @@ class ItemGenerator:
 
         if IS_UPLOAD_S3:
 
-            # Default expected bucket name (Case-sensitive) is usergenerated-proposal-[collection_id]
-            bucket_name = f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id}"
+            # Default expected bucket name (Case-sensitive) is usergenerated-proposal-[lower case collection_id]
+            bucket_name = f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id.lower()}"
 
             # An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
             # Only needed if the bucket_name you have been provided with does not follow the naming convention
@@ -192,15 +210,28 @@ class ItemGenerator:
 
     def get_item(
         self,
-        item_id,
-        geometry,
-        bbox,
-        item_datetime,
-        item_properties,
-        item_folder_path,
-        config_list,
-        collection,
-    ):
+        item_id: str,
+        geometry: Optional[Dict[str, Any]],
+        bbox: Optional[List[float]],
+        item_datetime: datetime,
+        item_properties: Dict[str, Any],
+        item_folder_path: Path,
+        config_list: List[Dict[str, Any]],
+        collection: pystac.Collection,
+    ) -> None:
+        """
+        Create and save a STAC Item with assets to disk.
+
+        Args:
+            item_id: Unique identifier for the item
+            geometry: GeoJSON geometry object for the item
+            bbox: Bounding box as [minx, miny, maxx, maxy]
+            item_datetime: Datetime associated with the item
+            item_properties: Additional properties for the item
+            item_folder_path: Path to the folder containing item data files
+            config_list: List of configuration dictionaries
+            collection: The parent STAC Collection object
+        """
 
         pystac.set_stac_version(STAC_VERSION)
 

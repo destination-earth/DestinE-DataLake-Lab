@@ -1,6 +1,7 @@
 import logging
 import logging.config
 from logging.handlers import RotatingFileHandler
+from typing import Optional
 
 from config import (
     APP_LOGGER_FILE_BACKUP_COUNT,
@@ -11,36 +12,21 @@ from config import (
 )
 
 
-# def setup_logging(log_file_path, level=logging.DEBUG):
-#     """
-#     Sets up logging configuration.
-
-#     :param log_file_path: Path to the log file.
-#     :param level: Logging level (default: logging.DEBUG).
-#     """
-#     logging.basicConfig(
-#         level=level,
-#         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-#         handlers=[logging.FileHandler(log_file_path), logging.StreamHandler()],
-#     )
-
-
-def setup_logging(log_file_path=APP_LOGGER_FILE_PATH, level=logging.DEBUG):
+def setup_logging(
+    log_file_path: str = APP_LOGGER_FILE_PATH, level: int = logging.DEBUG
+) -> None:
     """
-    Sets up logging configuration with different formatters for console and file handlers.
+    Set up logging configuration with different formatters for console and file handlers.
 
-    :param log_file_path: Path to the log file.
-    :param level: Logging level (default: logging.DEBUG).
+    Args:
+        log_file_path: Path to the log file.
+        level: Logging level (default: logging.DEBUG).
     """
     # Create a custom logger: same logger for all processes
     logger = logging.getLogger(APP_LOGGER_NAME)
 
     # Set the logging level
     logger.setLevel(level)
-
-    # Create handlers
-    # console_handler = logging.StreamHandler()
-    # file_handler = logging.FileHandler(log_file_path)
 
     # Create handlers
     console_handler = logging.StreamHandler()
