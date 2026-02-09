@@ -5,7 +5,13 @@ import re
 import magic
 from datetime import datetime
 
-from config import ITEM_FOLDER_LEVEL, ITEM_FOLDER_LEVEL_DD, ITEM_FOLDER_LEVEL_MM
+from config import (
+    ITEM_FOLDER_LEVEL,
+    ITEM_FOLDER_LEVEL_DD,
+    ITEM_FOLDER_LEVEL_MM,
+    ITEM_FOLDER_NAMING_CONVENTION_TYPE,
+    ItemFolderNamingConventionType,
+)
 from usergenerated.config import confighelper
 
 
@@ -41,7 +47,7 @@ def get_media_type(file_path):
         # Add more mappings as needed
         # e.g. adding text/csv
         ".csv": "text/csv",
-        ".npy": "application/x-npy"
+        ".npy": "application/x-npy",
     }
 
     # Get the media type based on the file extension
@@ -84,7 +90,7 @@ def get_asset_role(
         pystac.MediaType.NETCDF,
         # e.g. if csv files in your data are considered data assets
         "text/csv",
-        "application/x-npy"
+        "application/x-npy",
     ]
     metadata = [
         pystac.MediaType.GEOJSON,
@@ -162,8 +168,9 @@ def get_item_properties(
     # However, your situation might diverge from this. Here we show how you could modify the code to adapt to your item folder naming
     # For example, your item folder might be in the form EO.AAA.BBB.CCC_CCC_CCC-META1-META2_20110101T070000_20111231T220000)
     # This would mean the variable 'parts' would equal ["META1-META2", "20110101T070000", "20111231T220000"] at this stage
-    # To remove the first element from this list leaving just dates we could uncomment the following line ["20110101T070000","20111231T220000"]
-    # parts = parts[1:]
+    # To remove the first element from this list leaving just dates we could set ITEM_FOLDER_NAMING_CONVENTION_TYPE == ItemFolderNamingConventionType.NON_STANDARD_1 in config.py
+    if ITEM_FOLDER_NAMING_CONVENTION_TYPE == ItemFolderNamingConventionType.NON_STANDARD_1:
+        parts = parts[1:]
 
     # Check if the number of parts is valid we expect 1 or 2 parts
     if len(parts) not in [1, 2]:
