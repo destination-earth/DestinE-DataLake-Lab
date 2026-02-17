@@ -1,0 +1,14 @@
+# This RoleBinding grants the 'pvc-creator' Role to the 'airflow-worker' ServiceAccount in the 'airflow' namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pvc-creator-binding
+  namespace: airflow
+subjects:
+  - kind: ServiceAccount
+    name: airflow-worker
+    namespace: airflow
+roleRef:
+  kind: Role
+  name: pvc-creator
+  apiGroup: rbac.authorization.k8s.io

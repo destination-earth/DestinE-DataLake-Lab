@@ -1,0 +1,73 @@
+# This file contains some custom configuration for our Airflow deployment. It is used to override the default values of the Helm chart.
+#
+# In this part, we are configuring the gitSync sidecar to mount our DAGs from a private GitHub repository. We are also creating a secret to store the SSH key that will be used to authenticate with the GitHub repository.
+# https://airflow.apache.org/docs/helm-chart/stable/manage-dags-files.html#mounting-dags-from-a-private-github-repo-using-git-sync-sidecar
+dags:
+  gitSync:
+    enabled: true
+    repo: git@github.com:[YOUR-GITHUB-USERNAME]/[YOUR-GITHUB-REPO-NAME].git
+    branch: main
+    subPath: "dags"
+    sshKeySecret: airflow-ssh-secret
+extraSecrets:
+  airflow-ssh-secret:
+    data: |
+      gitSshKey: '[REPLACE_WITH_BASE64_ENCODED_SSH_KEY]'
+env:
+  - name: AIRFLOW__CORE__LOAD_EXAMPLES
+    value: "True"
+# Airflow executor
+# One of: LocalExecutor, LocalKubernetesExecutor, CeleryExecutor, KubernetesExecutor, CeleryKubernetesExecutor
+# executor: "KubernetesExecutor"
+# Here we are using a custom image that we have built and pushed to our private registry. This image is based on the official Airflow image, but it includes some additional dependencies that we need for our DAGs.
+images:
+  airflow:
+    repository: registry.central.data.destination-earth.eu/[YOUR-HARBOR-PROJECT]/[YOUR-HARBOR-IMAGE-NAME]
+    tag: latest
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
+
+registry:
+  secretName: harborcred
+
+# Note: activating basic auth for the API
+# Didn't see any change will use Dockerfile ENV
+#api:
+#  auth_backends: airflow.api.auth.backend.basic_auth
+
+#  hostAliases: []
+
+# Ingress configuration for the Airflow webserver
+# We are using cert-manager to automatically provision TLS certificates for our Ingress. The certificate will be issued by Let's Encrypt and stored in a Kubernetes Secret named "airflow-tls".
+# The Ingress will be accessible at the hostname "airflow.[YOUR-TENANT-NAME].[YOUR-DATABRIDGE-SITE].data.destination-earth.eu".
+ingress:
+  apiServer:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    ingressClassName: nginx
+
+    # The path for the API server Ingress
+    path: "/"
+    # The pathType for the above path (used only with Kubernetes v1.19 and above)
+    #pathType: "ImplementationSpecific"
+    pathType: "Prefix"
+
+    #hosts: []
+    hosts:
+      # The hostname for the API server Ingress (templated)
+      - name: "airflow.[YOUR-TENANT-NAME].[YOUR-DATABRIDGE-SITE].data.destination-earth.eu"
+
+        # configs for API server Ingress TLS
+        tls:
+          # Enable TLS termination for the API server Ingress
+          enabled: true
+          # the name of a pre-created Secret containing a TLS private key and certificate
+          secretName: "airflow-tls"
+
+
+# Needed this to fix helm chart issue
+postgresql:
+  image:
+    repository: postgres
+    tag: "16.2"
