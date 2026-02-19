@@ -35,7 +35,14 @@ jobs:
             "HDA/REST/HDA-REST-quick-start.ipynb" \
             "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" \
             "HDA/DestinE_Digital_Twins/ExtremeDT-ParameterPlotter.ipynb" \
-            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb" \
+            "HDA/DestinE_Digital_Twins/ClimateDT-ROISelectionandDataAnalysis.ipynb" \
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb" \
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb" \
+            "HDA/REST/HDA-REST-Queryables.ipynb" \
+            "HDA/REST/HDA-REST-full-version.ipynb" \
+            "HDA/PySTAC/HDA-PyStac-Client.ipynb" \
+            "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb"
 
           git add \
             "HDA/DestinE_Digital_Twins/ClimateDT-ParameterPlotter.ipynb" \
@@ -44,7 +51,14 @@ jobs:
             "HDA/REST/HDA-REST-quick-start.ipynb" \
             "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.MSG-1.5.ipynb" \
             "HDA/DestinE_Digital_Twins/ExtremeDT-ParameterPlotter.ipynb" \
-            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb"
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES-Series.ipynb" \
+            "HDA/DestinE_Digital_Twins/ClimateDT-ROISelectionandDataAnalysis.ipynb" \
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb" \
+            "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb" \
+            "HDA/REST/HDA-REST-Queryables.ipynb" \
+            "HDA/REST/HDA-REST-full-version.ipynb" \
+            "HDA/PySTAC/HDA-PyStac-Client.ipynb" \
+            "HDA/EUM_data/DEDL-HDA-EO.EUM.DAT.SENTINEL-3.OL_1_ERR___.ipynb"
 
           if ! git diff --quiet --staged; then
             git commit -m "Sync subset files from main"
