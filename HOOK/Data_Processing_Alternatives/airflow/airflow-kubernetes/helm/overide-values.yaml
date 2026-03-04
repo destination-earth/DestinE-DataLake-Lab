@@ -30,11 +30,6 @@ images:
 registry:
   secretName: harborcred
 
-# Note: activating basic auth for the API
-# Didn't see any change will use Dockerfile ENV
-#api:
-#  auth_backends: airflow.api.auth.backend.basic_auth
-
 #  hostAliases: []
 
 # Ingress configuration for the Airflow webserver
