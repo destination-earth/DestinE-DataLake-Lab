@@ -6,7 +6,7 @@ FROM apache/airflow:3.1.7
 ENV AIRFLOW_VERSION=3.1.7
 
 # Allows basic auth on API so can trigger dags using api
-ENV AIRFLOW__API__AUTH_BACKENDS="airflow.api.auth.backend.basic_auth"
+ENV AIRFLOW__API__AUTH_BACKENDS="airflow.api.auth.backend.jwt"
 
 COPY requirements.txt /
 
