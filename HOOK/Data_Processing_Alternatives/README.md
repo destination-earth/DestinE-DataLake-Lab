@@ -18,5 +18,5 @@ Here we show some data processing alternatives that may be of use to you.
 ### Airflow Kubernetes DAGs
 
 - This section is intended to be used in conjunction with the airflow on kubernetes section. It contains some example DAGs that you can use to test your airflow setup.
-- You should copy the code and create your own reposoitory from it. It is then referenced in helm/overide-values.yaml and used with the gitSync mechanism in airflow that allows you to pull the DAGs from a git repository. This way you can easily manage your DAGs and keep them in sync with your airflow instance. 
+- You could copy the folder airflow-kubernetes-dags, rename it, and create your own github reposoitory from it. It is then referenced in helm/overide-values.yaml and used with the gitSync mechanism in airflow that allows you to pull the DAGs from a git repository. This way you can easily manage your DAGs and keep them in sync with your airflow instance. 
   - [airflow-kubernetes-dags](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HOOK/Data_Processing_Alternatives/airflow/airflow-kubernetes-dags)
