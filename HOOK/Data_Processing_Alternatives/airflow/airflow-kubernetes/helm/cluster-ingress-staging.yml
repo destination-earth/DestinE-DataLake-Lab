@@ -1,0 +1,21 @@
+# This ClusterIssuer resource configures cert-manager to use Let's Encrypt's staging environment for issuing TLS certificates in the Kubernetes cluster. 
+# It is intended for testing purposes and should not be used in production environments, as certificates issued by the staging environment are not trusted by browsers.
+# Note: Please set your own email address in the 'email' field to receive important notifications from Let's Encrypt regarding your account and issued certificates.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: your-email@example.com # Replace with your actual email address
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
