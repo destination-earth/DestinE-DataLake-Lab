@@ -61,7 +61,7 @@ jobs:
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
 
           if ! git diff --quiet --staged; then
-            git commit -m "Sync subset files from main"
+            git commit -m "Sync subset files from main, only for files already in the insula_branch"
             git push origin insula-branch
           else
             echo "No changes detected, skipping commit"
