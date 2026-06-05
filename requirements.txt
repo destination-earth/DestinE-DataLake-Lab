@@ -1,9 +1,11 @@
-destinelab >= 1.1
-xarray >= 2024.09.0
-numpy == 1.26.4
-ipykernel 
-ipywidgets
-earthkit-maps
-earthkit-data
-earthkit-regrid
-cf-units
+destinelab >= 1.14
+earthkit >= 0.13.2
+earthkit.plots >= 0.6.1
+earthkit.data == 0.19.3
+xarray == 2024.11.0
+satpy >= 0.59
+matplotlib >= 3.10.9
+cf-units >= 3.3.1
+earthkit-workflows == 0.9.0
+pystac_client
+folium
