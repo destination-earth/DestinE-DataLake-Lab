@@ -59,7 +59,22 @@ class S3Tools:
     ) -> bool:
         """
         Upload a single file to S3 storage.
-        Note: This is only not used in the current implementation, but kept for potential future use.
+        Note: This is not used in the current implementation, but kept for potential future use.
+
+        example usage: path in bucket is same as local file path
+        s3_tools.upload_file_to_s3(
+            file_name="EO.XXX.YYY.ZZZ/metadata/collection.json",
+            endpoint_url="https://s3.central.data.destination-earth.eu",
+            bucket_name="test-bucket-1",
+        )
+
+        example usage: path in bucket is different from local file path
+        s3_tools.upload_file_to_s3(
+            file_name="EO.XXX.YYY.ZZZ/metadata/collection.json",
+            endpoint_url="https://s3.central.data.destination-earth.eu",
+            bucket_name="test-bucket-1",
+            object_name="collection.json",
+        )
 
         Args:
             file_name: Path to the local file to upload
@@ -70,6 +85,20 @@ class S3Tools:
         Returns:
             True if upload was successful, False otherwise
         """
+        if file_name is None:
+            logger.error("File name must be provided for upload.")
+            return False
+
+        if file_name.startswith("s3://"):
+            logger.error("File name must be a local path, not an S3 URL.")
+            return False
+
+        if file_name.startswith("."):
+            logger.error(
+                "File name can be a relative path, but should not start with './' or '../'"
+            )
+            return False
+
         # If S3 object_name was not specified, use the file_name
         if object_name is None:
             object_name = file_name
@@ -114,7 +143,7 @@ class S3Tools:
         return True
 
     def upload_folder_to_s3(
-        self, folder_path: str, endpoint_url: str, bucket_name: str
+        self, folder_path: str, endpoint_url: str, bucket_name: str, target_path: Optional[str] = None
     ) -> None:
         """
         Upload a folder and its contents to S3-compatible object storage.
@@ -123,6 +152,9 @@ class S3Tools:
             folder_path: Path to the local folder to upload
             endpoint_url: The endpoint URL of the S3-compatible service
             bucket_name: The name of the S3 bucket to upload to
+            target_path: The target path in the S3 bucket (optional). 
+            If not provided, files will be uploaded under the bucket root with the same path structure as the local folder.
+            If provided, files will be uploaded under the target path with the same path structure as the local folder.
         """
         # Create an S3 client
         s3_client = boto3.client(
@@ -134,11 +166,19 @@ class S3Tools:
         )
 
         # Get the list of all files in the folder
-        folder_path: Path = Path(folder_path)
-        for file_path in folder_path.rglob("*"):
+        folder_path_path: Path = Path(folder_path)
+        for file_path in folder_path_path.rglob("*"):
             if file_path.is_file():
                 # Generate the S3 object name
-                object_name_string: str = str(file_path)
+                if target_path:
+                    object_name_string: str = str(
+                        Path(target_path) / file_path.relative_to(folder_path_path)
+                    )
+                else:
+                    object_name_string: str = str(
+                        folder_path_path / file_path.relative_to(folder_path_path)
+                    )
+                object_name_string = Path(object_name_string).as_posix().lstrip("/")
 
                 # Check if the object already exists in S3 if overwrite is not allowed
                 if not self.is_overwrite_s3:
@@ -170,3 +210,133 @@ class S3Tools:
                     logger.error("Credentials not available.")
                 except ClientError as e:
                     logger.error(f"An error occurred: {e}")
+
+    def s3_create_bucket(
+        self,
+        endpoint_url: str,
+        bucket_name: str,
+    ) -> bool:
+        """
+        Create a new bucket in the S3-compatible object storage.
+        If the bucket already exists, it will not be created again and the function will return True.
+
+        example usage:
+        s3_tools.s3_create_bucket(
+            endpoint_url="https://s3.central.data.destination-earth.eu",
+            bucket_name="test-bucket-1",
+        )
+        
+        Args:
+            endpoint_url: The endpoint URL of the S3-compatible service
+            bucket_name: The name of the bucket to create
+        Returns:
+            True if bucket was created successfully, False otherwise
+        """
+
+        if not bucket_name or not endpoint_url:
+            logger.error("Bucket name and endpoint URL must be provided.")
+            return False
+        
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=self.aws_access_key_id,
+            aws_secret_access_key=self.aws_secret_access_key,
+            config=Config(signature_version="s3v4"),
+        )
+
+        try:
+            # Check if bucket already exists
+            s3_client.head_bucket(Bucket=bucket_name)
+            logger.info(f"Bucket '{bucket_name}' already exists.")
+            return True  # Bucket already exists
+
+        except ClientError as e:
+            error_code = int(e.response["Error"]["Code"])
+
+            # 404 = bucket does not exist → create it
+            if error_code == 404:
+                try:
+                    s3_client.create_bucket(Bucket=bucket_name)
+                    logger.info(f"Bucket '{bucket_name}' created successfully.")
+                    return True
+                except ClientError as e:
+                    logger.error(f"An error occurred while creating the bucket: {e}")
+                    return False
+
+            # Any other error (403 forbidden, auth failure, etc.)
+            logger.error(f"An error occurred while accessing the bucket: {e}")
+            return False
+
+    def move_bucket_contents_to_prefix(
+        self,
+        endpoint_url: str,
+        bucket_name: str,
+        target_prefix: str,
+    ) -> None:
+        """
+        Move all objects in a bucket under a new top-level folder prefix.
+
+        Each object is copied to '{target_prefix}/{original_key}' and then deleted
+        from its original location. Objects that already start with '{target_prefix}/'
+        are skipped to avoid double-moving.
+
+        Note: S3 has no native move operation; this is implemented as copy + delete.
+
+        Args:
+            endpoint_url: The endpoint URL of the S3-compatible service
+            bucket_name: The name of the S3 bucket
+            target_prefix: The top-level folder name to move all objects into
+        """
+        target_prefix = target_prefix.strip("/")
+
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=self.aws_access_key_id,
+            aws_secret_access_key=self.aws_secret_access_key,
+            config=Config(signature_version="s3v4"),
+        )
+
+        paginator = s3_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(Bucket=bucket_name)
+
+        for page in pages:
+            objects = page.get("Contents", [])
+            for obj in objects:
+                source_key: str = obj["Key"]
+
+                # Skip objects already under the target prefix
+                if source_key.startswith(f"{target_prefix}/"):
+                    logger.warning(
+                        f"Object '{source_key}' already under prefix '{target_prefix}/'. Skipping."
+                    )
+                    continue
+
+                destination_key: str = f"{target_prefix}/{source_key}"
+                copy_source = {"Bucket": bucket_name, "Key": source_key}
+
+                try:
+                    s3_client.copy_object(
+                        CopySource=copy_source,
+                        Bucket=bucket_name,
+                        Key=destination_key,
+                    )
+                    logger.info(
+                        f"Copied '{source_key}' -> '{destination_key}' in bucket '{bucket_name}'."
+                    )
+                except ClientError as e:
+                    logger.error(
+                        f"Failed to copy '{source_key}' to '{destination_key}': {e}"
+                    )
+                    continue
+
+                try:
+                    s3_client.delete_object(Bucket=bucket_name, Key=source_key)
+                    logger.info(
+                        f"Deleted original '{source_key}' from bucket '{bucket_name}'."
+                    )
+                except ClientError as e:
+                    logger.error(
+                        f"Failed to delete original '{source_key}' after copy: {e}"
+                    )

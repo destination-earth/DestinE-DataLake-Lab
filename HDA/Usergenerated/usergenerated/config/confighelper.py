@@ -7,7 +7,12 @@ import os
 from collections import OrderedDict
 from typing import List, Dict, Any, Optional
 
-from config import APP_LOGGER_NAME, ROOT_DIR
+from config import (
+    APP_LOGGER_NAME,
+    ITEM_FOLDER_NAMING_CONVENTION_TYPE,
+    ROOT_DIR,
+    ItemFolderNamingConventionType,
+)
 
 from pystac import Collection
 from pystac.validation import JsonSchemaSTACValidator, set_validator
@@ -63,12 +68,12 @@ def check_collection_fields(
 ) -> None:
     """
     Check for presence (and optional non-nullness) of fields in a PySTAC Collection.
-    
+
     Args:
         collection_dict: The collection dictionary to check
         required_fields: List of required field names
         require_non_null: Whether fields must be non-null
-        
+
     Raises:
         ValueError: If any required fields are missing or null
     """
@@ -89,7 +94,7 @@ def check_collection_fields(
 def cleanup_json_file(file_path: str) -> None:
     """
     Clean up a JSON file by removing self and root links and re-indenting.
-    
+
     Args:
         file_path: Path to the JSON file to clean up
     """
@@ -299,3 +304,33 @@ def sort_item_assets_in_folder(folder_path: str) -> None:
                     logger.debug(f"Skipped (not a STAC Item): {file_path}")
             except Exception as e:
                 logger.error(f"Error processing {file_path}: {e}")
+
+
+def get_item_folder_naming_convention_type(collection_config: Dict[str, Any]) -> None:
+    """
+    get the Item Folder Naming Convention Type from collection_config,
+    if not found or invalid, return the ITEM_FOLDER_NAMING_CONVENTION_TYPE that is set in config.py
+
+    """
+    item_folder_naming_convention_type = collection_config.get(
+        "item_folder_naming_convention_type", None
+    )
+
+    if item_folder_naming_convention_type:
+
+        # Validate and apply the override
+        if item_folder_naming_convention_type in ItemFolderNamingConventionType:
+
+            logger.info(
+                f"Overriding ITEM_FOLDER_NAMING_CONVENTION_TYPE to: {item_folder_naming_convention_type}"
+            )
+            return item_folder_naming_convention_type
+
+        else:
+            logger.warning(
+                f"Invalid item_folder_naming_convention_type: {item_folder_naming_convention_type}. "
+                f"Using default: {ITEM_FOLDER_NAMING_CONVENTION_TYPE}"
+            )
+
+    # Return the default if no valid override is found
+    return ITEM_FOLDER_NAMING_CONVENTION_TYPE
