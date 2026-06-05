@@ -37,7 +37,7 @@ Activate it:
 
 Install required dependencies for this example Notebooks:
 
-     pip install -r /home/jovyan/datalake-lab/requirements.txt
+     pip install -r /home/jovyan/datalake-lab-insula/requirements.txt
 
 Verify the installation:
      
@@ -45,7 +45,7 @@ Verify the installation:
 
 This should give:
 
-destinelab         1.1
+destinelab         1.14
 
 Install kernel my_env. Run the command:
 
@@ -53,5 +53,5 @@ Install kernel my_env. Run the command:
 
 Select the kernel my_env from the top-right menu of these notebooks.
 
-The requirements.txt file has been updated on **March 18, 2025**.
+The requirements.txt file has been updated on **June 5, 2026**.
 Users who already have a previous version of the 'my_env' environment installed, should delete the kernel before running the steps above. To delete the my_env kernel please run the following command: 'jupyter kernelspec uninstall my_env' from a terminal window.
