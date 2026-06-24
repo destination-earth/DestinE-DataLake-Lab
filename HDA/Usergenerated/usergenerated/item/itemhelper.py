@@ -4,12 +4,12 @@ from pathlib import Path
 import re
 import magic
 from datetime import datetime
+from typing import List, Dict, Any
 
 from config import (
     ITEM_FOLDER_LEVEL,
     ITEM_FOLDER_LEVEL_DD,
     ITEM_FOLDER_LEVEL_MM,
-    ITEM_FOLDER_NAMING_CONVENTION_TYPE,
     ItemFolderNamingConventionType,
 )
 from usergenerated.config import confighelper
@@ -118,7 +118,10 @@ def get_asset_role(
 
 
 def get_item_properties(
-    item_id: str, collection_id: str, additional_property_keys: list
+    item_id: str,
+    collection_id: str,
+    additional_property_keys: List[str],
+    item_folder_naming_convention_type: str,
 ):
     """
     item_id expected in form EO.XXX.YYY.ZZZ_20241116T000000_20241116T115959 i.e.  [Collection_ID]_[start_datetime/datetime]_[end_datetime]
@@ -169,7 +172,10 @@ def get_item_properties(
     # For example, your item folder might be in the form EO.AAA.BBB.CCC_CCC_CCC-META1-META2_20110101T070000_20111231T220000)
     # This would mean the variable 'parts' would equal ["META1-META2", "20110101T070000", "20111231T220000"] at this stage
     # To remove the first element from this list leaving just dates we could set ITEM_FOLDER_NAMING_CONVENTION_TYPE == ItemFolderNamingConventionType.NON_STANDARD_1 in config.py
-    if ITEM_FOLDER_NAMING_CONVENTION_TYPE == ItemFolderNamingConventionType.NON_STANDARD_1:
+    if (
+        item_folder_naming_convention_type
+        == ItemFolderNamingConventionType.NON_STANDARD_1
+    ):
         parts = parts[1:]
 
     # Check if the number of parts is valid we expect 1 or 2 parts

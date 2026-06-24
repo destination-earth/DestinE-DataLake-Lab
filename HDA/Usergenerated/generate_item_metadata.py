@@ -35,15 +35,17 @@ from usergenerated.env_utils import validate_aws_credentials
 
 class ItemGenerator:
 
-    def __init__(self, collection_id: str, overide_bucket_name: Optional[str] = None) -> None:
+    def __init__(
+        self, collection_id: str, overide_bucket_name: Optional[str] = None
+    ) -> None:
         """
         Class to generate STAC Item metadata for a given collection.
 
-        The class is initialized with the collection ID that you have been provided with 
+        The class is initialized with the collection ID that you have been provided with
         (Case-sensitive, use UpperCase) e.g. 'EO.XXX.YYY.ZZZ-ZZZ'
 
         An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
-        If not provided, the bucket_name is assumed to be 'usergenerated-proposal-[collection_id]' 
+        If not provided, the bucket_name is assumed to be 'usergenerated-proposal-[collection_id]'
         e.g. 'usergenerated-proposal-EO.XXX.YYY.ZZZ-ZZZ'
 
         Args:
@@ -86,18 +88,16 @@ class ItemGenerator:
             self.aws_access_key_id, self.aws_secret_access_key, self.is_overwrite_s3
         )
 
-    def _get_item_folders_by_level(
-        self, folder_level: str
-    ) -> List[Path]:
+    def _get_item_folders_by_level(self, folder_level: str) -> List[Path]:
         """
         Retrieve item folder paths based on the specified folder level configuration.
-        
+
         Args:
             folder_level: The folder level configuration (YYYY, MM, DD, or NONE)
-            
+
         Returns:
             List of Path objects pointing to item folders
-            
+
         Raises:
             ValueError: If an unexpected folder level configuration is provided
         """
@@ -165,6 +165,18 @@ class ItemGenerator:
         collection_config = confighelper.load_config(self.collection_config_path)
         logger.debug(f"collection_config:{collection_config}")
 
+        ###### Determine Item Folder Naming Convention Type (can be overiden in collection config) ######
+        self.item_folder_naming_convention_type: str = (
+            confighelper.get_item_folder_naming_convention_type(collection_config)
+        )
+        ###### Determine additional property keys from collection config (if any) ######
+        self.additional_property_keys: List[str] = (
+            confighelper.get_config_value(
+                [collection_config], ADDITIONAL_PROPERTY_KEYS, True
+            )
+            or []
+        )
+
         # ITEM Folders are expected by default to be in a folder representing a day DD
         if ITEM_FOLDER_LEVEL not in collection_config:
             collection_config[ITEM_FOLDER_LEVEL] = ITEM_FOLDER_LEVEL_DD
@@ -192,9 +204,13 @@ class ItemGenerator:
         confighelper.sort_item_assets_in_folder(self.items_root)
 
         if IS_UPLOAD_S3:
+            # This is an optional step to upload the generated metadata to S3 compatible object storage
+            # You may want to do this as a separate step in your workflow e.g. with s3cmd etc.
 
             # Default expected bucket name (Case-sensitive) is usergenerated-proposal-[lower case collection_id]
-            bucket_name = f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id.lower()}"
+            bucket_name = (
+                f"{S3_USER_GENERATED_BUCKET_PREFIX}-{self.collection_id.lower()}"
+            )
 
             # An optional overide_bucket_name can be provided to upload the generated metadata to S3 (Case-sensitive)
             # Only needed if the bucket_name you have been provided with does not follow the naming convention
@@ -509,10 +525,8 @@ class ItemGenerator:
             (item_datetime, item_properties) = itemhelper.get_item_properties(
                 item_id,
                 collection_id,
-                confighelper.get_config_value(
-                    config_list, ADDITIONAL_PROPERTY_KEYS, True
-                )
-                or [],
+                self.additional_property_keys,
+                self.item_folder_naming_convention_type,
             )
 
             # Update item_properties with additional properties if they exist
