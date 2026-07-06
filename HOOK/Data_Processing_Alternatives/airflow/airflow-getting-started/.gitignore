@@ -1,1 +1,7 @@
 .venv/
+
+# Add python related ignore files
+__pycache__/
+
+.env
+.github/

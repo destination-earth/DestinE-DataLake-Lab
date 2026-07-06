@@ -306,7 +306,19 @@ Here is the script sync-dags.sh which is executed as follows
 
 - We can see that our own DAG has now been succesfully executed
 
+### Synchronising your own DAGs to Airflow - Symlink method - Simplest
 
+- Alternatively you can use a symlink to the dags folder of airflow standalone application
+  - This is done by executing the following script 'script-symlink-dags.sh' at the root of this project
+  - Once executed, the Dags in the folder /dag/dedl should now be available in the user interface (wait a few moments and refresh the page if needed)
+  - You will not need to re-run the script if you add new Dags to the folder /dag/dedl, they will be automatically available in the airflow standalone application
+
+```bash
+
+# chmod +x ./script-symlink-dags.sh
+./script-symlink-dags.sh
+
+```
 
 # Trouble-shooting
 
