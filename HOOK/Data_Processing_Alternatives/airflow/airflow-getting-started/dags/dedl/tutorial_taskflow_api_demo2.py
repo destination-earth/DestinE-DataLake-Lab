@@ -24,6 +24,7 @@ import json
 import pendulum
 from airflow.sdk import dag, task
 from dedl.tasks.common import show_params
+
 # [END import_module]
 
 
@@ -465,9 +466,15 @@ def tutorial_taskflow_api_demo2():
                 f"Concatenated Zarr dataset size: {concatenated_size / 1024 / 1024:.2f} MB"
             )
 
-            return {"total_num_zarr_files": len(zarr_files)}
+            return {
+                "total_num_zarr_files": len(zarr_files),
+                "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
+            }
 
-        return {"total_num_zarr_files": 0}
+        return {
+            "total_num_zarr_files": 0,
+            "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
+        }
 
     # [END transform]
 
@@ -478,8 +485,29 @@ def tutorial_taskflow_api_demo2():
         #### Load task
         This load task could be used to upload the zarr files to e.g. S3 storage.
         """
+        import os
 
-        print(transform_results_dict)
+        from dedl.s3.s3_helper import upload_directory_to_s3
+
+        concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
+        endpoint_url = os.environ["S3_ENDPOINT_URL"]
+        bucket_name = os.environ["MY_S3_BUCKET_NAME"]
+        access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
+        secret_access_key = os.environ["MY_S3_SECRET_ACCESS_KEY"]
+
+        print(f"Uploading Zarr directory to S3: {concatenated_zarr_path}")
+
+        upload_result = upload_directory_to_s3(
+            local_directory_path=concatenated_zarr_path,
+            bucket_name=bucket_name,
+            endpoint_url=endpoint_url,
+            access_key_id=access_key_id,
+            secret_access_key=secret_access_key,
+            destination_prefix="my_ch9_zarr_data",  # Optional: specify a prefix in the S3 bucket
+        )
+
+        print(f"Uploaded to: {upload_result['s3_uri']}")
+        return upload_result
 
 
     # [END load]
