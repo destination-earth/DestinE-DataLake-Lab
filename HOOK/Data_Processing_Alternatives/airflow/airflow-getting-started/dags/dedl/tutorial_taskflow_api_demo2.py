@@ -20,24 +20,10 @@ from __future__ import annotations
 # [START tutorial]
 # [START import_module]
 import json
-from unittest import result
 
-import defair
-from libcst import If
 import pendulum
-from airflow.sdk import BaseHook, dag, task
-from dedl.eodag.eodag_helper import (
-    change_extension,
-    clean_directory,
-    find_dedl_collection_by_eodag_id,
-    find_eodag_collection_id_by_dedl_id,
-    get_collection_search_params,
-    get_eodag_collection_info,
-    get_files_with_extension,
-    shift_iso_date,
-)
+from airflow.sdk import dag, task
 from dedl.tasks.common import show_params
-
 # [END import_module]
 
 
@@ -66,6 +52,14 @@ def tutorial_taskflow_api_demo2():
         #### Extract task
         Here we demonstrate how to use the EODAG library to search for and download products from the DestinE Data Lake (DEDL) using the EODAG API. We also demonstrate how to retrieve credentials from an Airflow connection.
         """
+        from dedl.eodag.eodag_helper import (
+            clean_directory,
+            find_dedl_collection_by_eodag_id,
+            find_eodag_collection_id_by_dedl_id,
+            get_collection_search_params,
+            get_eodag_collection_info,
+            shift_iso_date,
+        )
 
         # ----------------------------------------------------
         # Example getting credentials from Airflow connection
@@ -226,6 +220,7 @@ def tutorial_taskflow_api_demo2():
         #### Transform task
         Transformation Task based on Defair Python Library.
         """
+        from dedl.eodag.eodag_helper import change_extension, get_files_with_extension
 
         print(f"Transforming data with previous results: {search_results_dict}")
         # Reference: https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/ai_ready_data_preparation/demos/01_msg_local_to_zarr_code.html
