@@ -156,7 +156,7 @@ def tutorial_taskflow_api_demo2():
         print("Search end date:", search_params["end"])
 
         # search limit
-        search_limit = 2
+        search_limit = 10
 
         search_kwargs = {
             "collection": eodag_collection_id,
@@ -508,15 +508,78 @@ def tutorial_taskflow_api_demo2():
 
         print(f"Uploaded to: {upload_result['s3_uri']}")
         return upload_result
-
-
     # [END load]
+
+    # [START visualise]
+    @task()
+    def visualise(load_result_dict: dict):
+        """
+        #### Visualise task
+        Build an MP4 time-lapse from CH9 data in the uploaded S3-backed Zarr.
+        """
+        import os
+
+        from dedl.s3.s3_helper import upload_file_to_s3
+        from dedl.visualization.visualization_helper import (
+            create_mp4_from_dataarray,
+            open_s3_zarr_dataset,
+            resolve_data_variable,
+        )
+
+        endpoint_url = os.environ["S3_ENDPOINT_URL"]
+        bucket_name = os.environ["MY_S3_BUCKET_NAME"]
+        access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
+        secret_access_key = os.environ["MY_S3_SECRET_ACCESS_KEY"]
+
+        source_prefix = load_result_dict["destination_prefix"]
+        source_s3_uri = load_result_dict["s3_uri"]
+
+        dataset = open_s3_zarr_dataset(
+            bucket_name=bucket_name,
+            prefix=source_prefix,
+            endpoint_url=endpoint_url,
+            access_key_id=access_key_id,
+            secret_access_key=secret_access_key,
+        )
+
+        ch9 = resolve_data_variable(dataset, preferred_name="ch9")
+        output_mp4_path = "/home/eouser/eodag_downloads/msg_hrseviri/ch9_timelapse.mp4"
+
+        video_result = create_mp4_from_dataarray(
+            ch9,
+            output_mp4_path,
+            fps=4,
+            frame_stride=1,
+            max_frames=120,
+            colormap_name="inferno",
+        )
+
+        upload_result = upload_file_to_s3(
+            local_file_path=output_mp4_path,
+            bucket_name=bucket_name,
+            endpoint_url=endpoint_url,
+            access_key_id=access_key_id,
+            secret_access_key=secret_access_key,
+            destination_key="visualization/ch9/ch9_timelapse.mp4",
+        )
+
+        return {
+            "source_s3_uri": source_s3_uri,
+            "video_path": video_result["video_path"],
+            "frame_count": video_result["frame_count"],
+            "fps": video_result["fps"],
+            "video_s3_uri": upload_result["s3_uri"],
+        }
+    # [END visualise]
+
+
 
     # [START main_flow]
     show_params()  # Example of a function call within a DAG context
     search_results_dict = extract()
     transform_results_dict = transform(search_results_dict)
-    load(transform_results_dict)
+    load_result_dict = load(transform_results_dict)
+    visualise(load_result_dict)
     # [END main_flow]
 
 

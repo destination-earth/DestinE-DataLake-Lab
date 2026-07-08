@@ -84,3 +84,38 @@ def upload_directory_to_s3(
         "uploaded_file_count": len(uploaded_files),
         "uploaded_keys": uploaded_files,
     }
+
+
+def upload_file_to_s3(
+    local_file_path: str,
+    bucket_name: str,
+    endpoint_url: str,
+    access_key_id: str,
+    secret_access_key: str,
+    destination_key: str,
+) -> dict:
+    local_file = Path(local_file_path)
+    if not local_file.exists():
+        raise FileNotFoundError(f"Local file not found: {local_file_path}")
+    if not local_file.is_file():
+        raise IsADirectoryError(f"Local path is not a file: {local_file_path}")
+
+    normalized_key = destination_key.strip("/")
+    if not normalized_key:
+        raise ValueError("destination_key must not be empty")
+
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        aws_access_key_id=access_key_id,
+        aws_secret_access_key=secret_access_key,
+    )
+    s3_client.upload_file(str(local_file), bucket_name, normalized_key)
+
+    return {
+        "success": True,
+        "local_file_path": str(local_file),
+        "bucket_name": bucket_name,
+        "destination_key": normalized_key,
+        "s3_uri": f"s3://{bucket_name}/{normalized_key}",
+    }
