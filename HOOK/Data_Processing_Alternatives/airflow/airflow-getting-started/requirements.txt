@@ -4,6 +4,10 @@ eodag
 boto3
 botocore
 python-dotenv
+matplotlib
+imageio
+imageio-ffmpeg
+s3fs
 
 ./dist/defair_data-0.3.0rc4-py3-none-any.whl
 ./dist/defair_ops-0.3.0rc4-py3-none-any.whl

@@ -10,7 +10,7 @@ DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.s3.s3_helper import upload_directory_to_s3  # noqa: E402
+from dedl.s3.s3_helper import upload_directory_to_s3, upload_file_to_s3  # noqa: E402
 
 
 class _DummyS3Client:
@@ -145,4 +145,87 @@ def test_upload_directory_to_s3_rejects_non_directory(tmp_path: Path) -> None:
             endpoint_url="https://example.invalid",
             access_key_id="access",
             secret_access_key="secret",
+        )
+
+
+def test_upload_file_to_s3_uploads_single_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    file_path = tmp_path / "movie.mp4"
+    file_path.write_text("video-bits", encoding="utf-8")
+
+    dummy_client = _DummyS3Client()
+
+    def fake_boto3_client(service_name: str, **kwargs):
+        assert service_name == "s3"
+        return dummy_client
+
+    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+
+    result = upload_file_to_s3(
+        local_file_path=str(file_path),
+        bucket_name="my-bucket",
+        endpoint_url="https://example.invalid",
+        access_key_id="access",
+        secret_access_key="secret",
+        destination_key="visualization/ch9/ch9_timelapse.mp4",
+    )
+
+    assert result == {
+        "success": True,
+        "local_file_path": str(file_path),
+        "bucket_name": "my-bucket",
+        "destination_key": "visualization/ch9/ch9_timelapse.mp4",
+        "s3_uri": "s3://my-bucket/visualization/ch9/ch9_timelapse.mp4",
+    }
+    assert dummy_client.calls == [
+        (
+            str(file_path),
+            "my-bucket",
+            "visualization/ch9/ch9_timelapse.mp4",
+        )
+    ]
+
+
+def test_upload_file_to_s3_missing_file() -> None:
+    with pytest.raises(FileNotFoundError, match="Local file not found"):
+        upload_file_to_s3(
+            local_file_path="/does/not/exist.mp4",
+            bucket_name="my-bucket",
+            endpoint_url="https://example.invalid",
+            access_key_id="access",
+            secret_access_key="secret",
+            destination_key="visualization/ch9/ch9_timelapse.mp4",
+        )
+
+
+def test_upload_file_to_s3_rejects_directory(tmp_path: Path) -> None:
+    with pytest.raises(IsADirectoryError, match="Local path is not a file"):
+        upload_file_to_s3(
+            local_file_path=str(tmp_path),
+            bucket_name="my-bucket",
+            endpoint_url="https://example.invalid",
+            access_key_id="access",
+            secret_access_key="secret",
+            destination_key="visualization/ch9/ch9_timelapse.mp4",
+        )
+
+
+def test_upload_file_to_s3_rejects_empty_destination_key(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    file_path = tmp_path / "movie.mp4"
+    file_path.write_text("video-bits", encoding="utf-8")
+
+    dummy_client = _DummyS3Client()
+
+    def fake_boto3_client(service_name: str, **kwargs):
+        return dummy_client
+
+    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+
+    with pytest.raises(ValueError, match="destination_key must not be empty"):
+        upload_file_to_s3(
+            local_file_path=str(file_path),
+            bucket_name="my-bucket",
+            endpoint_url="https://example.invalid",
+            access_key_id="access",
+            secret_access_key="secret",
+            destination_key="/",
         )
