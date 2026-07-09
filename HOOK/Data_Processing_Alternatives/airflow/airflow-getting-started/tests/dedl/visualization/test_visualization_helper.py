@@ -14,6 +14,9 @@ if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
 from dedl.visualization.visualization_helper import (  # noqa: E402
+    _build_annotation_lines,
+    _format_bbox,
+    _format_frame_time,
     compute_display_range,
     create_mp4_from_dataarray,
     resolve_data_variable,
@@ -123,3 +126,166 @@ def test_create_mp4_from_dataarray_generates_expected_metadata(monkeypatch: pyte
     assert len(written_frames) == 2
     assert written_frames[0].dtype == np.uint8
     assert written_frames[0].shape == (2, 4, 3)
+
+
+def test_format_frame_time_supports_datetime64() -> None:
+    result = _format_frame_time(np.datetime64("2024-07-09T12:34:56"))
+
+    assert result == "09/07/2024 12:34:56"
+
+
+def test_format_frame_time_supports_epoch_nanoseconds() -> None:
+    # 2004-01-19 10:30:00 UTC represented in nanoseconds since epoch.
+    result = _format_frame_time(1_074_508_200_000_000_000)
+
+    assert result == "19/01/2004 10:30:00"
+
+
+def test_format_frame_time_supports_seconds_plus_nanoseconds() -> None:
+    result = _format_frame_time((1_074_508_200, 123_000_000))
+
+    assert result == "19/01/2004 10:30:00"
+
+
+def test_format_bbox_formats_four_coordinate_bbox() -> None:
+    result = _format_bbox([-10, 35, 30.12345, 65])
+
+    assert result == "-10.0000, 35.0000, 30.1235, 65.0000"
+
+
+def test_build_annotation_lines_includes_time_collection_channel_and_bbox() -> None:
+    result = _build_annotation_lines(
+        time_value=np.datetime64("2024-07-09T12:34:56"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+            "start_time": "2004-01-19 10:30:00",
+            "grid_mapping": "spatial_ref",
+            "long_name": "High-resolution visible channel",
+        },
+    )
+
+    assert result == [
+        "time: 09/07/2024 12:34:56",
+        "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "channel: ch9",
+        "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
+        "target: EPSG:4326",
+        "resampling: bilinear",
+        "resolution: 0.05 degrees",
+        "grid_mapping: spatial_ref",
+        "long_name: High-resolution visible channel",
+    ]
+
+
+def test_build_annotation_lines_skips_missing_optional_channel_metadata() -> None:
+    result = _build_annotation_lines(
+        time_value=np.datetime64("2024-07-09T12:34:56"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+    )
+
+    assert result == [
+        "time: 09/07/2024 12:34:56",
+        "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "channel: ch9",
+        "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
+        "target: EPSG:4326",
+        "resampling: bilinear",
+        "resolution: 0.05 degrees",
+    ]
+
+
+def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "y", "x"), np.arange(8, dtype=float).reshape(2, 2, 2))},
+        coords={"time": np.array([np.datetime64("2024-07-09T00:00:00"), np.datetime64("2024-07-09T01:00:00")])},
+    )
+
+    written_frames: list[np.ndarray] = []
+    captured_lines: list[list[str]] = []
+
+    class _DummyWriter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def append_data(self, frame: np.ndarray) -> None:
+            written_frames.append(frame)
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper.imageio",
+        SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
+    )
+
+    def _capture_overlay(frame: np.ndarray, lines: list[str]) -> np.ndarray:
+        captured_lines.append(lines)
+        return frame
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_annotation_banner",
+        _capture_overlay,
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "annotated.mp4"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+            "start_time": "2004-01-19 10:30:00",
+            "grid_mapping": "spatial_ref",
+            "long_name": "High-resolution visible channel",
+        },
+        low_percentile=0.0,
+        high_percentile=100.0,
+    )
+
+    assert len(written_frames) == 2
+    assert captured_lines == [
+        [
+            "time: 09/07/2024 00:00:00",
+            "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel: ch9",
+            "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
+            "target: EPSG:4326",
+            "resampling: bilinear",
+            "resolution: 0.05 degrees",
+            "grid_mapping: spatial_ref",
+            "long_name: High-resolution visible channel",
+        ],
+        [
+            "time: 09/07/2024 01:00:00",
+            "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel: ch9",
+            "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
+            "target: EPSG:4326",
+            "resampling: bilinear",
+            "resolution: 0.05 degrees",
+            "grid_mapping: spatial_ref",
+            "long_name: High-resolution visible channel",
+        ],
+    ]

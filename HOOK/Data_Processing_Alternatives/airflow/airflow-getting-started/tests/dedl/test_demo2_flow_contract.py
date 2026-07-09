@@ -81,3 +81,60 @@ def test_normalize_channels_rejects_string_input() -> None:
         assert str(exc) == "channels must be a list of strings"
     else:
         raise AssertionError("Expected TypeError for string channel input")
+
+
+def test_build_visualization_annotation_metadata_includes_expected_fields() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+        {
+            "start_time": "2004-01-19 10:30:00",
+            "grid_mapping": "spatial_ref",
+            "long_name": "High-resolution visible channel",
+        },
+    )
+
+    assert result == {
+        "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+        "bbox": [-25.0, 34.0, 45.0, 72.0],
+        "channel_name": "ch9",
+        "reprojection_crs": "EPSG:4326",
+        "resampling": "bilinear",
+        "resolution": 0.05,
+        "resolution_unit": "degrees",
+        "start_time": "2004-01-19 10:30:00",
+        "grid_mapping": "spatial_ref",
+        "long_name": "High-resolution visible channel",
+    }
+
+
+def test_build_visualization_annotation_metadata_defaults_grid_mapping() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+        {
+            "long_name": "High-resolution visible channel",
+        },
+    )
+
+    assert result["grid_mapping"] == "spatial_ref"
