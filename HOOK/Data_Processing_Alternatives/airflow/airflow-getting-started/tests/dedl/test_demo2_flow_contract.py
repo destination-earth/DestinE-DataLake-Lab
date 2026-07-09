@@ -53,3 +53,31 @@ def test_channel_param_resolves_from_dag_run_conf(monkeypatch) -> None:
     channel_param = DagParam(demo2.dag, "channel", default="ch9")
 
     assert demo2._normalize_channel(channel_param) == "ch1"
+
+
+def test_channels_param_resolves_from_dag_run_conf(monkeypatch) -> None:
+    monkeypatch.setattr(
+        demo2,
+        "get_current_context",
+        lambda: {
+            "dag_run": SimpleNamespace(conf={"channels": ["ch1", "ch9"]}),
+            "params": {},
+        },
+    )
+
+    channels_param = DagParam(demo2.dag, "channels", default="ch9")
+
+    assert demo2._normalize_channels(channels_param) == ["ch1", "ch9"]
+
+
+def test_normalize_channels_deduplicates_list_entries() -> None:
+    assert demo2._normalize_channels(["ch1", "ch9", "ch1"]) == ["ch1", "ch9"]
+
+
+def test_normalize_channels_rejects_string_input() -> None:
+    try:
+        demo2._normalize_channels("ch1")
+    except TypeError as exc:
+        assert str(exc) == "channels must be a list of strings"
+    else:
+        raise AssertionError("Expected TypeError for string channel input")
