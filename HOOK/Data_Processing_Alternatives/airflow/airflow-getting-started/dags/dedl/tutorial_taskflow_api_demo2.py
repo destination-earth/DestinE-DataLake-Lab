@@ -75,6 +75,35 @@ def _normalize_search_limit(value: int | DagParam) -> int:
     return search_limit
 
 
+def _build_visualization_annotation_metadata(
+    search_results_dict: dict[str, Any],
+    transform_results_dict: dict[str, Any],
+    channel_name: str,
+    channel_attrs: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    annotation_metadata = {
+        "collection_id": search_results_dict["collection_id"],
+        "bbox": transform_results_dict.get(
+            "reprojection_bounds",
+            search_results_dict["bbox"],
+        ),
+        "channel_name": channel_name,
+        "reprojection_crs": transform_results_dict["reprojection_crs"],
+        "resampling": transform_results_dict["resampling"],
+        "resolution": transform_results_dict["resolution"],
+        "resolution_unit": transform_results_dict["resolution_unit"],
+    }
+
+    if channel_attrs is not None:
+        for key in ["start_time", "long_name", "grid_mapping"]:
+            if key in channel_attrs:
+                annotation_metadata[key] = channel_attrs[key]
+
+    annotation_metadata.setdefault("grid_mapping", "spatial_ref")
+
+    return annotation_metadata
+
+
 # [START instantiate_dag]
 @dag(
     schedule=None,
@@ -96,6 +125,12 @@ def tutorial_taskflow_api_demo2(
     """
     if isinstance(channels, list):
         _normalize_channels(channels)
+
+    reprojection_crs = "EPSG:4326"
+    reprojection_resampling = "bilinear"
+    reprojection_resolution = 0.05
+    reprojection_resolution_unit = "degrees"
+    reprojection_bounds = (-25.0, 34.0, 45.0, 72.0)
 
     # [END instantiate_dag]
 
@@ -271,6 +306,8 @@ def tutorial_taskflow_api_demo2(
             return {
                 "search_results": len(search_results),
                 "downloaded_nat_files": [str(path) for path in ordered_nat_files],
+                "collection_id": dedl_collection_id,
+                "bbox": search_params["bbox"],
             }
 
         else:
@@ -281,6 +318,8 @@ def tutorial_taskflow_api_demo2(
         return {
             "search_results": 0,
             "downloaded_nat_files": [],
+            "collection_id": dedl_collection_id,
+            "bbox": search_params["bbox"],
         }
 
     # [END extract]
@@ -430,11 +469,11 @@ def tutorial_taskflow_api_demo2(
 
             # Reproject + resample to a regular EPSG:4326 grid covering Europe : (reproject the cropped dataset to avoid reprojecting the full original)
             ds_europe_reproj = ds_europe.reproject(
-                "EPSG:4326",
-                resampling="bilinear",  # or "nearest", "cubic"
-                resolution=0.05,  # in degrees (see resolution_unit)
-                resolution_unit="degrees",
-                bounds=(-25.0, 34.0, 45.0, 72.0),  # (minlon, minlat, maxlon, maxlat)
+                reprojection_crs,
+                resampling=reprojection_resampling,  # or "nearest", "cubic"
+                resolution=reprojection_resolution,  # in degrees (see resolution_unit)
+                resolution_unit=reprojection_resolution_unit,
+                bounds=reprojection_bounds,  # (minlon, minlat, maxlon, maxlat)
             )
 
             # -----------------------------------------------------
@@ -565,12 +604,22 @@ def tutorial_taskflow_api_demo2(
                 "total_num_zarr_files": len(zarr_files),
                 "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
                 "channels": channels,
+                "reprojection_bounds": reprojection_bounds,
+                "reprojection_crs": reprojection_crs,
+                "resampling": reprojection_resampling,
+                "resolution": reprojection_resolution,
+                "resolution_unit": reprojection_resolution_unit,
             }
 
         return {
             "total_num_zarr_files": 0,
             "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
             "channels": channels,
+            "reprojection_bounds": reprojection_bounds,
+            "reprojection_crs": reprojection_crs,
+            "resampling": reprojection_resampling,
+            "resolution": reprojection_resolution,
+            "resolution_unit": reprojection_resolution_unit,
         }
 
     # [END transform]
@@ -607,12 +656,17 @@ def tutorial_taskflow_api_demo2(
 
         print(f"Uploaded to: {upload_result['s3_uri']}")
         upload_result["channels"] = channels
+        upload_result["reprojection_bounds"] = transform_results_dict["reprojection_bounds"]
+        upload_result["reprojection_crs"] = transform_results_dict["reprojection_crs"]
+        upload_result["resampling"] = transform_results_dict["resampling"]
+        upload_result["resolution"] = transform_results_dict["resolution"]
+        upload_result["resolution_unit"] = transform_results_dict["resolution_unit"]
         return upload_result
     # [END load]
 
     # [START visualise]
     @task()
-    def visualise(load_result_dict: dict, channels: list[str]):
+    def visualise(load_result_dict: dict, search_results_dict: dict, channels: list[str]):
         """
         #### Visualise task
         Build an MP4 time-lapse from the selected channel in the uploaded S3-backed Zarr.
@@ -657,6 +711,12 @@ def tutorial_taskflow_api_demo2(
             output_mp4_path = (
                 f"/home/eouser/eodag_downloads/msg_hrseviri/{channel_name}_timelapse.mp4"
             )
+            annotation_metadata = _build_visualization_annotation_metadata(
+                search_results_dict,
+                load_result_dict,
+                channel_name,
+                channel_attrs=dict(selected_channel.attrs),
+            )
 
             video_result = create_mp4_from_dataarray(
                 selected_channel,
@@ -665,6 +725,7 @@ def tutorial_taskflow_api_demo2(
                 frame_stride=1,
                 max_frames=120,
                 colormap_name="inferno",
+                annotation_metadata=annotation_metadata,
             )
 
             upload_result = upload_file_to_s3(
@@ -701,7 +762,7 @@ def tutorial_taskflow_api_demo2(
     search_results_dict = extract(search_limit=search_limit)
     transform_results_dict = transform(search_results_dict, channels=channels)
     load_result_dict = load(transform_results_dict, channels=channels)
-    visualise(load_result_dict, channels=channels)
+    visualise(load_result_dict, search_results_dict, channels=channels)
     # [END main_flow]
 
 
@@ -712,4 +773,4 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
-    dag.test(run_conf={"search_limit": 10, "channels": ["ch1", "ch9"]})
+    dag.test(run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch9"]})

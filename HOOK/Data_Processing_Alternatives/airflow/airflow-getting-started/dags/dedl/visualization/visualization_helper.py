@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -8,6 +11,124 @@ try:
     import imageio.v2 as imageio
 except ModuleNotFoundError:  # pragma: no cover - depends on optional runtime deps
     imageio = None
+
+
+def _format_frame_time(time_value: Any) -> str:
+    scalar = np.asarray(time_value).item() if np.asarray(time_value).shape == () else time_value
+
+    def _format_epoch_seconds(epoch_seconds: float) -> str:
+        parsed = datetime.fromtimestamp(epoch_seconds, tz=timezone.utc)
+        return parsed.strftime("%d/%m/%Y %H:%M:%S")
+
+    if isinstance(scalar, np.datetime64):
+        as_seconds = np.datetime64(scalar, "s")
+        parsed = datetime.strptime(
+            np.datetime_as_string(as_seconds, unit="s"),
+            "%Y-%m-%dT%H:%M:%S",
+        )
+        return parsed.strftime("%d/%m/%Y %H:%M:%S")
+
+    if isinstance(scalar, datetime):
+        if scalar.tzinfo is None:
+            scalar = scalar.replace(tzinfo=timezone.utc)
+        else:
+            scalar = scalar.astimezone(timezone.utc)
+        return scalar.strftime("%d/%m/%Y %H:%M:%S")
+
+    if isinstance(scalar, (list, tuple)) and len(scalar) == 2:
+        seconds, nanoseconds = scalar
+        if isinstance(seconds, (int, float, np.integer, np.floating)) and isinstance(
+            nanoseconds,
+            (int, float, np.integer, np.floating),
+        ):
+            return _format_epoch_seconds(float(seconds) + (float(nanoseconds) / 1_000_000_000.0))
+
+    if isinstance(scalar, dict):
+        seconds = scalar.get("seconds")
+        nanoseconds = scalar.get("nanoseconds", 0)
+        if isinstance(seconds, (int, float, np.integer, np.floating)) and isinstance(
+            nanoseconds,
+            (int, float, np.integer, np.floating),
+        ):
+            return _format_epoch_seconds(float(seconds) + (float(nanoseconds) / 1_000_000_000.0))
+
+    if isinstance(scalar, (int, float, np.integer, np.floating)):
+        epoch_value = float(scalar)
+        abs_epoch_value = abs(epoch_value)
+        if abs_epoch_value >= 1e17:
+            return _format_epoch_seconds(epoch_value / 1_000_000_000.0)
+        if abs_epoch_value >= 1e14:
+            return _format_epoch_seconds(epoch_value / 1_000_000.0)
+        if abs_epoch_value >= 1e11:
+            return _format_epoch_seconds(epoch_value / 1_000.0)
+        return _format_epoch_seconds(epoch_value)
+
+    return str(scalar)
+
+
+def _format_bbox(bbox: Any) -> str:
+    if isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+        return ", ".join(
+            f"{Decimal(str(coord)).quantize(Decimal('0.0001'), rounding=ROUND_HALF_UP):f}"
+            for coord in bbox
+        )
+    return str(bbox)
+
+
+def _build_annotation_lines(*, time_value: Any, annotation_metadata: dict[str, Any]) -> list[str]:
+    lines = [
+        f"time: {_format_frame_time(time_value)}",
+        f"collection: {annotation_metadata['collection_id']}",
+        f"channel: {annotation_metadata['channel_name']}",
+        f"bbox: {_format_bbox(annotation_metadata['bbox'])}",
+        f"target: {annotation_metadata.get('reprojection_crs', 'N/A')}",
+        f"resampling: {annotation_metadata.get('resampling', 'N/A')}",
+        f"resolution: {annotation_metadata.get('resolution', 'N/A')} {annotation_metadata.get('resolution_unit', '')}".rstrip(),
+    ]
+
+    if "grid_mapping" in annotation_metadata:
+        lines.append(f"grid_mapping: {annotation_metadata['grid_mapping']}")
+    if "long_name" in annotation_metadata:
+        lines.append(f"long_name: {annotation_metadata['long_name']}")
+
+    return lines
+
+
+def _overlay_annotation_banner(frame: np.ndarray, lines: list[str]) -> np.ndarray:
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ModuleNotFoundError as exc:  # pragma: no cover - depends on optional runtime deps
+        raise RuntimeError(
+            "Pillow is required to render video annotations. Install pillow to enable overlays."
+        ) from exc
+
+    image = Image.fromarray(frame, mode="RGB")
+    draw = ImageDraw.Draw(image, mode="RGBA")
+    font = ImageFont.load_default()
+
+    left_padding = 8
+    top_padding = 8
+    line_spacing = 4
+    inner_padding = 8
+
+    text_boxes = [draw.textbbox((0, 0), line, font=font) for line in lines]
+    text_width = max((box[2] - box[0]) for box in text_boxes)
+    text_height = sum((box[3] - box[1]) for box in text_boxes) + line_spacing * (len(lines) - 1)
+
+    banner_right = left_padding + text_width + inner_padding * 2
+    banner_bottom = top_padding + text_height + inner_padding * 2
+
+    draw.rectangle(
+        [(left_padding, top_padding), (banner_right, banner_bottom)],
+        fill=(0, 0, 0, 170),
+    )
+
+    current_y = top_padding + inner_padding
+    for line, box in zip(lines, text_boxes):
+        draw.text((left_padding + inner_padding, current_y), line, fill=(255, 255, 255, 255), font=font)
+        current_y += (box[3] - box[1]) + line_spacing
+
+    return np.asarray(image)
 
 
 def open_s3_zarr_dataset(
@@ -82,6 +203,7 @@ def create_mp4_from_dataarray(
     colormap_name: str = "inferno",
     low_percentile: float = 2.0,
     high_percentile: float = 98.0,
+    annotation_metadata: dict[str, Any] | None = None,
 ) -> dict:
     if "time" not in data_array.dims:
         raise ValueError(f"DataArray must contain a 'time' dimension, got dims={data_array.dims}")
@@ -117,6 +239,14 @@ def create_mp4_from_dataarray(
             for idx in time_indexes:
                 values = data_array.isel(time=idx).load().values
                 frame = _to_uint8_rgb_frame(values, vmin=vmin, vmax=vmax, colormap_name=colormap_name)
+                if annotation_metadata is not None:
+                    frame = _overlay_annotation_banner(
+                        frame,
+                        _build_annotation_lines(
+                            time_value=data_array["time"].values[idx],
+                            annotation_metadata=annotation_metadata,
+                        ),
+                    )
                 writer.append_data(frame)
     except Exception as exc:  # pragma: no cover - depends on system ffmpeg support
         raise RuntimeError(
