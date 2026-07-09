@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from collections.abc import Mapping
+import re
 from typing import Any
 
 from eodag import EODataAccessGateway
@@ -441,7 +442,7 @@ def clean_directory(dir_path: str, unzip: bool = False, overwrite: bool = True):
     extracted_folders = []
 
     # --- STEP 1: CLEAN ---
-    for p in dir_path.iterdir():
+    for p in sorted(dir_path.iterdir()):
         if not p.is_file():
             continue
 
@@ -518,7 +519,47 @@ def get_files_with_extension(
 
         results.extend([f for f in files if f.is_file()])
 
-    return results
+    return sorted(results)
+
+
+_FILENAME_TIMESTAMP_PATTERNS = (
+    re.compile(r"(20\d{2})(\d{2})(\d{2})[T_-]?(\d{2})(\d{2})(\d{2})"),
+    re.compile(r"(20\d{2})-(\d{2})-(\d{2})[T_-]?(\d{2})(\d{2})(\d{2})"),
+    re.compile(r"(20\d{2})(\d{2})(\d{2})"),
+    re.compile(r"(20\d{2})-(\d{2})-(\d{2})"),
+)
+
+
+def _extract_timestamp_sort_token(file_name: str) -> str | None:
+    """Extract a sortable timestamp token from a file name when possible."""
+    for pattern in _FILENAME_TIMESTAMP_PATTERNS:
+        match = pattern.search(file_name)
+        if match is None:
+            continue
+
+        groups = match.groups()
+        if len(groups) >= 6:
+            return "".join(groups[:6])
+        if len(groups) >= 3:
+            return "".join(groups[:3]) + "000000"
+
+    return None
+
+
+def filename_timestamp_sort_key(file_path: str | Path) -> tuple[int, str, str]:
+    """Return deterministic sort key using timestamp in filename, then lexical fallback."""
+    path = Path(file_path)
+    file_name = path.name
+    token = _extract_timestamp_sort_token(file_name)
+    if token is not None:
+        return (0, token, file_name)
+    return (1, "", file_name)
+
+
+def filter_and_sort_nat_files(file_paths: list[str | Path]) -> list[Path]:
+    """Keep only .nat files and sort deterministically by timestamp-like filename token."""
+    nat_files = [Path(file_path) for file_path in file_paths if Path(file_path).suffix.lower() == ".nat"]
+    return sorted(nat_files, key=filename_timestamp_sort_key)
 
 
 from pathlib import Path

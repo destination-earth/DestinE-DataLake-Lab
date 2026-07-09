@@ -12,6 +12,8 @@ if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
 from dedl.eodag.eodag_helper import (  # noqa: E402
+    filename_timestamp_sort_key,
+    filter_and_sort_nat_files,
     find_dedl_collection_by_eodag_id,
     find_eodag_collection_id_by_dedl_id,
     get_collection_search_params,
@@ -263,3 +265,35 @@ def test_get_collection_search_params_with_date_start_datetime() -> None:
 
 def test_shift_iso_date_from_iso_string() -> None:
     assert shift_iso_date("2018-03-26", days=30) == "2018-04-25"
+
+
+def test_filename_timestamp_sort_key_prefers_timestamp_when_present() -> None:
+    key = filename_timestamp_sort_key("MSG4-SEVI-MSG15-0100-NA-20260708091531.nat")
+
+    assert key[0] == 0
+    assert key[1] == "20260708091531"
+
+
+def test_filename_timestamp_sort_key_falls_back_to_filename() -> None:
+    key = filename_timestamp_sort_key("product_without_date.nat")
+
+    assert key[0] == 1
+    assert key[1] == ""
+    assert key[2] == "product_without_date.nat"
+
+
+def test_filter_and_sort_nat_files_keeps_only_nat_and_orders_by_filename_time() -> None:
+    files = [
+        "/tmp/MSG4-SEVI-MSG15-0100-NA-20260708093000.nat",
+        "/tmp/ignore_me.txt",
+        "/tmp/MSG4-SEVI-MSG15-0100-NA-20260708091531.nat",
+        "/tmp/no_timestamp_product.nat",
+    ]
+
+    result = filter_and_sort_nat_files(files)
+
+    assert [path.name for path in result] == [
+        "MSG4-SEVI-MSG15-0100-NA-20260708091531.nat",
+        "MSG4-SEVI-MSG15-0100-NA-20260708093000.nat",
+        "no_timestamp_product.nat",
+    ]

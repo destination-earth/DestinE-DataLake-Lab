@@ -20,12 +20,36 @@ from __future__ import annotations
 # [START tutorial]
 # [START import_module]
 import json
+from typing import Any
 
 import pendulum
-from airflow.sdk import dag, task
+from airflow.sdk import dag, get_current_context, task
+from airflow.sdk.definitions.param import DagParam
 from dedl.tasks.common import show_params
 
 # [END import_module]
+
+
+def _resolve_runtime_param(value: Any) -> Any:
+    if isinstance(value, DagParam):
+        return value.resolve(get_current_context())
+    return value
+
+
+def _normalize_channel(value: str | DagParam) -> str:
+    channel = str(_resolve_runtime_param(value)).strip()
+    if not channel:
+        raise ValueError("channel must be a non-empty string")
+    if "/" in channel or "\\" in channel:
+        raise ValueError("channel must not contain path separators")
+    return channel
+
+
+def _normalize_search_limit(value: int | DagParam) -> int:
+    search_limit = int(_resolve_runtime_param(value))
+    if search_limit <= 0:
+        raise ValueError("search_limit must be greater than 0")
+    return search_limit
 
 
 # [START instantiate_dag]
@@ -35,7 +59,7 @@ from dedl.tasks.common import show_params
     catchup=False,
     tags=["example"],
 )
-def tutorial_taskflow_api_demo2():
+def tutorial_taskflow_api_demo2(search_limit: int = 10, channel: str = "ch9"):
     """
     ### TaskFlow API Tutorial Documentation
     This is a simple data pipeline example which demonstrates the use of
@@ -44,19 +68,24 @@ def tutorial_taskflow_api_demo2():
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
+    if isinstance(channel, str):
+        channel = _normalize_channel(channel)
+
     # [END instantiate_dag]
 
     # [START extract]
     @task()
-    def extract():
+    def extract(search_limit: int):
         """
         #### Extract task
         Here we demonstrate how to use the EODAG library to search for and download products from the DestinE Data Lake (DEDL) using the EODAG API. We also demonstrate how to retrieve credentials from an Airflow connection.
         """
         from dedl.eodag.eodag_helper import (
             clean_directory,
+            filter_and_sort_nat_files,
             find_dedl_collection_by_eodag_id,
             find_eodag_collection_id_by_dedl_id,
+            get_files_with_extension,
             get_collection_search_params,
             get_eodag_collection_info,
             shift_iso_date,
@@ -155,8 +184,7 @@ def tutorial_taskflow_api_demo2():
 
         print("Search end date:", search_params["end"])
 
-        # search limit
-        search_limit = 10
+        search_limit = _normalize_search_limit(search_limit)
 
         search_kwargs = {
             "collection": eodag_collection_id,
@@ -199,8 +227,24 @@ def tutorial_taskflow_api_demo2():
                 "/home/eouser/eodag_downloads/msg_hrseviri", unzip=True, overwrite=True
             )
 
+            current_run_nat_files = [
+                path for path in cleaned_files if path.suffix.lower() == ".nat"
+            ]
+            if extracted_folders:
+                extracted_nat_files = get_files_with_extension(
+                    [str(path) for path in extracted_folders],
+                    "nat",
+                    recursive=True,
+                )
+                current_run_nat_files.extend(extracted_nat_files)
+
+            ordered_nat_files = filter_and_sort_nat_files(
+                [str(path) for path in current_run_nat_files]
+            )
+
             return {
                 "search_results": len(search_results),
+                "downloaded_nat_files": [str(path) for path in ordered_nat_files],
             }
 
         else:
@@ -210,20 +254,28 @@ def tutorial_taskflow_api_demo2():
 
         return {
             "search_results": 0,
+            "downloaded_nat_files": [],
         }
 
     # [END extract]
 
     # [START transform]
     @task(multiple_outputs=True)
-    def transform(search_results_dict: dict):
+    def transform(search_results_dict: dict, channel: str):
         """
         #### Transform task
         Transformation Task based on Defair Python Library.
         """
-        from dedl.eodag.eodag_helper import change_extension, get_files_with_extension
+        from dedl.eodag.eodag_helper import (
+            change_extension,
+            filename_timestamp_sort_key,
+            filter_and_sort_nat_files,
+        )
+
+        channel = _normalize_channel(channel)
 
         print(f"Transforming data with previous results: {search_results_dict}")
+        print(f"Transforming data for channel: {channel}")
         # Reference: https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/ai_ready_data_preparation/demos/01_msg_local_to_zarr_code.html
 
         # -----------------------------------------------------
@@ -249,9 +301,11 @@ def tutorial_taskflow_api_demo2():
         # Step 2 : Configuration : getting input files
         # -----------------------------------------------------
 
-        nat_files = get_files_with_extension(
-            ["/home/eouser/eodag_downloads/msg_hrseviri"], "nat", recursive=True
+        nat_files = filter_and_sort_nat_files(
+            search_results_dict.get("downloaded_nat_files", [])
         )
+
+        print(f"Current run .nat files selected for transform: {len(nat_files)}")
 
         # We will use this list of treated zarr files to generate Just a singe zarr file with concat_dim="time"
         zarr_files = []
@@ -274,14 +328,21 @@ def tutorial_taskflow_api_demo2():
             # Step 4 : Inspect Dataset Structure
             # -----------------------------------------------------
 
-            # Inspect a single channel
-            ir_channel = dataset.data["ch9"]
-            print("Channel: ir_10.8")
-            print(f"Shape: {ir_channel.shape}")
-            print(f"Dtype: {ir_channel.dtype}")
-            print(f"Chunks: {ir_channel.chunks}")
+            available_channels = list(dataset.data.data_vars)
+            if channel not in available_channels:
+                raise ValueError(
+                    f"Requested channel '{channel}' not found in dataset. "
+                    f"Available channels: {available_channels}"
+                )
+
+            # Inspect the selected channel
+            selected_channel = dataset.data[channel]
+            print(f"Channel: {channel}")
+            print(f"Shape: {selected_channel.shape}")
+            print(f"Dtype: {selected_channel.dtype}")
+            print(f"Chunks: {selected_channel.chunks}")
             print("\nAttributes:")
-            for key, value in ir_channel.attrs.items():
+            for key, value in selected_channel.attrs.items():
                 print(f"  {key}: {value}")
 
             # -----------------------------------------------------
@@ -301,8 +362,8 @@ def tutorial_taskflow_api_demo2():
                 crs = dataset.data.coords["spatial_ref"]
                 print(f"  CRS WKT: {crs.attrs.get('crs_wkt', 'N/A')[:200]}...")
 
-            if "grid_mapping" in dataset.data["ch9"].attrs:
-                print(f"  Grid mapping: {dataset.data['ch9'].attrs['grid_mapping']}")
+            if "grid_mapping" in selected_channel.attrs:
+                print(f"  Grid mapping: {selected_channel.attrs['grid_mapping']}")
 
             # -----------------------------------------------------
             # Step X1a : Apply Spatial Filtering to Crop to Europe
@@ -351,12 +412,12 @@ def tutorial_taskflow_api_demo2():
             # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
             # -----------------------------------------------------
 
-            # 1) then select ch9 from the transformed dataset ()
-            xr_ch9 = ds_europe_reproj.data[["ch9"]]
-            ds_ch9 = Dataset(xr_ch9)
+            # Select the configured channel from the transformed dataset.
+            xr_channel = ds_europe_reproj.data[[channel]]
+            ds_channel = Dataset(xr_channel)
 
-            # So we don't have to modify the following code, we can just assign the ch9-only dataset to the variable `dataset` for further processing.
-            dataset = ds_ch9
+            # Keep downstream logic unchanged by replacing dataset with the single-channel view.
+            dataset = ds_channel
 
             # -----------------------------------------------------
             # Step 6 : Write a cloud-optimized Zarr file with consolidated metadata
@@ -445,6 +506,11 @@ def tutorial_taskflow_api_demo2():
 
         if zarr_files:
 
+            zarr_files = sorted(
+                zarr_files,
+                key=lambda path: filename_timestamp_sort_key(Path(path).with_suffix(".nat")),
+            )
+
             xr_dsets = [xr.open_zarr(str(p), consolidated=True) for p in zarr_files]
 
             combined = xr.concat(xr_dsets, dim="time")
@@ -480,7 +546,7 @@ def tutorial_taskflow_api_demo2():
 
     # [START load]
     @task()
-    def load(transform_results_dict: dict):
+    def load(transform_results_dict: dict, channel: str):
         """
         #### Load task
         This load task could be used to upload the zarr files to e.g. S3 storage.
@@ -489,6 +555,7 @@ def tutorial_taskflow_api_demo2():
 
         from dedl.s3.s3_helper import upload_directory_to_s3
 
+        channel = _normalize_channel(channel)
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
         endpoint_url = os.environ["S3_ENDPOINT_URL"]
         bucket_name = os.environ["MY_S3_BUCKET_NAME"]
@@ -503,7 +570,7 @@ def tutorial_taskflow_api_demo2():
             endpoint_url=endpoint_url,
             access_key_id=access_key_id,
             secret_access_key=secret_access_key,
-            destination_prefix="my_ch9_zarr_data",  # Optional: specify a prefix in the S3 bucket
+            destination_prefix=f"my_{channel}_zarr_data",  # Optional: specify a prefix in the S3 bucket
         )
 
         print(f"Uploaded to: {upload_result['s3_uri']}")
@@ -512,10 +579,10 @@ def tutorial_taskflow_api_demo2():
 
     # [START visualise]
     @task()
-    def visualise(load_result_dict: dict):
+    def visualise(load_result_dict: dict, channel: str):
         """
         #### Visualise task
-        Build an MP4 time-lapse from CH9 data in the uploaded S3-backed Zarr.
+        Build an MP4 time-lapse from the selected channel in the uploaded S3-backed Zarr.
         """
         import os
 
@@ -526,6 +593,7 @@ def tutorial_taskflow_api_demo2():
             resolve_data_variable,
         )
 
+        channel = _normalize_channel(channel)
         endpoint_url = os.environ["S3_ENDPOINT_URL"]
         bucket_name = os.environ["MY_S3_BUCKET_NAME"]
         access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
@@ -542,11 +610,20 @@ def tutorial_taskflow_api_demo2():
             secret_access_key=secret_access_key,
         )
 
-        ch9 = resolve_data_variable(dataset, preferred_name="ch9")
-        output_mp4_path = "/home/eouser/eodag_downloads/msg_hrseviri/ch9_timelapse.mp4"
+        available_channels = list(dataset.data_vars)
+        if channel not in available_channels:
+            raise ValueError(
+                f"Requested channel '{channel}' not found in uploaded dataset. "
+                f"Available channels: {available_channels}"
+            )
+
+        selected_channel = resolve_data_variable(dataset, preferred_name=channel)
+        output_mp4_path = (
+            f"/home/eouser/eodag_downloads/msg_hrseviri/{channel}_timelapse.mp4"
+        )
 
         video_result = create_mp4_from_dataarray(
-            ch9,
+            selected_channel,
             output_mp4_path,
             fps=4,
             frame_stride=1,
@@ -560,7 +637,7 @@ def tutorial_taskflow_api_demo2():
             endpoint_url=endpoint_url,
             access_key_id=access_key_id,
             secret_access_key=secret_access_key,
-            destination_key="visualization/ch9/ch9_timelapse.mp4",
+            destination_key=f"visualization/{channel}/{channel}_timelapse.mp4",
         )
 
         return {
@@ -576,10 +653,10 @@ def tutorial_taskflow_api_demo2():
 
     # [START main_flow]
     show_params()  # Example of a function call within a DAG context
-    search_results_dict = extract()
-    transform_results_dict = transform(search_results_dict)
-    load_result_dict = load(transform_results_dict)
-    visualise(load_result_dict)
+    search_results_dict = extract(search_limit=search_limit)
+    transform_results_dict = transform(search_results_dict, channel=channel)
+    load_result_dict = load(transform_results_dict, channel=channel)
+    visualise(load_result_dict, channel=channel)
     # [END main_flow]
 
 
@@ -590,4 +667,4 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
-    dag.test()
+    dag.test(run_conf={"search_limit": 3, "channel": "ch1"})
