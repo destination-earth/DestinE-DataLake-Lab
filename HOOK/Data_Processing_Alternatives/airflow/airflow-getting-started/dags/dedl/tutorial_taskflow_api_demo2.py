@@ -126,9 +126,6 @@ def tutorial_taskflow_api_demo2(
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
-    if isinstance(channels, list):
-        _normalize_channels(channels)
-
     # Define the bounding box for Europe
     lat_min=34.0
     lat_max=72.0
@@ -369,7 +366,6 @@ def tutorial_taskflow_api_demo2(
         # Step 1 : Defair Setup and import : Show readers and writers
         # -----------------------------------------------------
 
-        import sys
         from pathlib import Path
 
         import xarray as xr
