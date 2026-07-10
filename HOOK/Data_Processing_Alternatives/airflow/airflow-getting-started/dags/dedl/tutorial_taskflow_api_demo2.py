@@ -29,11 +29,78 @@ from dedl.tasks.common import show_params
 
 # [END import_module]
 
+from typing import TypedDict
+
+
+class SearchResultsDict(TypedDict):
+    """Data contract: extract task output"""
+    num_search_results: int
+    downloaded_nat_files: list[str]
+    collection_id: str
+    bbox: tuple[float, float, float, float]
+
+
+class TransformResultsDict(TypedDict):
+    """Data contract: transform task output"""
+    total_num_zarr_files: int
+    concatenated_zarr_path: str
+    channels: list[str]
+    reprojection_bounds: tuple[float, float, float, float]
+    reprojection_crs: str
+    resampling: str
+    resolution: float
+    resolution_unit: str
+
+
+class LoadResultDict(TypedDict):
+    """Data contract: load task output (extends S3 upload result)"""
+    success: bool
+    s3_uri: str
+    destination_prefix: str
+    channels: list[str]
+    reprojection_bounds: tuple[float, float, float, float]
+    reprojection_crs: str
+    resampling: str
+    resolution: float
+    resolution_unit: str
+
 
 def _resolve_runtime_param(value: Any) -> Any:
     if isinstance(value, DagParam):
         return value.resolve(get_current_context())
     return value
+
+
+def _get_output_base_dir() -> str:
+    """
+    Retrieve the base output directory for EODAG downloads.
+
+    Reads from EODAG__DEDL__DOWNLOAD__OUTPUT_DIR environment variable.
+    Raises ValueError if not set or empty.
+
+    Returns:
+        str: The base directory path (e.g., /home/eouser/eodag_downloads/msg_hrseviri)
+    """
+    import os
+    base_dir = os.environ.get("EODAG__DEDL__DOWNLOAD__OUTPUT_DIR", "").strip()
+    if not base_dir:
+        raise ValueError(
+            "EODAG__DEDL__DOWNLOAD__OUTPUT_DIR environment variable not set. "
+            "Please set it to the output directory for EODAG downloads."
+        )
+    return base_dir
+
+
+def _build_concatenated_zarr_path() -> str:
+    """Build the path for the concatenated Zarr file."""
+    base_dir = _get_output_base_dir()
+    return f"{base_dir}/concatenated.zarr"
+
+
+def _build_video_output_path(channel_name: str) -> str:
+    """Build the local path for an MP4 output file for a given channel."""
+    base_dir = _get_output_base_dir()
+    return f"{base_dir}/{channel_name}_timelapse.mp4"
 
 
 def _normalize_channel(value: str | DagParam) -> str:
@@ -46,24 +113,40 @@ def _normalize_channel(value: str | DagParam) -> str:
 
 
 def _normalize_channels(value: list[str] | DagParam) -> list[str]:
+    """
+    Normalize and deduplicate a list of channel names.
+
+    1. Resolves runtime DagParam if needed
+    2. Validates each channel (no path separators, non-empty after strip)
+    3. Deduplicates while preserving order of first occurrence
+
+    Args:
+        value: List of channel names or a DagParam that resolves to a list
+
+    Returns:
+        Deduplicated, normalized list of channel names
+
+    Raises:
+        TypeError: If value is not a list
+        ValueError: If list is empty or any channel is invalid
+    """
     resolved_value = _resolve_runtime_param(value)
 
     if isinstance(resolved_value, list):
-        raw_channels = [_normalize_channel(channel) for channel in resolved_value]
+        normalized_channels = [_normalize_channel(channel) for channel in resolved_value]
     else:
         raise TypeError("channels must be a list of strings")
 
-    if not raw_channels:
+    if not normalized_channels:
         raise ValueError("channels must contain at least one channel")
 
     deduplicated_channels: list[str] = []
     seen: set[str] = set()
-    for channel in raw_channels:
-        normalized_channel = _normalize_channel(channel)
-        if normalized_channel in seen:
+    for channel in normalized_channels:
+        if channel in seen:
             continue
-        seen.add(normalized_channel)
-        deduplicated_channels.append(normalized_channel)
+        seen.add(channel)
+        deduplicated_channels.append(channel)
 
     return deduplicated_channels
 
@@ -81,6 +164,24 @@ def _build_visualization_annotation_metadata(
     channel_name: str,
     channel_attrs: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    """
+    Build metadata dictionary for annotating a visualization (MP4 time-lapse).
+
+    Combines extraction metadata (collection_id, search bbox) with transformation
+    metadata (reprojection CRS, resolution, resampling). Falls back to search bbox
+    if reprojection bounds not available; defaults grid_mapping to 'spatial_ref'.
+
+    Args:
+        search_results_dict: From extract(); provides collection_id and search bbox
+        transform_results_dict: From transform(); provides reprojection metadata
+        channel_name: Channel identifier to annotate (e.g., 'ch9')
+        channel_attrs: Optional per-channel xarray attributes (start_time, long_name, grid_mapping)
+
+    Returns:
+        dict: Annotation metadata with keys: collection_id, bbox (reprojection or search),
+              channel_name, reprojection_crs, resampling, resolution, resolution_unit,
+              and optionally channel_attrs fields (start_time, long_name, grid_mapping)
+    """
     annotation_metadata = {
         "collection_id": search_results_dict["collection_id"],
         "bbox": transform_results_dict.get(
@@ -153,10 +254,17 @@ def tutorial_taskflow_api_demo2(
 
     # [START extract]
     @task()
-    def extract(search_limit: int, search_start: str = None, search_end: str = None, dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI") -> dict:
+    def extract(search_limit: int, search_start: str = None, search_end: str = None, dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI") -> SearchResultsDict:
         """
-        #### Extract task
-        Here we demonstrate how to use the EODAG library to search for and download products from the DestinE Data Lake (DEDL) using the EODAG API. We also demonstrate how to retrieve credentials from an Airflow connection.
+        #### Extract task: Search and download MSG/SEVIRI products
+
+        Uses EODAG library to search for and download products from the DestinE Data Lake (DEDL).
+        Credentials retrieved from Airflow connection 'hda_api'.
+        Downloads to EODAG__DEDL__DOWNLOAD__OUTPUT_DIR and returns ordered .nat file list.
+
+        Returns:
+            SearchResultsDict: Contains num_search_results, downloaded_nat_files list,
+                              collection_id, and spatial bbox
         """
         from dedl.eodag.eodag_helper import (
             clean_directory,
@@ -309,7 +417,7 @@ def tutorial_taskflow_api_demo2(
 
             # Note: Issue with eodag extract. We need to clean the output directory to assure that the extracted files are in the correct location. This is a workaround for now.
             clean_directory(
-                "/home/eouser/eodag_downloads/msg_hrseviri", unzip=True, overwrite=True
+                _get_output_base_dir(), unzip=True, overwrite=True
             )
 
             for downloaded_folder in downloaded_folder_list:
@@ -345,10 +453,25 @@ def tutorial_taskflow_api_demo2(
 
     # [START transform]
     @task(multiple_outputs=True)
-    def transform(search_results_dict: dict, channels: list[str]):
+    def transform(search_results_dict: SearchResultsDict, channels: list[str]) -> TransformResultsDict:
         """
-        #### Transform task
-        Transformation Task based on Defair Python Library.
+        #### Transform task: Spatially filter, reproject, and zarr-encode MSG products
+
+        For each .nat file:
+        1. Crop to Europe (spatial_filter)
+        2. Reproject to EPSG:4326 at 0.05° resolution
+        3. Extract selected channels
+        4. Write cloud-optimized Zarr
+
+        Concatenates all Zarr files along the time dimension into a single dataset.
+
+        Args:
+            search_results_dict: From extract(); contains downloaded .nat file paths
+            channels: List of channel names to extract (normalized and deduplicated)
+
+        Returns:
+            TransformResultsDict: Contains concatenated_zarr_path, channel list,
+                                 and reprojection metadata
         """
         from dedl.eodag.eodag_helper import (
             change_extension,
@@ -605,24 +728,23 @@ def tutorial_taskflow_api_demo2(
 
             ds = Dataset(combined)
 
+            concatenated_zarr_path = _build_concatenated_zarr_path()
             ds.to_file(
-                "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
+                concatenated_zarr_path,
                 writer="zarrv2",
                 mode="w",
                 consolidated=True,
             )
 
             # print size of the concatenated dataset
-            concatenated_size = get_dir_size(
-                "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr"
-            )
+            concatenated_size = get_dir_size(concatenated_zarr_path)
             print(
                 f"Concatenated Zarr dataset size: {concatenated_size / 1024 / 1024:.2f} MB"
             )
 
             return {
                 "total_num_zarr_files": len(zarr_files),
-                "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
+                "concatenated_zarr_path": concatenated_zarr_path,
                 "channels": channels,
                 "reprojection_bounds": reprojection_bounds,
                 "reprojection_crs": reprojection_crs,
@@ -633,7 +755,7 @@ def tutorial_taskflow_api_demo2(
 
         return {
             "total_num_zarr_files": 0,
-            "concatenated_zarr_path": "/home/eouser/eodag_downloads/msg_hrseviri/concatenated.zarr",
+            "concatenated_zarr_path": _build_concatenated_zarr_path(),
             "channels": channels,
             "reprojection_bounds": reprojection_bounds,
             "reprojection_crs": reprojection_crs,
@@ -646,10 +768,21 @@ def tutorial_taskflow_api_demo2(
 
     # [START load]
     @task()
-    def load(transform_results_dict: dict, channels: list[str]):
+    def load(transform_results_dict: TransformResultsDict, channels: list[str]) -> LoadResultDict:
         """
-        #### Load task
-        This load task could be used to upload the zarr files to e.g. S3 storage.
+        #### Load task: Upload transformed Zarr dataset to S3
+
+        Uploads the concatenated Zarr directory to S3 under a channel-based prefix.
+        S3 credentials (endpoint, bucket, keys) come from environment variables.
+
+        Args:
+            transform_results_dict: From transform(); contains concatenated_zarr_path
+                                   and reprojection metadata
+            channels: List of channels for S3 key naming (normalized and deduplicated)
+
+        Returns:
+            LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
+                           plus reprojection metadata for downstream tasks
         """
         import os
 
@@ -690,11 +823,25 @@ def tutorial_taskflow_api_demo2(
     # [START visualise]
     @task()
     def visualise(
-        load_result_dict: dict, search_results_dict: dict, channels: list[str]
-    ):
+        load_result_dict: LoadResultDict, search_results_dict: SearchResultsDict, channels: list[str]
+    ) -> dict[str, Any]:
         """
-        #### Visualise task
-        Build an MP4 time-lapse from the selected channel in the uploaded S3-backed Zarr.
+        #### Visualise task: Render annotated MP4 time-lapse from Zarr channels
+
+        Reads the S3-backed Zarr dataset, renders an MP4 time-lapse for each channel with:
+        - 4 FPS, max 120 frames
+        - Inferno colormap
+        - Metadata overlay: collection ID, bbox, CRS, resolution, channel attributes
+
+        Uploads MP4 to S3 under 'visualization/{channel}/' prefix.
+
+        Args:
+            load_result_dict: From load(); contains S3 URI and reprojection metadata
+            search_results_dict: From extract(); contains collection_id and search bbox
+            channels: List of channels to visualize (normalized and deduplicated)
+
+        Returns:
+            dict: Contains source_s3_uri and videos list with per-channel video metadata
         """
         import os
 
@@ -735,7 +882,7 @@ def tutorial_taskflow_api_demo2(
             selected_channel = resolve_data_variable(
                 dataset, preferred_name=channel_name
             )
-            output_mp4_path = f"/home/eouser/eodag_downloads/msg_hrseviri/{channel_name}_timelapse.mp4"
+            output_mp4_path = _build_video_output_path(channel_name)
             annotation_metadata = _build_visualization_annotation_metadata(
                 search_results_dict,
                 load_result_dict,
@@ -782,10 +929,25 @@ def tutorial_taskflow_api_demo2(
     # [END visualise]
 
     # [START main_flow]
-    show_params()  # Example of a function call within a DAG context
-    search_results_dict = extract(search_limit=search_limit, search_start=search_start, search_end=search_end, dedl_collection_id=dedl_collection_id)
-    transform_results_dict = transform(search_results_dict, channels=channels)
-    load_result_dict = load(transform_results_dict, channels=channels)
+    show_params()  # Display DAG run configuration
+
+    # Extract: search & download MSG products
+    search_results_dict: SearchResultsDict = extract(
+        search_limit=search_limit,
+        search_start=search_start,
+        search_end=search_end,
+        dedl_collection_id=dedl_collection_id,
+    )
+
+    # Transform: crop, reproject, zarr-encode
+    transform_results_dict: TransformResultsDict = transform(
+        search_results_dict, channels=channels
+    )
+
+    # Load: upload Zarr to S3
+    load_result_dict: LoadResultDict = load(transform_results_dict, channels=channels)
+
+    # Visualise: render MP4 time-lapses
     visualise(load_result_dict, search_results_dict, channels=channels)
     # [END main_flow]
 
@@ -798,5 +960,5 @@ dag = tutorial_taskflow_api_demo2()
 if __name__ == "__main__":
 
     dag.test(
-        run_conf={"search_limit": 30, "channels": ["ch1", "ch9"], "search_start": "2026-05-17T12:00:00Z", "search_end": "2026-05-18T15:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
+        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-06-10T10:00:00Z", "search_end": "2026-06-10T15:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
     )
