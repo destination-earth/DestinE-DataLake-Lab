@@ -55,6 +55,20 @@ def test_channel_param_resolves_from_dag_run_conf(monkeypatch) -> None:
     assert demo2._normalize_channel(channel_param) == "ch1"
 
 
+def test_normalize_channel_rejects_path_separators() -> None:
+    for invalid in ["ch1/sub", "ch1\\sub"]:
+        try:
+            demo2._normalize_channel(invalid)
+        except ValueError as exc:
+            assert str(exc) == "channel must not contain path separators"
+        else:
+            raise AssertionError("Expected ValueError for channel with separator")
+
+
+def test_normalize_channel_strips_whitespace() -> None:
+    assert demo2._normalize_channel("  ch9  ") == "ch9"
+
+
 def test_channels_param_resolves_from_dag_run_conf(monkeypatch) -> None:
     monkeypatch.setattr(
         demo2,
@@ -81,6 +95,16 @@ def test_normalize_channels_rejects_string_input() -> None:
         assert str(exc) == "channels must be a list of strings"
     else:
         raise AssertionError("Expected TypeError for string channel input")
+
+
+def test_normalize_search_limit_rejects_non_positive_values() -> None:
+    for invalid in [0, -1]:
+        try:
+            demo2._normalize_search_limit(invalid)
+        except ValueError as exc:
+            assert str(exc) == "search_limit must be greater than 0"
+        else:
+            raise AssertionError("Expected ValueError for non-positive search_limit")
 
 
 def test_build_visualization_annotation_metadata_includes_expected_fields() -> None:
@@ -138,3 +162,21 @@ def test_build_visualization_annotation_metadata_defaults_grid_mapping() -> None
     )
 
     assert result["grid_mapping"] == "spatial_ref"
+
+
+def test_build_visualization_annotation_metadata_falls_back_to_search_bbox() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+    )
+
+    assert result["bbox"] == [-10.0, 35.0, 30.0, 65.0]
