@@ -114,6 +114,8 @@ def _build_visualization_annotation_metadata(
 def tutorial_taskflow_api_demo2(
     search_limit: int = 10,
     channels: list[str] = ["ch9"],
+    search_start: str = None,  # e.g., "2026-05-17",
+    search_end: str = None,  # e.g., "2026-05-18",
 ):
     """
     ### TaskFlow API Tutorial Documentation
@@ -126,17 +128,34 @@ def tutorial_taskflow_api_demo2(
     if isinstance(channels, list):
         _normalize_channels(channels)
 
+    # Define the bounding box for Europe
+    lat_min=34.0
+    lat_max=72.0
+    lon_min=-25.0
+    lon_max=45.0
+
+    # Define the reprojection parameters for France
+    # lat_min = 41.33
+    # lat_max = 51.09
+    # lon_min = -5.14
+    # lon_max = 9.56
+
     reprojection_crs = "EPSG:4326"
     reprojection_resampling = "bilinear"
     reprojection_resolution = 0.05
     reprojection_resolution_unit = "degrees"
-    reprojection_bounds = (-25.0, 34.0, 45.0, 72.0)
+    reprojection_bounds = (
+        lon_min,
+        lat_min,
+        lon_max,
+        lat_max,
+    )  # (minlon, minlat, maxlon, maxlat)
 
     # [END instantiate_dag]
 
     # [START extract]
     @task()
-    def extract(search_limit: int):
+    def extract(search_limit: int, search_start: str = None, search_end: str = None):
         """
         #### Extract task
         Here we demonstrate how to use the EODAG library to search for and download products from the DestinE Data Lake (DEDL) using the EODAG API. We also demonstrate how to retrieve credentials from an Airflow connection.
@@ -232,18 +251,25 @@ def tutorial_taskflow_api_demo2(
 
         search_params = get_collection_search_params(collection_info)
 
-        print("Search start date:", search_params["start"])
-        print("Search bbox:", search_params["bbox"])
+        print("Search start date from collection:", search_params["start"])
+        print("Search end date from collection:", search_params["end"])
+        print("Search bbox from collection:", search_params["bbox"])
 
-        is_custom_end_date = True  # Set to True if you want to use the end date from the collection metadata
-        if is_custom_end_date:
-            shift_by = 2  # Number of days to shift the start date to get the end date
-            search_params["end"] = shift_iso_date(search_params["start"], days=shift_by)
+        # By default, we will use the collection metadata start and end dates for the search. However, you can override them with user-specified values if provided.
+        shift_by = 2  # Number of days to shift the start date to get the end date
+        search_params["end"] = shift_iso_date(search_params["start"], days=shift_by)
+
+        # If the user has provided search_start and search_end parameters, we will use those instead of the collection metadata values.
+        if search_start is not None and search_end is not None:
+            search_params["start"] = search_start
+            search_params["end"] = search_end
             print(
-                f"Using custom end date start '{search_params['start']}' shift_by '{shift_by}' gives end {search_params['end']}"
+                f"Using user-specified search start '{search_start}' and end '{search_end}'"
             )
-
-        print("Search end date:", search_params["end"])
+        else:
+            print(
+                f"Using collection metadata search start '{search_params['start']}' and end '{search_params['end']}'"
+            )
 
         search_limit = _normalize_search_limit(search_limit)
 
@@ -281,23 +307,19 @@ def tutorial_taskflow_api_demo2(
 
             print(f"Downloading all {len(search_results)} products...")
             # Assure output directory is set. e.g. in env file: EODAG__DEDL__DOWNLOAD__OUTPUT_DIR=/home/eouser/eodag_downloads
-            dag.download_all(search_results, extract=True, delete_archive=False)
+            downloaded_folder_list = dag.download_all(search_results, extract=True, delete_archive=False)
             print(f"Downloaded all {len(search_results)} products.")
 
-            cleaned_files, extracted_folders = clean_directory(
+            # Note: Issue with eodag extract. We need to clean the output directory to assure that the extracted files are in the correct location. This is a workaround for now.
+            clean_directory(
                 "/home/eouser/eodag_downloads/msg_hrseviri", unzip=True, overwrite=True
             )
 
-            current_run_nat_files = [
-                path for path in cleaned_files if path.suffix.lower() == ".nat"
-            ]
-            if extracted_folders:
-                extracted_nat_files = get_files_with_extension(
-                    [str(path) for path in extracted_folders],
-                    "nat",
-                    recursive=True,
-                )
-                current_run_nat_files.extend(extracted_nat_files)
+            for downloaded_folder in downloaded_folder_list:
+                print(f"Downloaded product to: {downloaded_folder}")
+            
+            # Get the list of .nat files from the downloaded folders
+            current_run_nat_files = get_files_with_extension(downloaded_folder_list, ".nat")
 
             ordered_nat_files = filter_and_sort_nat_files(
                 [str(path) for path in current_run_nat_files]
@@ -448,10 +470,10 @@ def tutorial_taskflow_api_demo2(
 
             ds_europe = dataset.transform(
                 "spatial_filter",
-                lat_min=34.0,
-                lat_max=72.0,
-                lon_min=-25.0,
-                lon_max=45.0,
+                lat_min=lat_min,
+                lat_max=lat_max,
+                lon_min=lon_min,
+                lon_max=lon_max,
                 drop=True,  # drop pixels outside AOI (shrinks dims)
                 allow_partial=True,  # allow partial coverage without raising
             )
@@ -473,7 +495,7 @@ def tutorial_taskflow_api_demo2(
                 resampling=reprojection_resampling,  # or "nearest", "cubic"
                 resolution=reprojection_resolution,  # in degrees (see resolution_unit)
                 resolution_unit=reprojection_resolution_unit,
-                bounds=reprojection_bounds,  # (minlon, minlat, maxlon, maxlat)
+                bounds=reprojection_bounds,  # (lon_min, lat_min, lon_max, lat_max)
             )
 
             # -----------------------------------------------------
@@ -576,7 +598,9 @@ def tutorial_taskflow_api_demo2(
 
             zarr_files = sorted(
                 zarr_files,
-                key=lambda path: filename_timestamp_sort_key(Path(path).with_suffix(".nat")),
+                key=lambda path: filename_timestamp_sort_key(
+                    Path(path).with_suffix(".nat")
+                ),
             )
 
             xr_dsets = [xr.open_zarr(str(p), consolidated=True) for p in zarr_files]
@@ -656,17 +680,22 @@ def tutorial_taskflow_api_demo2(
 
         print(f"Uploaded to: {upload_result['s3_uri']}")
         upload_result["channels"] = channels
-        upload_result["reprojection_bounds"] = transform_results_dict["reprojection_bounds"]
+        upload_result["reprojection_bounds"] = transform_results_dict[
+            "reprojection_bounds"
+        ]
         upload_result["reprojection_crs"] = transform_results_dict["reprojection_crs"]
         upload_result["resampling"] = transform_results_dict["resampling"]
         upload_result["resolution"] = transform_results_dict["resolution"]
         upload_result["resolution_unit"] = transform_results_dict["resolution_unit"]
         return upload_result
+
     # [END load]
 
     # [START visualise]
     @task()
-    def visualise(load_result_dict: dict, search_results_dict: dict, channels: list[str]):
+    def visualise(
+        load_result_dict: dict, search_results_dict: dict, channels: list[str]
+    ):
         """
         #### Visualise task
         Build an MP4 time-lapse from the selected channel in the uploaded S3-backed Zarr.
@@ -707,10 +736,10 @@ def tutorial_taskflow_api_demo2(
 
         videos: list[dict[str, Any]] = []
         for channel_name in channels:
-            selected_channel = resolve_data_variable(dataset, preferred_name=channel_name)
-            output_mp4_path = (
-                f"/home/eouser/eodag_downloads/msg_hrseviri/{channel_name}_timelapse.mp4"
+            selected_channel = resolve_data_variable(
+                dataset, preferred_name=channel_name
             )
+            output_mp4_path = f"/home/eouser/eodag_downloads/msg_hrseviri/{channel_name}_timelapse.mp4"
             annotation_metadata = _build_visualization_annotation_metadata(
                 search_results_dict,
                 load_result_dict,
@@ -753,13 +782,12 @@ def tutorial_taskflow_api_demo2(
             "source_s3_uri": source_s3_uri,
             "videos": videos,
         }
+
     # [END visualise]
-
-
 
     # [START main_flow]
     show_params()  # Example of a function call within a DAG context
-    search_results_dict = extract(search_limit=search_limit)
+    search_results_dict = extract(search_limit=search_limit, search_start=search_start, search_end=search_end)
     transform_results_dict = transform(search_results_dict, channels=channels)
     load_result_dict = load(transform_results_dict, channels=channels)
     visualise(load_result_dict, search_results_dict, channels=channels)
@@ -773,4 +801,6 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
-    dag.test(run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch9"]})
+    dag.test(
+        run_conf={"search_limit": 20, "channels": ["ch1", "ch9"], "search_start": "2026-05-17T15:00:00Z", "search_end": "2026-05-18T15:00:00Z"},
+    )
