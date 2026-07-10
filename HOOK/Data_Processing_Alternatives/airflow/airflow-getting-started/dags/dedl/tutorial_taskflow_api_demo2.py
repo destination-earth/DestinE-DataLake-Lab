@@ -116,6 +116,7 @@ def tutorial_taskflow_api_demo2(
     channels: list[str] = ["ch9"],
     search_start: str = None,  # e.g., "2026-05-17",
     search_end: str = None,  # e.g., "2026-05-18",
+    dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI"
 ):
     """
     ### TaskFlow API Tutorial Documentation
@@ -155,7 +156,7 @@ def tutorial_taskflow_api_demo2(
 
     # [START extract]
     @task()
-    def extract(search_limit: int, search_start: str = None, search_end: str = None):
+    def extract(search_limit: int, search_start: str = None, search_end: str = None, dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI") -> dict:
         """
         #### Extract task
         Here we demonstrate how to use the EODAG library to search for and download products from the DestinE Data Lake (DEDL) using the EODAG API. We also demonstrate how to retrieve credentials from an Airflow connection.
@@ -213,8 +214,7 @@ def tutorial_taskflow_api_demo2(
         # ----------------------------------------------------
 
         # See https://data.destination-earth.eu/data-portfolio/EO.EUM.DAT.MSG.HRSEVIRI
-        dedl_collection_id = "EO.EUM.DAT.MSG.HRSEVIRI"
-
+        # dedl_collection_id = "EO.EUM.DAT.MSG.HRSEVIRI" by default
         eodag_collection_id = find_eodag_collection_id_by_dedl_id(
             dedl_collection_id,
             dag=dag,
@@ -326,7 +326,7 @@ def tutorial_taskflow_api_demo2(
             )
 
             return {
-                "search_results": len(search_results),
+                "num_search_results": len(search_results),
                 "downloaded_nat_files": [str(path) for path in ordered_nat_files],
                 "collection_id": dedl_collection_id,
                 "bbox": search_params["bbox"],
@@ -338,7 +338,7 @@ def tutorial_taskflow_api_demo2(
             )
 
         return {
-            "search_results": 0,
+            "num_search_results": 0,
             "downloaded_nat_files": [],
             "collection_id": dedl_collection_id,
             "bbox": search_params["bbox"],
@@ -787,7 +787,7 @@ def tutorial_taskflow_api_demo2(
 
     # [START main_flow]
     show_params()  # Example of a function call within a DAG context
-    search_results_dict = extract(search_limit=search_limit, search_start=search_start, search_end=search_end)
+    search_results_dict = extract(search_limit=search_limit, search_start=search_start, search_end=search_end, dedl_collection_id=dedl_collection_id)
     transform_results_dict = transform(search_results_dict, channels=channels)
     load_result_dict = load(transform_results_dict, channels=channels)
     visualise(load_result_dict, search_results_dict, channels=channels)
@@ -802,5 +802,5 @@ dag = tutorial_taskflow_api_demo2()
 if __name__ == "__main__":
 
     dag.test(
-        run_conf={"search_limit": 20, "channels": ["ch1", "ch9"], "search_start": "2026-05-17T15:00:00Z", "search_end": "2026-05-18T15:00:00Z"},
+        run_conf={"search_limit": 30, "channels": ["ch1", "ch9"], "search_start": "2026-05-17T12:00:00Z", "search_end": "2026-05-18T15:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
     )
