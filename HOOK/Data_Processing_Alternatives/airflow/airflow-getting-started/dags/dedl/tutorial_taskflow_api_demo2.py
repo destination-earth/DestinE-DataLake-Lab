@@ -60,6 +60,7 @@ class TransformOneResultDict(TypedDict):
     zarr_path: str
     nat_file: str
     duration_seconds: float
+    source_channel_attrs: dict[str, dict[str, Any]]
 
 
 class TransformResultsDict(TypedDict):
@@ -72,6 +73,7 @@ class TransformResultsDict(TypedDict):
     resampling: str
     resolution: float
     resolution_unit: str
+    source_channel_attrs: dict[str, dict[str, Any]]
 
 
 class VisualiseOneResultDict(TypedDict):
@@ -95,6 +97,7 @@ class LoadResultDict(TypedDict):
     resampling: str
     resolution: float
     resolution_unit: str
+    source_channel_attrs: dict[str, dict[str, Any]]
 
 
 def _resolve_runtime_param(value: Any) -> Any:
@@ -207,6 +210,7 @@ def _build_visualization_annotation_metadata(
     transform_results_dict: dict[str, Any],
     channel_name: str,
     channel_attrs: dict[str, Any] | None = None,
+    source_channel_attrs: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Build metadata dictionary for annotating a visualization (MP4 time-lapse).
@@ -219,12 +223,20 @@ def _build_visualization_annotation_metadata(
         search_results_dict: From extract(); provides collection_id and search bbox
         transform_results_dict: From transform(); provides reprojection metadata
         channel_name: Channel identifier to annotate (e.g., 'ch9')
-        channel_attrs: Optional per-channel xarray attributes (start_time, long_name, grid_mapping)
+        channel_attrs: Optional per-channel xarray attributes read back *after*
+            reprojection (start_time, long_name, grid_mapping). Reprojection
+            rebinds grid_mapping to 'spatial_ref', so this is only used for
+            start_time/long_name once source_channel_attrs is available.
+        source_channel_attrs: Optional attributes captured from the *original*
+            pre-reprojection dataset (grid_mapping, platform_name) in
+            transform_one — takes precedence over channel_attrs for
+            grid_mapping since reprojection overwrites it, and is the only
+            source of platform_name.
 
     Returns:
         dict: Annotation metadata with keys: collection_id, bbox (reprojection or search),
               channel_name, reprojection_crs, resampling, resolution, resolution_unit,
-              and optionally channel_attrs fields (start_time, long_name, grid_mapping)
+              and optionally start_time, long_name, grid_mapping, platform_name
     """
     annotation_metadata = {
         "collection_id": search_results_dict["collection_id"],
@@ -243,6 +255,12 @@ def _build_visualization_annotation_metadata(
         for key in ["start_time", "long_name", "grid_mapping"]:
             if key in channel_attrs:
                 annotation_metadata[key] = channel_attrs[key]
+
+    if source_channel_attrs is not None:
+        if source_channel_attrs.get("grid_mapping"):
+            annotation_metadata["grid_mapping"] = source_channel_attrs["grid_mapping"]
+        if source_channel_attrs.get("platform_name"):
+            annotation_metadata["platform_name"] = source_channel_attrs["platform_name"]
 
     annotation_metadata.setdefault("grid_mapping", "spatial_ref")
 
@@ -718,6 +736,13 @@ def tutorial_taskflow_api_demo2(
                 f"Available channels: {available_channels}"
             )
 
+        # Capture grid_mapping (per-channel) and platform_name (dataset-global)
+        # from this *original* pre-reprojection dataset: reproject() below
+        # rebinds every channel's grid_mapping attr to "spatial_ref", so the
+        # source value ("geostationary" for MSG/SEVIRI) is only readable here.
+        source_platform_name = dataset.data.attrs.get("platform_name")
+        source_channel_attrs: dict[str, dict[str, Any]] = {}
+
         # Inspect each selected channel
         for channel_name in channels:
             selected_channel = dataset.data[channel_name]
@@ -728,6 +753,11 @@ def tutorial_taskflow_api_demo2(
             print("\nAttributes:")
             for key, value in selected_channel.attrs.items():
                 print(f"  {key}: {value}")
+
+            source_channel_attrs[channel_name] = {
+                "grid_mapping": selected_channel.attrs.get("grid_mapping"),
+                "platform_name": source_platform_name,
+            }
 
         # -----------------------------------------------------
         # Step 5 : Check CF 1.8 Compliance
@@ -886,6 +916,7 @@ def tutorial_taskflow_api_demo2(
             "zarr_path": str(zarr_file),
             "nat_file": nat_file,
             "duration_seconds": time.perf_counter() - transform_start,
+            "source_channel_attrs": source_channel_attrs,
         }
 
     @task(multiple_outputs=True)
@@ -924,6 +955,13 @@ def tutorial_taskflow_api_demo2(
 
         zarr_files = [result["zarr_path"] for result in transform_results]
 
+        # Representative per-channel source attrs (grid_mapping, platform_name)
+        # captured pre-reprojection in transform_one: assumed constant across
+        # all .nat files in a single run, same as reprojection_crs/etc. above.
+        source_channel_attrs = (
+            transform_results[0]["source_channel_attrs"] if transform_results else {}
+        )
+
         if zarr_files:
             xr_dsets = [xr.open_zarr(str(p), consolidated=True) for p in zarr_files]
 
@@ -954,6 +992,7 @@ def tutorial_taskflow_api_demo2(
                 "resampling": reprojection_resampling,
                 "resolution": reprojection_resolution,
                 "resolution_unit": reprojection_resolution_unit,
+                "source_channel_attrs": source_channel_attrs,
             }
 
         return {
@@ -965,6 +1004,7 @@ def tutorial_taskflow_api_demo2(
             "resampling": reprojection_resampling,
             "resolution": reprojection_resolution,
             "resolution_unit": reprojection_resolution_unit,
+            "source_channel_attrs": source_channel_attrs,
         }
 
     # [END transform]
@@ -1018,6 +1058,9 @@ def tutorial_taskflow_api_demo2(
         upload_result["resampling"] = transform_results_dict["resampling"]
         upload_result["resolution"] = transform_results_dict["resolution"]
         upload_result["resolution_unit"] = transform_results_dict["resolution_unit"]
+        upload_result["source_channel_attrs"] = transform_results_dict[
+            "source_channel_attrs"
+        ]
         return upload_result
 
     # [END load]
@@ -1089,6 +1132,9 @@ def tutorial_taskflow_api_demo2(
             load_result_dict,
             channel_name,
             channel_attrs=dict(selected_channel.attrs),
+            source_channel_attrs=load_result_dict.get("source_channel_attrs", {}).get(
+                channel_name
+            ),
         )
 
         video_result = create_mp4_from_dataarray(

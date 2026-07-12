@@ -183,6 +183,35 @@ def test_build_annotation_lines_includes_time_collection_channel_and_bbox() -> N
     ]
 
 
+def test_build_annotation_lines_includes_platform_name_when_present() -> None:
+    result = _build_annotation_lines(
+        time_value=np.datetime64("2024-07-09T12:34:56"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+            "grid_mapping": "geostationary",
+            "platform_name": "MSG3",
+        },
+    )
+
+    assert result == [
+        "time: 09/07/2024 12:34:56",
+        "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "channel: ch9",
+        "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
+        "target: EPSG:4326",
+        "resampling: bilinear",
+        "resolution: 0.05 degrees",
+        "grid_mapping: geostationary",
+        "platform_name: MSG3",
+    ]
+
+
 def test_build_annotation_lines_skips_missing_optional_channel_metadata() -> None:
     result = _build_annotation_lines(
         time_value=np.datetime64("2024-07-09T12:34:56"),

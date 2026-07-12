@@ -88,6 +88,8 @@ def _build_annotation_lines(*, time_value: Any, annotation_metadata: dict[str, A
 
     if "grid_mapping" in annotation_metadata:
         lines.append(f"grid_mapping: {annotation_metadata['grid_mapping']}")
+    if "platform_name" in annotation_metadata:
+        lines.append(f"platform_name: {annotation_metadata['platform_name']}")
     if "long_name" in annotation_metadata:
         lines.append(f"long_name: {annotation_metadata['long_name']}")
 
