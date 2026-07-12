@@ -100,9 +100,28 @@ class LoadResultDict(TypedDict):
     source_channel_attrs: dict[str, dict[str, Any]]
 
 
+class ReprojectionSettingsDict(TypedDict):
+    """Data contract: normalize_reprojection_settings task output"""
+    bounds: tuple[float, float, float, float]
+    crs: str
+    resampling: str
+    resolution: float
+    resolution_unit: str
+
+
 def _resolve_runtime_param(value: Any) -> Any:
     if isinstance(value, DagParam):
         return value.resolve(get_current_context())
+    return value
+
+
+def _require_env(name: str) -> str:
+    """Read a required environment variable, raising a clear error if unset/empty."""
+    import os
+
+    value = os.environ.get(name, "").strip()
+    if not value:
+        raise ValueError(f"{name} environment variable not set.")
     return value
 
 
@@ -336,15 +355,87 @@ def _build_visualization_annotation_metadata(
             title="DEDL Collection ID",
             description="Collection ID to search in the DestinE Data Lake (DEDL)",
         ),
+        "download_max_workers": Param(
+            4,
+            type="integer",
+            minimum=1,
+            title="Download Concurrency",
+            description="Number of products to download in parallel from DEDL",
+        ),
+        "verbose_tutorial_logging": Param(
+            True,
+            type="boolean",
+            title="Verbose Tutorial Logging",
+            description="Print extra demonstration output (collection listing, id-mapping "
+            "examples, full collection metadata) in the extract task. Disable for quieter logs.",
+        ),
+        "reprojection_lat_min": Param(
+            34.0,
+            type="number",
+            title="Reprojection AOI: Min Latitude",
+            description="Southern bound of the crop/reprojection area of interest",
+        ),
+        "reprojection_lat_max": Param(
+            72.0,
+            type="number",
+            title="Reprojection AOI: Max Latitude",
+            description="Northern bound of the crop/reprojection area of interest",
+        ),
+        "reprojection_lon_min": Param(
+            -25.0,
+            type="number",
+            title="Reprojection AOI: Min Longitude",
+            description="Western bound of the crop/reprojection area of interest",
+        ),
+        "reprojection_lon_max": Param(
+            45.0,
+            type="number",
+            title="Reprojection AOI: Max Longitude",
+            description="Eastern bound of the crop/reprojection area of interest",
+        ),
+        "reprojection_crs": Param(
+            "EPSG:4326",
+            type="string",
+            title="Reprojection CRS",
+            description="Target coordinate reference system for reprojection",
+        ),
+        "reprojection_resampling": Param(
+            "bilinear",
+            type="string",
+            title="Reprojection Resampling",
+            description="Resampling method used when reprojecting (e.g. bilinear, nearest, cubic)",
+        ),
+        "reprojection_resolution": Param(
+            0.05,
+            type="number",
+            title="Reprojection Resolution",
+            description="Target grid resolution in reprojection_resolution_unit",
+        ),
+        "reprojection_resolution_unit": Param(
+            "degrees",
+            type="string",
+            title="Reprojection Resolution Unit",
+            description="Unit of reprojection_resolution (e.g. degrees)",
+        ),
     },
 
 )
 def tutorial_taskflow_api_demo2(
     search_limit: int = 5,
     channels: list[str] = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"],
-    search_start: str = "2026-07-12T12:00:00Z",  # e.g., "2026-05-17T00:00:00Z",
-    search_end: str = "2026-07-12T17:00:00Z",  # e.g., "2026-05-18T00:00:00Z",
-    dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI"
+    search_start: str = None, # "2026-07-12T12:00:00Z",
+    search_end: str = None, # "2026-07-12T17:00:00Z",
+    dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
+    download_max_workers: int = 4,
+    verbose_tutorial_logging: bool = True,
+    reprojection_lat_min: float = 34.0,
+    reprojection_lat_max: float = 72.0,
+    reprojection_lon_min: float = -25.0,
+    reprojection_lon_max: float = 45.0,
+    reprojection_crs: str = "EPSG:4326",
+    reprojection_resampling: str = "bilinear",
+    reprojection_resolution: float = 0.05,
+    reprojection_resolution_unit: str = "degrees",
 ):
     """
     ### TaskFlow API Tutorial Documentation
@@ -354,29 +445,6 @@ def tutorial_taskflow_api_demo2(
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
-    # Define the bounding box for Europe
-    lat_min=34.0
-    lat_max=72.0
-    lon_min=-25.0
-    lon_max=45.0
-
-    # Define the reprojection parameters for France
-    # lat_min = 41.33
-    # lat_max = 51.09
-    # lon_min = -5.14
-    # lon_max = 9.56
-
-    reprojection_crs = "EPSG:4326"
-    reprojection_resampling = "bilinear"
-    reprojection_resolution = 0.05
-    reprojection_resolution_unit = "degrees"
-    reprojection_bounds = (
-        lon_min,
-        lat_min,
-        lon_max,
-        lat_max,
-    )  # (minlon, minlat, maxlon, maxlat)
-
     # [END instantiate_dag]
 
     # [START normalize_inputs]
@@ -403,11 +471,46 @@ def tutorial_taskflow_api_demo2(
         """
         return _normalize_channels(channels)
 
+    @task()
+    def normalize_reprojection_settings(
+        lat_min: float,
+        lat_max: float,
+        lon_min: float,
+        lon_max: float,
+        crs: str,
+        resampling: str,
+        resolution: float,
+        resolution_unit: str,
+    ) -> ReprojectionSettingsDict:
+        """
+        #### Normalize task: resolve reprojection AOI/grid settings once
+
+        DAG params are DagParam-typed at parse time. Bundling them into a
+        plain dict here — rather than referencing them as closures inside
+        transform_one/concatenate_zarr_files, which run in a different task's
+        process — is what lets Airflow resolve each one to its concrete
+        runtime value before those tasks execute.
+        """
+        return {
+            "bounds": (float(lon_min), float(lat_min), float(lon_max), float(lat_max)),
+            "crs": str(crs),
+            "resampling": str(resampling),
+            "resolution": float(resolution),
+            "resolution_unit": str(resolution_unit),
+        }
+
     # [END normalize_inputs]
 
     # [START extract]
     @task()
-    def extract(search_limit: int, search_start: str = None, search_end: str = None, dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI") -> SearchResultsDict:
+    def extract(
+        search_limit: int,
+        search_start: str = None,
+        search_end: str = None,
+        dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
+        download_max_workers: int = 4,
+        verbose_tutorial_logging: bool = True,
+    ) -> SearchResultsDict:
         """
         #### Extract task: Search and download MSG/SEVIRI products
 
@@ -454,23 +557,20 @@ def tutorial_taskflow_api_demo2(
 
         # Initialize EODAG with DestinE provider
         dag = EODataAccessGateway()
-        print(dag.available_providers())
+        if verbose_tutorial_logging:
+            print(dag.available_providers())
 
         dedl_provider = "dedl"
         dag.set_preferred_provider(dedl_provider)
 
         print("EODAG configured for DestinE!")
 
-        # ----------------------------------------------------
-        # Show eodag collections for the provier "dedl"
-        # ----------------------------------------------------
-
-        collections = dag.list_collections(provider=dedl_provider)
-        print(collections)
-
-        # ----------------------------------------------------
-        # Demonstrate getting normalized EODAG collection id from DEDL collection id
-        # ----------------------------------------------------
+        if verbose_tutorial_logging:
+            # ----------------------------------------------------
+            # Show eodag collections for the provier "dedl"
+            # ----------------------------------------------------
+            collections = dag.list_collections(provider=dedl_provider)
+            print(collections)
 
         # See https://data.destination-earth.eu/data-portfolio/EO.EUM.DAT.MSG.HRSEVIRI
         # dedl_collection_id = "EO.EUM.DAT.MSG.HRSEVIRI" by default
@@ -483,40 +583,29 @@ def tutorial_taskflow_api_demo2(
             f"Normalized EODAG collection id for DEDL collection id '{dedl_collection_id}': {eodag_collection_id}"
         )
 
-        # ----------------------------------------------------
-        # Demonstrate getting DEDL collection id from normalized EODAG collection id
-        # ----------------------------------------------------
-
-        retrieved_dedl_collection_id = find_dedl_collection_by_eodag_id(
-            eodag_collection_id, dag=dag
-        )
-
-        print(
-            f"DEDL collection id(s) for normalized EODAG collection id '{eodag_collection_id}': {retrieved_dedl_collection_id}"
-        )
-
-        # ----------------------------------------------------
-        # Demonstrate getting information about the eodag collection id
-        # ----------------------------------------------------
+        if verbose_tutorial_logging:
+            # ----------------------------------------------------
+            # Demonstrate getting DEDL collection id from normalized EODAG collection id
+            # (reverse of the mapping above; not needed for the search below)
+            # ----------------------------------------------------
+            retrieved_dedl_collection_id = find_dedl_collection_by_eodag_id(
+                eodag_collection_id, dag=dag
+            )
+            print(
+                f"DEDL collection id(s) for normalized EODAG collection id '{eodag_collection_id}': {retrieved_dedl_collection_id}"
+            )
 
         collection_info = get_eodag_collection_info(eodag_collection_id, dag=dag)
 
-        print("Collection metadata:")
-        print(json.dumps(collection_info, indent=2, default=str))
-
-        # ----------------------------------------------------
-        # Demonstrate searching for products using EODAG collection id and DEDL provider
-        # ----------------------------------------------------
+        if verbose_tutorial_logging:
+            print("Collection metadata:")
+            print(json.dumps(collection_info, indent=2, default=str))
 
         search_params = get_collection_search_params(collection_info)
 
         print("Search start date from collection:", search_params["start"])
         print("Search end date from collection:", search_params["end"])
         print("Search bbox from collection:", search_params["bbox"])
-
-        # By default, we will use the collection metadata start and end dates for the search. However, you can override them with user-specified values if provided.
-        shift_by = 2  # Number of days to shift the start date to get the end date
-        search_params["end"] = shift_iso_date(search_params["start"], days=shift_by)
 
         # If the user has provided search_start and search_end parameters, we will use those instead of the collection metadata values.
         if search_start is not None and search_end is not None:
@@ -526,8 +615,15 @@ def tutorial_taskflow_api_demo2(
                 f"Using user-specified search start '{search_start}' and end '{search_end}'"
             )
         else:
+            # Default window: a short shift_by-day span from the collection's
+            # start date, not the collection's full metadata-reported extent —
+            # for an ongoing collection like HRSEVIRI the metadata end date can
+            # be "today", which would make the default search span years.
+            shift_by = 2  # Number of days to shift the start date to get the end date
+            search_params["end"] = shift_iso_date(search_params["start"], days=shift_by)
             print(
-                f"Using collection metadata search start '{search_params['start']}' and end '{search_params['end']}'"
+                f"Using collection metadata search start '{search_params['start']}' "
+                f"and a {shift_by}-day default window ending '{search_params['end']}'"
             )
 
         search_kwargs = {
@@ -599,7 +695,7 @@ def tutorial_taskflow_api_demo2(
                     }
 
             download_records: list[DownloadRecordDict] = []
-            with ThreadPoolExecutor(max_workers=4) as executor:
+            with ThreadPoolExecutor(max_workers=max(1, int(download_max_workers))) as executor:
                 futures = [
                     executor.submit(_download_one, product) for product in search_results
                 ]
@@ -690,20 +786,24 @@ def tutorial_taskflow_api_demo2(
 
     # [START transform]
     @task()
-    def transform_one(nat_file: str, channels: list[str]) -> TransformOneResultDict:
+    def transform_one(
+        nat_file: str, channels: list[str], reprojection: ReprojectionSettingsDict
+    ) -> TransformOneResultDict:
         """
         #### Transform task (mapped): spatially filter, reproject, and zarr-encode one .nat file
 
         Runs once per downloaded .nat file via dynamic task mapping (see main_flow),
         so files are processed in parallel instead of one after another:
-        1. Crop to Europe (spatial_filter)
-        2. Reproject to EPSG:4326 at 0.05° resolution
+        1. Crop to the reprojection AOI (spatial_filter)
+        2. Reproject to the configured CRS/resolution
         3. Extract selected channels
         4. Write cloud-optimized Zarr
 
         Args:
             nat_file: Path to a single downloaded .nat file
             channels: List of channel names to extract (already normalized upstream)
+            reprojection: AOI bounds + CRS/resampling/resolution settings
+                (already normalized upstream, see normalize_reprojection_settings)
 
         Returns:
             TransformOneResultDict: Path to the per-file Zarr output
@@ -814,6 +914,7 @@ def tutorial_taskflow_api_demo2(
 
         # Crop to Europe using the spatial_filter transformation
 
+        lon_min, lat_min, lon_max, lat_max = reprojection["bounds"]
         ds_europe = dataset.transform(
             "spatial_filter",
             lat_min=lat_min,
@@ -837,11 +938,11 @@ def tutorial_taskflow_api_demo2(
 
         # Reproject + resample to a regular EPSG:4326 grid covering Europe : (reproject the cropped dataset to avoid reprojecting the full original)
         ds_europe_reproj = ds_europe.reproject(
-            reprojection_crs,
-            resampling=reprojection_resampling,  # or "nearest", "cubic"
-            resolution=reprojection_resolution,  # in degrees (see resolution_unit)
-            resolution_unit=reprojection_resolution_unit,
-            bounds=reprojection_bounds,  # (lon_min, lat_min, lon_max, lat_max)
+            reprojection["crs"],
+            resampling=reprojection["resampling"],  # or "nearest", "cubic"
+            resolution=reprojection["resolution"],  # in degrees (see resolution_unit)
+            resolution_unit=reprojection["resolution_unit"],
+            bounds=reprojection["bounds"],  # (lon_min, lat_min, lon_max, lat_max)
         )
 
         # -----------------------------------------------------
@@ -942,7 +1043,9 @@ def tutorial_taskflow_api_demo2(
 
     @task(multiple_outputs=True)
     def concatenate_zarr_files(
-        transform_results: list[TransformOneResultDict], channels: list[str]
+        transform_results: list[TransformOneResultDict],
+        channels: list[str],
+        reprojection: ReprojectionSettingsDict,
     ) -> TransformResultsDict:
         """
         #### Concatenate task: merge per-file Zarr outputs into one time-indexed Zarr
@@ -957,6 +1060,8 @@ def tutorial_taskflow_api_demo2(
         Args:
             transform_results: Outputs of the mapped transform_one task instances
             channels: List of channel names extracted (already normalized upstream)
+            reprojection: AOI bounds + CRS/resampling/resolution settings
+                (already normalized upstream, see normalize_reprojection_settings)
 
         Returns:
             TransformResultsDict: Contains concatenated_zarr_path, channel list,
@@ -1008,11 +1113,11 @@ def tutorial_taskflow_api_demo2(
                 "total_num_zarr_files": len(zarr_files),
                 "concatenated_zarr_path": concatenated_zarr_path,
                 "channels": channels,
-                "reprojection_bounds": reprojection_bounds,
-                "reprojection_crs": reprojection_crs,
-                "resampling": reprojection_resampling,
-                "resolution": reprojection_resolution,
-                "resolution_unit": reprojection_resolution_unit,
+                "reprojection_bounds": reprojection["bounds"],
+                "reprojection_crs": reprojection["crs"],
+                "resampling": reprojection["resampling"],
+                "resolution": reprojection["resolution"],
+                "resolution_unit": reprojection["resolution_unit"],
                 "source_channel_attrs": source_channel_attrs,
             }
 
@@ -1020,11 +1125,11 @@ def tutorial_taskflow_api_demo2(
             "total_num_zarr_files": 0,
             "concatenated_zarr_path": _build_concatenated_zarr_path(),
             "channels": channels,
-            "reprojection_bounds": reprojection_bounds,
-            "reprojection_crs": reprojection_crs,
-            "resampling": reprojection_resampling,
-            "resolution": reprojection_resolution,
-            "resolution_unit": reprojection_resolution_unit,
+            "reprojection_bounds": reprojection["bounds"],
+            "reprojection_crs": reprojection["crs"],
+            "resampling": reprojection["resampling"],
+            "resolution": reprojection["resolution"],
+            "resolution_unit": reprojection["resolution_unit"],
             "source_channel_attrs": source_channel_attrs,
         }
 
@@ -1048,15 +1153,13 @@ def tutorial_taskflow_api_demo2(
             LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
                            plus reprojection metadata for downstream tasks
         """
-        import os
-
         from dedl.s3.s3_helper import upload_directory_to_s3
 
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
-        endpoint_url = os.environ["S3_ENDPOINT_URL"]
-        bucket_name = os.environ["MY_S3_BUCKET_NAME"]
-        access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
-        secret_access_key = os.environ["MY_S3_SECRET_ACCESS_KEY"]
+        endpoint_url = _require_env("S3_ENDPOINT_URL")
+        bucket_name = _require_env("MY_S3_BUCKET_NAME")
+        access_key_id = _require_env("MY_S3_ACCESS_KEY_ID")
+        secret_access_key = _require_env("MY_S3_SECRET_ACCESS_KEY")
 
         print(f"Uploading Zarr directory to S3: {concatenated_zarr_path}")
 
@@ -1114,7 +1217,6 @@ def tutorial_taskflow_api_demo2(
         Returns:
             VisualiseOneResultDict: Per-channel video metadata
         """
-        import os
         import time
 
         from dedl.s3.s3_helper import upload_file_to_s3
@@ -1126,10 +1228,10 @@ def tutorial_taskflow_api_demo2(
 
         visualise_start = time.perf_counter()
 
-        endpoint_url = os.environ["S3_ENDPOINT_URL"]
-        bucket_name = os.environ["MY_S3_BUCKET_NAME"]
-        access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
-        secret_access_key = os.environ["MY_S3_SECRET_ACCESS_KEY"]
+        endpoint_url = _require_env("S3_ENDPOINT_URL")
+        bucket_name = _require_env("MY_S3_BUCKET_NAME")
+        access_key_id = _require_env("MY_S3_ACCESS_KEY_ID")
+        secret_access_key = _require_env("MY_S3_SECRET_ACCESS_KEY")
 
         source_prefix = load_result_dict["destination_prefix"]
 
@@ -1194,9 +1296,20 @@ def tutorial_taskflow_api_demo2(
     # [START main_flow]
     show_params()  # Display DAG run configuration
 
-    # Normalize: validate/coerce search_limit and channels once, upfront
+    # Normalize: validate/coerce search_limit, channels, and reprojection
+    # settings once, upfront
     normalized_search_limit: int = normalize_search_limit(search_limit)
     normalized_channels: list[str] = normalize_channels(channels)
+    normalized_reprojection: ReprojectionSettingsDict = normalize_reprojection_settings(
+        lat_min=reprojection_lat_min,
+        lat_max=reprojection_lat_max,
+        lon_min=reprojection_lon_min,
+        lon_max=reprojection_lon_max,
+        crs=reprojection_crs,
+        resampling=reprojection_resampling,
+        resolution=reprojection_resolution,
+        resolution_unit=reprojection_resolution_unit,
+    )
 
     # Extract: search & download MSG products
     search_results_dict: SearchResultsDict = extract(
@@ -1204,18 +1317,20 @@ def tutorial_taskflow_api_demo2(
         search_start=search_start,
         search_end=search_end,
         dedl_collection_id=dedl_collection_id,
+        download_max_workers=download_max_workers,
+        verbose_tutorial_logging=verbose_tutorial_logging,
     )
 
     downloaded_nat_files: list[str] = get_downloaded_nat_files(search_results_dict)
 
     # Transform: crop, reproject, zarr-encode — one mapped task instance per
     # downloaded .nat file, processed in parallel, then concatenated
-    transform_results = transform_one.partial(channels=normalized_channels).expand(
-        nat_file=downloaded_nat_files
-    )
+    transform_results = transform_one.partial(
+        channels=normalized_channels, reprojection=normalized_reprojection
+    ).expand(nat_file=downloaded_nat_files)
 
     transform_results_dict: TransformResultsDict = concatenate_zarr_files(
-        transform_results, channels=normalized_channels
+        transform_results, channels=normalized_channels, reprojection=normalized_reprojection
     )
 
     # Load: upload Zarr to S3
@@ -1241,11 +1356,7 @@ def tutorial_taskflow_api_demo2(
             "search_start": search_start,
             "search_end": search_end,
             "dedl_collection_id": dedl_collection_id,
-            "reprojection_crs": reprojection_crs,
-            "resampling": reprojection_resampling,
-            "resolution": reprojection_resolution,
-            "resolution_unit": reprojection_resolution_unit,
-            "reprojection_bounds": reprojection_bounds,
+            "reprojection": normalized_reprojection,
         },
         search_results_dict=search_results_dict,
         transform_results=transform_results,

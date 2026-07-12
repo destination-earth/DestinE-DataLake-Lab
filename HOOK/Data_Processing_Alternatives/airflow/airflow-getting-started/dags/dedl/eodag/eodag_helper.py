@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from collections.abc import Mapping
+from pathlib import Path
 import re
-from typing import Any
+import zipfile
+from typing import Any, List, Union
 
 from eodag import EODataAccessGateway
 
@@ -421,12 +423,6 @@ def get_collection_search_params(collection_info: dict[str, Any]) -> dict[str, A
     }
 
 
-from pathlib import Path
-import zipfile
-from pathlib import Path
-import zipfile
-
-
 def clean_directory(dir_path: str) -> list[Path]:
     """
     Renames malformed EODAG file names (stray '", attachment' / quotes left
@@ -485,10 +481,6 @@ def extract_zip_files(paths: list[Path], overwrite: bool = True) -> list[Path]:
         extracted_folders.append(extract_dir)
 
     return extracted_folders
-
-
-from pathlib import Path
-from typing import List
 
 
 def get_files_with_extension(
@@ -567,9 +559,6 @@ def filter_and_sort_nat_files(file_paths: list[str | Path]) -> list[Path]:
     nat_files = [Path(file_path) for file_path in file_paths if Path(file_path).suffix.lower() == ".nat"]
     return sorted(nat_files, key=filename_timestamp_sort_key)
 
-
-from pathlib import Path
-from typing import Union
 
 def change_extension(file_path: Union[str, Path], new_extension: str) -> Path:
     """
