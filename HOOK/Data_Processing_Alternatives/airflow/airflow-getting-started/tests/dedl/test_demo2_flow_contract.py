@@ -79,7 +79,7 @@ def test_channels_param_resolves_from_dag_run_conf(monkeypatch) -> None:
         },
     )
 
-    channels_param = DagParam(demo2.dag, "channels", default="ch9")
+    channels_param = DagParam(demo2.dag, "channels", default=["ch9"])
 
     assert demo2._normalize_channels(channels_param) == ["ch1", "ch9"]
 
