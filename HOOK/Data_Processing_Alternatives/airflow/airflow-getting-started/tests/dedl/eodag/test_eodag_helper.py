@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -12,6 +13,8 @@ if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
 from dedl.eodag.eodag_helper import (  # noqa: E402
+    clean_directory,
+    extract_zip_files,
     filename_timestamp_sort_key,
     filter_and_sort_nat_files,
     find_dedl_collection_by_eodag_id,
@@ -297,3 +300,80 @@ def test_filter_and_sort_nat_files_keeps_only_nat_and_orders_by_filename_time() 
         "MSG4-SEVI-MSG15-0100-NA-20260708093000.nat",
         "no_timestamp_product.nat",
     ]
+
+
+def test_clean_directory_renames_attachment_artifact(tmp_path: Path) -> None:
+    bad_file = tmp_path / 'product.zip", attachment'
+    bad_file.write_text("data")
+
+    renamed = clean_directory(str(tmp_path))
+
+    assert [p.name for p in renamed] == ["product.zip"]
+    assert (tmp_path / "product.zip").exists()
+    assert not bad_file.exists()
+
+
+def test_clean_directory_renames_stray_quotes(tmp_path: Path) -> None:
+    bad_file = tmp_path / '"product.zip"'
+    bad_file.write_text("data")
+
+    renamed = clean_directory(str(tmp_path))
+
+    assert [p.name for p in renamed] == ["product.zip"]
+    assert (tmp_path / "product.zip").exists()
+
+
+def test_clean_directory_leaves_clean_names_untouched(tmp_path: Path) -> None:
+    clean_file = tmp_path / "product.zip"
+    clean_file.write_text("data")
+
+    renamed = clean_directory(str(tmp_path))
+
+    assert renamed == []
+    assert clean_file.exists()
+
+
+def test_clean_directory_skips_subdirectories(tmp_path: Path) -> None:
+    (tmp_path / 'sub", attachment').mkdir()
+
+    renamed = clean_directory(str(tmp_path))
+
+    assert renamed == []
+    assert (tmp_path / 'sub", attachment').exists()
+
+
+def _build_zip(zip_path: Path, member_name: str, content: str) -> None:
+    with zipfile.ZipFile(zip_path, "w") as z:
+        z.writestr(member_name, content)
+
+
+def test_extract_zip_files_extracts_into_stem_folder(tmp_path: Path) -> None:
+    zip_path = tmp_path / "product.zip"
+    _build_zip(zip_path, "data.txt", "hello")
+
+    extracted_folders = extract_zip_files([zip_path])
+
+    assert extracted_folders == [tmp_path / "product"]
+    assert (tmp_path / "product" / "data.txt").read_text() == "hello"
+
+
+def test_extract_zip_files_ignores_non_zip_paths(tmp_path: Path) -> None:
+    txt_path = tmp_path / "notes.txt"
+    txt_path.write_text("hello")
+
+    extracted_folders = extract_zip_files([txt_path])
+
+    assert extracted_folders == []
+
+
+def test_extract_zip_files_overwrite_false_keeps_existing_member(tmp_path: Path) -> None:
+    zip_path = tmp_path / "product.zip"
+    _build_zip(zip_path, "data.txt", "new content")
+
+    extract_dir = tmp_path / "product"
+    extract_dir.mkdir()
+    (extract_dir / "data.txt").write_text("original content")
+
+    extract_zip_files([zip_path], overwrite=False)
+
+    assert (extract_dir / "data.txt").read_text() == "original content"

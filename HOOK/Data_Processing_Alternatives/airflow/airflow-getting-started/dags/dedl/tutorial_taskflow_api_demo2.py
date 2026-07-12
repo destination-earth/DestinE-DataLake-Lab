@@ -20,10 +20,11 @@ from __future__ import annotations
 # [START tutorial]
 # [START import_module]
 import json
+from datetime import timedelta
 from typing import Any
 
 import pendulum
-from airflow.sdk import dag, get_current_context, task
+from airflow.sdk import dag, get_current_context, task, Param
 from airflow.sdk.definitions.param import DagParam
 from dedl.tasks.common import show_params
 
@@ -40,8 +41,14 @@ class SearchResultsDict(TypedDict):
     bbox: tuple[float, float, float, float]
 
 
+class TransformOneResultDict(TypedDict):
+    """Data contract: transform_one task output (single .nat file)"""
+    zarr_path: str
+    nat_file: str
+
+
 class TransformResultsDict(TypedDict):
-    """Data contract: transform task output"""
+    """Data contract: concatenate_zarr_files task output"""
     total_num_zarr_files: int
     concatenated_zarr_path: str
     channels: list[str]
@@ -50,6 +57,15 @@ class TransformResultsDict(TypedDict):
     resampling: str
     resolution: float
     resolution_unit: str
+
+
+class VisualiseOneResultDict(TypedDict):
+    """Data contract: visualise_one task output (single channel)"""
+    channel: str
+    video_path: str
+    frame_count: int
+    fps: int
+    video_s3_uri: str
 
 
 class LoadResultDict(TypedDict):
@@ -77,6 +93,18 @@ def _get_output_base_dir() -> str:
 
     Reads from EODAG__DEDL__DOWNLOAD__OUTPUT_DIR environment variable.
     Raises ValueError if not set or empty.
+
+    Note (portability): every task in this DAG run reads/writes this same path
+    to hand off .nat/.zarr/.mp4 files between tasks. That only works if the
+    value resolves to identical, shared, writable storage across every task
+    instance of the run. True today under LocalExecutor on a single VM. Under
+    CeleryExecutor/KubernetesExecutor this requires a shared ReadWriteMany PVC
+    mounted at this same path on every worker/task pod (see
+    airflow-kubernetes/helm/pvc-role.yml for the RBAC scaffolding for that). The
+    fully portable alternative is routing every intermediate artifact through S3
+    between tasks and running tasks via @task.kubernetes (see
+    airflow-kubernetes-dags/README.md) — a larger follow-up change, not required
+    for LocalExecutor/single-VM deployments.
 
     Returns:
         str: The base directory path (e.g., /home/eouser/eodag_downloads/msg_hrseviri)
@@ -211,12 +239,56 @@ def _build_visualization_annotation_metadata(
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["example"],
+    default_args={
+        # Covers transient eodag/S3 network failures. execution_timeout is
+        # intentionally left unset: durations vary too widely with
+        # search_limit/channels to pick a safe default across deployments.
+        "retries": 2,
+        "retry_delay": timedelta(minutes=2),
+    },
+    # Use Param to define DAG-level parameters with type hints and descriptions for UI and validation.
+    params={
+        "search_limit": Param(
+            5,
+            type="integer",
+            title="Search Limit",
+            description="Maximum number of products to search/download from DEDL",
+        ),
+        "channels": Param(
+            ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"],
+            type="array",
+            items={"type": "string"},
+            title="Channels",
+            description="List of channel names to extract from the downloaded products",
+        ),
+        "search_start": Param(
+            "2026-07-12T12:00:00Z", # Initialise to 2026-07-12T12:00:00Z
+            type=["string", "null"],
+            format="date-time",
+            title="Search Start Date-Time",
+            description="Start date-time for product search (ISO 8601 format, e.g., '2026-05-17T00:00:00Z'). Leave empty to use the collection's default search range.",
+        ),
+        "search_end": Param(
+            "2026-07-12T17:00:00Z", # Initialise to 2026-07-12T17:00:00Z
+            type=["string", "null"],
+            format="date-time",
+            title="Search End Date-Time",
+            description="End date-time for product search (ISO 8601 format, e.g., '2026-05-18T00:00:00Z'). Leave empty to use the collection's default search range.",
+        ),
+        "dedl_collection_id": Param(
+            "EO.EUM.DAT.MSG.HRSEVIRI",
+            type="string",
+            title="DEDL Collection ID",
+            description="Collection ID to search in the DestinE Data Lake (DEDL)",
+        ),
+    },
+
 )
 def tutorial_taskflow_api_demo2(
     search_limit: int = 10,
     channels: list[str] = ["ch9"],
-    search_start: str = None,  # e.g., "2026-05-17",
-    search_end: str = None,  # e.g., "2026-05-18",
+    search_start: str = None,  # e.g., "2026-05-17T00:00:00Z",
+    search_end: str = None,  # e.g., "2026-05-18T00:00:00Z",
     dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI"
 ):
     """
@@ -252,6 +324,32 @@ def tutorial_taskflow_api_demo2(
 
     # [END instantiate_dag]
 
+    # [START normalize_inputs]
+    @task()
+    def normalize_search_limit(search_limit: int) -> int:
+        """
+        #### Normalize task: validate/coerce search_limit once
+
+        Was being validated independently inside extract() on every run; do it
+        once here instead. Returned as a plain int (not wrapped in a dict) so
+        it stays a task return_value XCom, which dynamic task mapping requires
+        for values used as .partial()/.expand() inputs downstream.
+        """
+        return _normalize_search_limit(search_limit)
+
+    @task()
+    def normalize_channels(channels: list[str]) -> list[str]:
+        """
+        #### Normalize task: validate/dedupe channels once
+
+        Was being validated independently inside transform/load/visualise (same
+        work repeated per task). Do it once here; downstream tasks map over or
+        pass through this single normalized list.
+        """
+        return _normalize_channels(channels)
+
+    # [END normalize_inputs]
+
     # [START extract]
     @task()
     def extract(search_limit: int, search_start: str = None, search_end: str = None, dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI") -> SearchResultsDict:
@@ -268,6 +366,7 @@ def tutorial_taskflow_api_demo2(
         """
         from dedl.eodag.eodag_helper import (
             clean_directory,
+            extract_zip_files,
             filter_and_sort_nat_files,
             find_dedl_collection_by_eodag_id,
             find_eodag_collection_id_by_dedl_id,
@@ -376,8 +475,6 @@ def tutorial_taskflow_api_demo2(
                 f"Using collection metadata search start '{search_params['start']}' and end '{search_params['end']}'"
             )
 
-        search_limit = _normalize_search_limit(search_limit)
-
         search_kwargs = {
             "collection": eodag_collection_id,
             "start": search_params["start"],
@@ -401,24 +498,40 @@ def tutorial_taskflow_api_demo2(
                 f"Found {len(search_results)} search results for collection '{eodag_collection_id}' in {search_params['start']} to {search_params['end']}."
             )
 
-            for product in search_results:
-                props = product.properties
-                print("Product metadata:", json.dumps(props, indent=2, default=str))
+            print(
+                f"Product ids: {[product.properties.get('id', product.properties.get('title')) for product in search_results]}"
+            )
 
-                # download the product
-                # downloaded_file = dag.download(product, extract=True, delete_archive=False)
-                # downloaded_file = product.download()
-                # print(f"Downloaded product to: {downloaded_file}")
-
-            print(f"Downloading all {len(search_results)} products...")
+            print(f"Downloading all {len(search_results)} products (parallel)...")
             # Assure output directory is set. e.g. in env file: EODAG__DEDL__DOWNLOAD__OUTPUT_DIR=/home/eouser/eodag_downloads
-            downloaded_folder_list = dag.download_all(search_results, extract=True, delete_archive=False)
+            from concurrent.futures import ThreadPoolExecutor
+
+
+            import os
+            from eodag.utils import ProgressCallback
+
+            progress_callback = None
+
+            if "AIRFLOW_CTX_DAG_ID" in os.environ:
+                progress_callback = ProgressCallback(disable=True)
+
+            downloaded_folder_list = dag.download_all(
+                search_results,
+                extract=True,
+                delete_archive=False,
+                executor=ThreadPoolExecutor(max_workers=4),
+                progress_callback=progress_callback
+            )
             print(f"Downloaded all {len(search_results)} products.")
 
-            # Note: Issue with eodag extract. We need to clean the output directory to assure that the extracted files are in the correct location. This is a workaround for now.
-            clean_directory(
-                _get_output_base_dir(), unzip=True, overwrite=True
-            )
+            print("starting to clean the output directory to ensure extracted files are in the correct location...")
+            # Note: workaround for an eodag extract issue — some downloaded filenames arrive
+            # with malformed Content-Disposition artifacts that break eodag's own extraction.
+            # Rename those files, then re-extract only the ones that needed renaming (files
+            # already correctly named/extracted by eodag, or renamed in a prior run, are skipped).
+            renamed_files = clean_directory(_get_output_base_dir())
+            extract_zip_files(renamed_files, overwrite=True)
+            print("Cleaned the output directory.")
 
             for downloaded_folder in downloaded_folder_list:
                 print(f"Downloaded product to: {downloaded_folder}")
@@ -451,38 +564,41 @@ def tutorial_taskflow_api_demo2(
 
     # [END extract]
 
-    # [START transform]
-    @task(multiple_outputs=True)
-    def transform(search_results_dict: SearchResultsDict, channels: list[str]) -> TransformResultsDict:
+    @task()
+    def get_downloaded_nat_files(search_results_dict: SearchResultsDict) -> list[str]:
         """
-        #### Transform task: Spatially filter, reproject, and zarr-encode MSG products
+        #### Bridge task: expose the downloaded .nat file list as a plain return_value
 
-        For each .nat file:
+        Airflow's dynamic task mapping (.expand()) only accepts a task's raw
+        return_value XCom, not a subscript/derived key from a dict-returning
+        task. This task exists purely so transform_one can .expand() over the
+        .nat files extract() downloaded.
+        """
+        return search_results_dict["downloaded_nat_files"]
+
+    # [START transform]
+    @task()
+    def transform_one(nat_file: str, channels: list[str]) -> TransformOneResultDict:
+        """
+        #### Transform task (mapped): spatially filter, reproject, and zarr-encode one .nat file
+
+        Runs once per downloaded .nat file via dynamic task mapping (see main_flow),
+        so files are processed in parallel instead of one after another:
         1. Crop to Europe (spatial_filter)
         2. Reproject to EPSG:4326 at 0.05° resolution
         3. Extract selected channels
         4. Write cloud-optimized Zarr
 
-        Concatenates all Zarr files along the time dimension into a single dataset.
-
         Args:
-            search_results_dict: From extract(); contains downloaded .nat file paths
-            channels: List of channel names to extract (normalized and deduplicated)
+            nat_file: Path to a single downloaded .nat file
+            channels: List of channel names to extract (already normalized upstream)
 
         Returns:
-            TransformResultsDict: Contains concatenated_zarr_path, channel list,
-                                 and reprojection metadata
+            TransformOneResultDict: Path to the per-file Zarr output
         """
-        from dedl.eodag.eodag_helper import (
-            change_extension,
-            filename_timestamp_sort_key,
-            filter_and_sort_nat_files,
-        )
+        from dedl.eodag.eodag_helper import change_extension
 
-        channels = _normalize_channels(channels)
-
-        print(f"Transforming data with previous results: {search_results_dict}")
-        print(f"Transforming data for channels: {channels}")
+        print(f"Transforming file: {nat_file} for channels: {channels}")
         # Reference: https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/ai_ready_data_preparation/demos/01_msg_local_to_zarr_code.html
 
         # -----------------------------------------------------
@@ -496,7 +612,6 @@ def tutorial_taskflow_api_demo2(
         from defair_data.readers import list_readers
         from defair_data.writers import list_writers
         from defair.logging import setup_logging
-        from defair_data.dask_manager import close_dask_client
 
         setup_logging(log_level="INFO")
 
@@ -504,224 +619,231 @@ def tutorial_taskflow_api_demo2(
         print("Available writers:", list_writers())
 
         # -----------------------------------------------------
-        # Step 2 : Configuration : getting input files
+        # Step 3 : Read MSG data with automatic reader detection
         # -----------------------------------------------------
 
-        nat_files = filter_and_sort_nat_files(
-            search_results_dict.get("downloaded_nat_files", [])
+        # Automatically detect the reader based on the file extension and content
+        dataset = Dataset.from_source(nat_file)
+
+        print(f"Dataset loaded: {dataset}")
+        print(f"\nData variables: {list(dataset.data.data_vars)}")
+        print(f"Coordinates: {list(dataset.data.coords)}")
+
+        # -----------------------------------------------------
+        # Step 4 : Inspect Dataset Structure
+        # -----------------------------------------------------
+
+        available_channels = list(dataset.data.data_vars)
+        missing_channels = [ch for ch in channels if ch not in available_channels]
+        if missing_channels:
+            raise ValueError(
+                f"Requested channels {missing_channels} not found in dataset. "
+                f"Available channels: {available_channels}"
+            )
+
+        # Inspect each selected channel
+        for channel_name in channels:
+            selected_channel = dataset.data[channel_name]
+            print(f"Channel: {channel_name}")
+            print(f"Shape: {selected_channel.shape}")
+            print(f"Dtype: {selected_channel.dtype}")
+            print(f"Chunks: {selected_channel.chunks}")
+            print("\nAttributes:")
+            for key, value in selected_channel.attrs.items():
+                print(f"  {key}: {value}")
+
+        # -----------------------------------------------------
+        # Step 5 : Check CF 1.8 Compliance
+        # -----------------------------------------------------
+        print("Global Attributes:")
+        for key in ["Conventions", "title", "institution", "source", "history"]:
+            if key in dataset.data.attrs:
+                value = dataset.data.attrs[key]
+                # Truncate long values
+                if isinstance(value, str) and len(value) > 100:
+                    value = value[:100] + "..."
+                print(f"  {key}: {value}")
+
+        print("\nCoordinate Reference System:")
+        if "spatial_ref" in dataset.data.coords:
+            crs = dataset.data.coords["spatial_ref"]
+            print(f"  CRS WKT: {crs.attrs.get('crs_wkt', 'N/A')[:200]}...")
+
+        reference_channel = dataset.data[channels[0]]
+        if "grid_mapping" in reference_channel.attrs:
+            print(f"  Grid mapping: {reference_channel.attrs['grid_mapping']}")
+
+        # -----------------------------------------------------
+        # Step X1a : Apply Spatial Filtering to Crop to Europe
+        # -----------------------------------------------------
+
+        # Crop to Europe (fast, no reprojection) — use spatial_filter
+        #     Good when you only want an AOI crop and keep original grid.
+        #     Example bounding box that covers most of continental Europe: lon ∈ [-25, 45], lat ∈ [34, 72].
+
+        # The spatial_filter plugin accepts polygon inputs (GeoJSON/WKT/paths) if you want a precise European shape instead of a bbox.
+        # If your product has multiple coordinate groups (swath products), spatial_filter will handle per-group masking; use coordinate_group=(lat_name, lon_name) to target a single group.
+
+        # Crop to Europe using the spatial_filter transformation
+
+        ds_europe = dataset.transform(
+            "spatial_filter",
+            lat_min=lat_min,
+            lat_max=lat_max,
+            lon_min=lon_min,
+            lon_max=lon_max,
+            drop=True,  # drop pixels outside AOI (shrinks dims)
+            allow_partial=True,  # allow partial coverage without raising
         )
 
-        print(f"Current run .nat files selected for transform: {len(nat_files)}")
+        # -----------------------------------------------------
+        # Step X1b : Reproject and Resample to Europe
+        # -----------------------------------------------------
 
-        # We will use this list of treated zarr files to generate Just a singe zarr file with concat_dim="time"
-        zarr_files = []
+        # Reproject to EPSG:4326 and spatially sample (resample) — use reprojection bounds+resolution
+        #     Use when you want a regular lat/lon grid and a specific spatial resolution (degrees or km).
+        #     Example: 0.05° resolution (~5 km at equator) and the same Europe bbox.
 
-        for nat_file in nat_files:
-            print(f"Processing file: {nat_file}")
+        # If you need conservative flux-preserving regridding (e.g., area-averaged variables), use the xarray_regrid backend via reproject(..., backend="xarray_regrid", resampling="conservative", resolution=...) — see the reprojection plugin docs.
+        # Bounds format is (minx, miny, maxx, maxy) → for lon/lat that's (minlon, minlat, maxlon, maxlat).
 
-            # -----------------------------------------------------
-            # Step 3 : Read MSG data with automatic reader detection
-            # -----------------------------------------------------
-
-            # Automatically detect the reader based on the file extension and content
-            dataset = Dataset.from_source(nat_file)
-
-            print(f"Dataset loaded: {dataset}")
-            print(f"\nData variables: {list(dataset.data.data_vars)}")
-            print(f"Coordinates: {list(dataset.data.coords)}")
-
-            # -----------------------------------------------------
-            # Step 4 : Inspect Dataset Structure
-            # -----------------------------------------------------
-
-            available_channels = list(dataset.data.data_vars)
-            missing_channels = [ch for ch in channels if ch not in available_channels]
-            if missing_channels:
-                raise ValueError(
-                    f"Requested channels {missing_channels} not found in dataset. "
-                    f"Available channels: {available_channels}"
-                )
-
-            # Inspect each selected channel
-            for channel_name in channels:
-                selected_channel = dataset.data[channel_name]
-                print(f"Channel: {channel_name}")
-                print(f"Shape: {selected_channel.shape}")
-                print(f"Dtype: {selected_channel.dtype}")
-                print(f"Chunks: {selected_channel.chunks}")
-                print("\nAttributes:")
-                for key, value in selected_channel.attrs.items():
-                    print(f"  {key}: {value}")
-
-            # -----------------------------------------------------
-            # Step 5 : Check CF 1.8 Compliance
-            # -----------------------------------------------------
-            print("Global Attributes:")
-            for key in ["Conventions", "title", "institution", "source", "history"]:
-                if key in dataset.data.attrs:
-                    value = dataset.data.attrs[key]
-                    # Truncate long values
-                    if isinstance(value, str) and len(value) > 100:
-                        value = value[:100] + "..."
-                    print(f"  {key}: {value}")
-
-            print("\nCoordinate Reference System:")
-            if "spatial_ref" in dataset.data.coords:
-                crs = dataset.data.coords["spatial_ref"]
-                print(f"  CRS WKT: {crs.attrs.get('crs_wkt', 'N/A')[:200]}...")
-
-            reference_channel = dataset.data[channels[0]]
-            if "grid_mapping" in reference_channel.attrs:
-                print(f"  Grid mapping: {reference_channel.attrs['grid_mapping']}")
-
-            # -----------------------------------------------------
-            # Step X1a : Apply Spatial Filtering to Crop to Europe
-            # -----------------------------------------------------
-
-            # Crop to Europe (fast, no reprojection) — use spatial_filter
-            #     Good when you only want an AOI crop and keep original grid.
-            #     Example bounding box that covers most of continental Europe: lon ∈ [-25, 45], lat ∈ [34, 72].
-
-            # The spatial_filter plugin accepts polygon inputs (GeoJSON/WKT/paths) if you want a precise European shape instead of a bbox.
-            # If your product has multiple coordinate groups (swath products), spatial_filter will handle per-group masking; use coordinate_group=(lat_name, lon_name) to target a single group.
-
-            # Crop to Europe using the spatial_filter transformation
-
-            ds_europe = dataset.transform(
-                "spatial_filter",
-                lat_min=lat_min,
-                lat_max=lat_max,
-                lon_min=lon_min,
-                lon_max=lon_max,
-                drop=True,  # drop pixels outside AOI (shrinks dims)
-                allow_partial=True,  # allow partial coverage without raising
-            )
-
-            # -----------------------------------------------------
-            # Step X1b : Reproject and Resample to Europe
-            # -----------------------------------------------------
-
-            # Reproject to EPSG:4326 and spatially sample (resample) — use reprojection bounds+resolution
-            #     Use when you want a regular lat/lon grid and a specific spatial resolution (degrees or km).
-            #     Example: 0.05° resolution (~5 km at equator) and the same Europe bbox.
-
-            # If you need conservative flux-preserving regridding (e.g., area-averaged variables), use the xarray_regrid backend via reproject(..., backend="xarray_regrid", resampling="conservative", resolution=...) — see the reprojection plugin docs.
-            # Bounds format is (minx, miny, maxx, maxy) → for lon/lat that's (minlon, minlat, maxlon, maxlat).
-
-            # Reproject + resample to a regular EPSG:4326 grid covering Europe : (reproject the cropped dataset to avoid reprojecting the full original)
-            ds_europe_reproj = ds_europe.reproject(
-                reprojection_crs,
-                resampling=reprojection_resampling,  # or "nearest", "cubic"
-                resolution=reprojection_resolution,  # in degrees (see resolution_unit)
-                resolution_unit=reprojection_resolution_unit,
-                bounds=reprojection_bounds,  # (lon_min, lat_min, lon_max, lat_max)
-            )
-
-            # -----------------------------------------------------
-            # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
-            # -----------------------------------------------------
-
-            # Select all configured channels from the transformed dataset.
-            xr_channel = ds_europe_reproj.data[channels]
-            ds_channel = Dataset(xr_channel)
-
-            # Keep downstream logic unchanged by replacing dataset with the single-channel view.
-            dataset = ds_channel
-
-            # -----------------------------------------------------
-            # Step 6 : Write a cloud-optimized Zarr file with consolidated metadata
-            # -----------------------------------------------------
-
-            zarr_file = change_extension(nat_file, ".zarr")
-
-            dataset.to_file(
-                zarr_file,
-                writer="zarrv2",  # Use Zarr v2 format
-                mode="w",  # Overwrite if exists
-                consolidated=True,  # Create consolidated metadata for faster reads
-            )
-
-            # we will use this list of treated zarr files to generate Just a singe zarr file with concat_dim="time"
-            zarr_files.append(zarr_file)
-
-            print(f"✓ Data written to: {zarr_file}")
-
-            # -----------------------------------------------------
-            # Step 7 : Verify the Zarr file by reading it back and checking its structure
-            # -----------------------------------------------------
-
-            zarr_ds = xr.open_zarr(zarr_file, consolidated=True)
-
-            print("Zarr Dataset:")
-            print(zarr_ds)
-
-            # Verify data integrity
-            print("\n✓ Verification:")
-            print(
-                f"  Variables match: {set(dataset.data.data_vars) == set(zarr_ds.data_vars)}"
-            )
-            print(
-                f"  Coordinates match: {set(dataset.data.coords) == set(zarr_ds.coords)}"
-            )
-
-            # Check Zarr storage details
-            print("\nZarr Storage:")
-            for var in zarr_ds.data_vars:
-                zarr_array = zarr_ds[var]
-                print(f"  {var}:")
-                print(f"    Chunks: {zarr_array.chunks}")
-                print(
-                    f"    Compressor: {zarr_array.encoding.get('compressor', 'default')}"
-                )
-
-            # -----------------------------------------------------
-            # Step 8 : Check Provenance Tracking and Metadata
-            # -----------------------------------------------------
-
-            print("Provenance History:")
-            print(zarr_ds.attrs["history"])
-
-            print("\nCreation Metadata:")
-            for key in ["date_created", "creator_name", "creator_url"]:
-                if key in zarr_ds.attrs:
-                    print(f"  {key}: {zarr_ds.attrs[key]}")
-
-            def get_dir_size(path):
-                total = 0
-                for entry in Path(path).rglob("*"):
-                    if entry.is_file():
-                        total += entry.stat().st_size
-                return total
-
-            # -----------------------------------------------------
-            # Step 9 : Storage Efficiency Comparison: Compare the size of the original MSG .nat file and the resulting Zarr file
-            # -----------------------------------------------------
-
-            if Path(nat_file).exists() and Path(zarr_file).exists():
-                input_size = Path(nat_file).stat().st_size
-                output_size = get_dir_size(zarr_file)
-
-                print("Storage Comparison:")
-                print(f"  Input (MSG .nat):  {input_size / 1024 / 1024:.2f} MB")
-                print(f"  Output (Zarr):     {output_size / 1024 / 1024:.2f} MB")
-                print(f"  Compression ratio: {input_size / output_size:.2f}x")
-                print(
-                    f"  Size change:       {(output_size - input_size) / input_size * 100:+.1f}%"
-                )
+        # Reproject + resample to a regular EPSG:4326 grid covering Europe : (reproject the cropped dataset to avoid reprojecting the full original)
+        ds_europe_reproj = ds_europe.reproject(
+            reprojection_crs,
+            resampling=reprojection_resampling,  # or "nearest", "cubic"
+            resolution=reprojection_resolution,  # in degrees (see resolution_unit)
+            resolution_unit=reprojection_resolution_unit,
+            bounds=reprojection_bounds,  # (lon_min, lat_min, lon_max, lat_max)
+        )
 
         # -----------------------------------------------------
-        # Step 10 : Concatenate all Zarr files along the time dimension to create a single Zarr dataset using Defair.from_source with concat_dim="time"
+        # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
         # -----------------------------------------------------
+
+        # Select all configured channels from the transformed dataset.
+        xr_channel = ds_europe_reproj.data[channels]
+        ds_channel = Dataset(xr_channel)
+
+        # Keep downstream logic unchanged by replacing dataset with the single-channel view.
+        dataset = ds_channel
+
+        # -----------------------------------------------------
+        # Step 6 : Write a cloud-optimized Zarr file with consolidated metadata
+        # -----------------------------------------------------
+
+        zarr_file = change_extension(nat_file, ".zarr")
+
+        dataset.to_file(
+            zarr_file,
+            writer="zarrv2",  # Use Zarr v2 format
+            mode="w",  # Overwrite if exists
+            consolidated=True,  # Create consolidated metadata for faster reads
+        )
+
+        print(f"✓ Data written to: {zarr_file}")
+
+        # -----------------------------------------------------
+        # Step 7 : Verify the Zarr file by reading it back and checking its structure
+        # -----------------------------------------------------
+
+        zarr_ds = xr.open_zarr(zarr_file, consolidated=True)
+
+        print("Zarr Dataset:")
+        print(zarr_ds)
+
+        # Verify data integrity
+        print("\n✓ Verification:")
+        print(
+            f"  Variables match: {set(dataset.data.data_vars) == set(zarr_ds.data_vars)}"
+        )
+        print(
+            f"  Coordinates match: {set(dataset.data.coords) == set(zarr_ds.coords)}"
+        )
+
+        # Check Zarr storage details
+        print("\nZarr Storage:")
+        for var in zarr_ds.data_vars:
+            zarr_array = zarr_ds[var]
+            print(f"  {var}:")
+            print(f"    Chunks: {zarr_array.chunks}")
+            print(
+                f"    Compressor: {zarr_array.encoding.get('compressor', 'default')}"
+            )
+
+        # -----------------------------------------------------
+        # Step 8 : Check Provenance Tracking and Metadata
+        # -----------------------------------------------------
+
+        print("Provenance History:")
+        print(zarr_ds.attrs["history"])
+
+        print("\nCreation Metadata:")
+        for key in ["date_created", "creator_name", "creator_url"]:
+            if key in zarr_ds.attrs:
+                print(f"  {key}: {zarr_ds.attrs[key]}")
+
+        def get_dir_size(path):
+            total = 0
+            for entry in Path(path).rglob("*"):
+                if entry.is_file():
+                    total += entry.stat().st_size
+            return total
+
+        # -----------------------------------------------------
+        # Step 9 : Storage Efficiency Comparison: Compare the size of the original MSG .nat file and the resulting Zarr file
+        # -----------------------------------------------------
+
+        if Path(nat_file).exists() and Path(zarr_file).exists():
+            input_size = Path(nat_file).stat().st_size
+            output_size = get_dir_size(zarr_file)
+
+            print("Storage Comparison:")
+            print(f"  Input (MSG .nat):  {input_size / 1024 / 1024:.2f} MB")
+            print(f"  Output (Zarr):     {output_size / 1024 / 1024:.2f} MB")
+            print(f"  Compression ratio: {input_size / output_size:.2f}x")
+            print(
+                f"  Size change:       {(output_size - input_size) / input_size * 100:+.1f}%"
+            )
+
+        return {"zarr_path": str(zarr_file), "nat_file": nat_file}
+
+    @task(multiple_outputs=True)
+    def concatenate_zarr_files(
+        transform_results: list[TransformOneResultDict], channels: list[str]
+    ) -> TransformResultsDict:
+        """
+        #### Concatenate task: merge per-file Zarr outputs into one time-indexed Zarr
+
+        Consumes the outputs of the mapped transform_one task instances and
+        concatenates them along the time dimension using Defair.from_source with
+        concat_dim="time". No re-sort by timestamp is needed here: extract()
+        already sorts .nat files chronologically before transform_one.expand(),
+        and dynamic task mapping preserves that input order in the collected
+        results.
+
+        Args:
+            transform_results: Outputs of the mapped transform_one task instances
+            channels: List of channel names extracted (already normalized upstream)
+
+        Returns:
+            TransformResultsDict: Contains concatenated_zarr_path, channel list,
+                                 and reprojection metadata
+        """
+        from pathlib import Path
+
+        import xarray as xr
+        from defair_data.core import Dataset
+
+        def get_dir_size(path):
+            total = 0
+            for entry in Path(path).rglob("*"):
+                if entry.is_file():
+                    total += entry.stat().st_size
+            return total
+
+        zarr_files = [result["zarr_path"] for result in transform_results]
 
         if zarr_files:
-
-            zarr_files = sorted(
-                zarr_files,
-                key=lambda path: filename_timestamp_sort_key(
-                    Path(path).with_suffix(".nat")
-                ),
-            )
-
             xr_dsets = [xr.open_zarr(str(p), consolidated=True) for p in zarr_files]
 
             combined = xr.concat(xr_dsets, dim="time")
@@ -776,9 +898,9 @@ def tutorial_taskflow_api_demo2(
         S3 credentials (endpoint, bucket, keys) come from environment variables.
 
         Args:
-            transform_results_dict: From transform(); contains concatenated_zarr_path
-                                   and reprojection metadata
-            channels: List of channels for S3 key naming (normalized and deduplicated)
+            transform_results_dict: From concatenate_zarr_files(); contains
+                                   concatenated_zarr_path and reprojection metadata
+            channels: List of channels for S3 key naming (already normalized upstream)
 
         Returns:
             LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
@@ -788,7 +910,6 @@ def tutorial_taskflow_api_demo2(
 
         from dedl.s3.s3_helper import upload_directory_to_s3
 
-        channels = _normalize_channels(channels)
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
         endpoint_url = os.environ["S3_ENDPOINT_URL"]
         bucket_name = os.environ["MY_S3_BUCKET_NAME"]
@@ -822,13 +943,17 @@ def tutorial_taskflow_api_demo2(
 
     # [START visualise]
     @task()
-    def visualise(
-        load_result_dict: LoadResultDict, search_results_dict: SearchResultsDict, channels: list[str]
-    ) -> dict[str, Any]:
+    def visualise_one(
+        channel_name: str,
+        load_result_dict: LoadResultDict,
+        search_results_dict: SearchResultsDict,
+    ) -> VisualiseOneResultDict:
         """
-        #### Visualise task: Render annotated MP4 time-lapse from Zarr channels
+        #### Visualise task (mapped): render + upload an annotated MP4 for one channel
 
-        Reads the S3-backed Zarr dataset, renders an MP4 time-lapse for each channel with:
+        Runs once per channel via dynamic task mapping (see main_flow), so channels
+        render in parallel. Each mapped instance is fully self-contained: it reads
+        the S3-backed Zarr dataset for its channel, renders an MP4 time-lapse with:
         - 4 FPS, max 120 frames
         - Inferno colormap
         - Metadata overlay: collection ID, bbox, CRS, resolution, channel attributes
@@ -836,12 +961,12 @@ def tutorial_taskflow_api_demo2(
         Uploads MP4 to S3 under 'visualization/{channel}/' prefix.
 
         Args:
+            channel_name: Single channel to visualize (already normalized upstream)
             load_result_dict: From load(); contains S3 URI and reprojection metadata
             search_results_dict: From extract(); contains collection_id and search bbox
-            channels: List of channels to visualize (normalized and deduplicated)
 
         Returns:
-            dict: Contains source_s3_uri and videos list with per-channel video metadata
+            VisualiseOneResultDict: Per-channel video metadata
         """
         import os
 
@@ -852,14 +977,12 @@ def tutorial_taskflow_api_demo2(
             resolve_data_variable,
         )
 
-        channels = _normalize_channels(channels)
         endpoint_url = os.environ["S3_ENDPOINT_URL"]
         bucket_name = os.environ["MY_S3_BUCKET_NAME"]
         access_key_id = os.environ["MY_S3_ACCESS_KEY_ID"]
         secret_access_key = os.environ["MY_S3_SECRET_ACCESS_KEY"]
 
         source_prefix = load_result_dict["destination_prefix"]
-        source_s3_uri = load_result_dict["s3_uri"]
 
         dataset = open_s3_zarr_dataset(
             bucket_name=bucket_name,
@@ -869,61 +992,48 @@ def tutorial_taskflow_api_demo2(
             secret_access_key=secret_access_key,
         )
 
-        available_channels = list(dataset.data_vars)
-        missing_channels = [ch for ch in channels if ch not in available_channels]
-        if missing_channels:
+        if channel_name not in dataset.data_vars:
             raise ValueError(
-                f"Requested channels {missing_channels} not found in uploaded dataset. "
-                f"Available channels: {available_channels}"
+                f"Requested channel '{channel_name}' not found in uploaded dataset. "
+                f"Available channels: {list(dataset.data_vars)}"
             )
 
-        videos: list[dict[str, Any]] = []
-        for channel_name in channels:
-            selected_channel = resolve_data_variable(
-                dataset, preferred_name=channel_name
-            )
-            output_mp4_path = _build_video_output_path(channel_name)
-            annotation_metadata = _build_visualization_annotation_metadata(
-                search_results_dict,
-                load_result_dict,
-                channel_name,
-                channel_attrs=dict(selected_channel.attrs),
-            )
+        selected_channel = resolve_data_variable(dataset, preferred_name=channel_name)
+        output_mp4_path = _build_video_output_path(channel_name)
+        annotation_metadata = _build_visualization_annotation_metadata(
+            search_results_dict,
+            load_result_dict,
+            channel_name,
+            channel_attrs=dict(selected_channel.attrs),
+        )
 
-            video_result = create_mp4_from_dataarray(
-                selected_channel,
-                output_mp4_path,
-                fps=4,
-                frame_stride=1,
-                max_frames=120,
-                colormap_name="inferno",
-                annotation_metadata=annotation_metadata,
-            )
+        video_result = create_mp4_from_dataarray(
+            selected_channel,
+            output_mp4_path,
+            fps=4,
+            frame_stride=1,
+            max_frames=120,
+            colormap_name="inferno",
+            annotation_metadata=annotation_metadata,
+        )
 
-            upload_result = upload_file_to_s3(
-                local_file_path=output_mp4_path,
-                bucket_name=bucket_name,
-                endpoint_url=endpoint_url,
-                access_key_id=access_key_id,
-                secret_access_key=secret_access_key,
-                destination_key=(
-                    f"visualization/{channel_name}/{channel_name}_timelapse.mp4"
-                ),
-            )
-
-            videos.append(
-                {
-                    "channel": channel_name,
-                    "video_path": video_result["video_path"],
-                    "frame_count": video_result["frame_count"],
-                    "fps": video_result["fps"],
-                    "video_s3_uri": upload_result["s3_uri"],
-                }
-            )
+        upload_result = upload_file_to_s3(
+            local_file_path=output_mp4_path,
+            bucket_name=bucket_name,
+            endpoint_url=endpoint_url,
+            access_key_id=access_key_id,
+            secret_access_key=secret_access_key,
+            destination_key=(
+                f"visualization/{channel_name}/{channel_name}_timelapse.mp4"
+            ),
+        )
 
         return {
-            "source_s3_uri": source_s3_uri,
-            "videos": videos,
+            "channel": channel_name,
+            "video_path": video_result["video_path"],
+            "frame_count": video_result["frame_count"],
+            "fps": video_result["fps"],
+            "video_s3_uri": upload_result["s3_uri"],
         }
 
     # [END visualise]
@@ -931,24 +1041,40 @@ def tutorial_taskflow_api_demo2(
     # [START main_flow]
     show_params()  # Display DAG run configuration
 
+    # Normalize: validate/coerce search_limit and channels once, upfront
+    normalized_search_limit: int = normalize_search_limit(search_limit)
+    normalized_channels: list[str] = normalize_channels(channels)
+
     # Extract: search & download MSG products
     search_results_dict: SearchResultsDict = extract(
-        search_limit=search_limit,
+        search_limit=normalized_search_limit,
         search_start=search_start,
         search_end=search_end,
         dedl_collection_id=dedl_collection_id,
     )
 
-    # Transform: crop, reproject, zarr-encode
-    transform_results_dict: TransformResultsDict = transform(
-        search_results_dict, channels=channels
+    downloaded_nat_files: list[str] = get_downloaded_nat_files(search_results_dict)
+
+    # Transform: crop, reproject, zarr-encode — one mapped task instance per
+    # downloaded .nat file, processed in parallel, then concatenated
+    transform_results = transform_one.partial(channels=normalized_channels).expand(
+        nat_file=downloaded_nat_files
+    )
+
+    transform_results_dict: TransformResultsDict = concatenate_zarr_files(
+        transform_results, channels=normalized_channels
     )
 
     # Load: upload Zarr to S3
-    load_result_dict: LoadResultDict = load(transform_results_dict, channels=channels)
+    load_result_dict: LoadResultDict = load(
+        transform_results_dict, channels=normalized_channels
+    )
 
-    # Visualise: render MP4 time-lapses
-    visualise(load_result_dict, search_results_dict, channels=channels)
+    # Visualise: render MP4 time-lapses — one mapped task instance per channel,
+    # rendered in parallel
+    visualise_one.partial(
+        load_result_dict=load_result_dict, search_results_dict=search_results_dict
+    ).expand(channel_name=normalized_channels)
     # [END main_flow]
 
 
@@ -960,5 +1086,5 @@ dag = tutorial_taskflow_api_demo2()
 if __name__ == "__main__":
 
     dag.test(
-        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-06-10T10:00:00Z", "search_end": "2026-06-10T15:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
+        run_conf={"search_limit": 5, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
     )

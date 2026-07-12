@@ -427,58 +427,64 @@ from pathlib import Path
 import zipfile
 
 
-def clean_directory(dir_path: str, unzip: bool = False, overwrite: bool = True):
+def clean_directory(dir_path: str) -> list[Path]:
     """
-    Cleans malformed EODAG ZIP filenames and optionally unzips them.
+    Renames malformed EODAG file names (stray '", attachment' / quotes left
+    over from a Content-Disposition header) so the files can be unzipped correctly.
 
-    Returns:
-        corrected_files: list[Path]
-        extracted_folders: list[Path]
+    Returns only the files that were actually renamed.
     """
-
     dir_path = Path(dir_path)
+    renamed_files = []
 
-    corrected_files = []
-    extracted_folders = []
-
-    # --- STEP 1: CLEAN ---
     for p in sorted(dir_path.iterdir()):
         if not p.is_file():
             continue
 
         new_name = p.name
-
         if '", attachment' in new_name:
             new_name = new_name.replace('", attachment', "")
-
         new_name = new_name.strip('"')
 
+        if new_name == p.name:
+            continue
+
         new_path = p.with_name(new_name)
+        p.rename(new_path)
+        renamed_files.append(new_path)
 
-        if new_path != p:
-            p.rename(new_path)
+    return renamed_files
 
-        corrected_files.append(new_path)
 
-    # --- STEP 2: UNZIP ---
-    if unzip:
-        for p in corrected_files:
-            if p.suffix == ".zip":
-                extract_dir = p.with_name(p.stem)
-                extract_dir.mkdir(parents=True, exist_ok=True)
+def extract_zip_files(paths: list[Path], overwrite: bool = True) -> list[Path]:
+    """
+    Extracts each given .zip file into a sibling folder named after its stem.
+    Non-.zip paths are ignored.
 
-                with zipfile.ZipFile(p, "r") as z:
-                    if overwrite:
-                        z.extractall(extract_dir)
-                    else:
-                        for member in z.namelist():
-                            target = extract_dir / member
-                            if not target.exists():
-                                z.extract(member, extract_dir)
+    Returns the list of extraction target folders.
+    """
+    extracted_folders = []
 
-                extracted_folders.append(extract_dir)
+    for p in paths:
+        p = Path(p)
+        if p.suffix != ".zip":
+            continue
 
-    return corrected_files, extracted_folders
+        extract_dir = p.with_name(p.stem)
+        extract_dir.mkdir(parents=True, exist_ok=True)
+
+        with zipfile.ZipFile(p, "r") as z:
+            if overwrite:
+                z.extractall(extract_dir)
+            else:
+                for member in z.namelist():
+                    target = extract_dir / member
+                    if not target.exists():
+                        z.extract(member, extract_dir)
+
+        extracted_folders.append(extract_dir)
+
+    return extracted_folders
 
 
 from pathlib import Path
