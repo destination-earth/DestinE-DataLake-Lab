@@ -164,6 +164,60 @@ def test_build_visualization_annotation_metadata_defaults_grid_mapping() -> None
     assert result["grid_mapping"] == "spatial_ref"
 
 
+def test_build_visualization_annotation_metadata_source_overrides_grid_mapping() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+        channel_attrs={
+            "start_time": "2004-01-19 10:30:00",
+            "grid_mapping": "spatial_ref",
+            "long_name": "High-resolution visible channel",
+        },
+        source_channel_attrs={
+            "grid_mapping": "geostationary",
+            "platform_name": "MSG3",
+        },
+    )
+
+    assert result["grid_mapping"] == "geostationary"
+    assert result["platform_name"] == "MSG3"
+    # channel_attrs-only fields (unaffected by reprojection) are preserved
+    assert result["start_time"] == "2004-01-19 10:30:00"
+    assert result["long_name"] == "High-resolution visible channel"
+
+
+def test_build_visualization_annotation_metadata_ignores_empty_source_fields() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+        channel_attrs={"grid_mapping": "spatial_ref"},
+        source_channel_attrs={"grid_mapping": None, "platform_name": None},
+    )
+
+    assert result["grid_mapping"] == "spatial_ref"
+    assert "platform_name" not in result
+
+
 def test_build_visualization_annotation_metadata_falls_back_to_search_bbox() -> None:
     result = demo2._build_visualization_annotation_metadata(
         {
