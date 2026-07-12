@@ -27,10 +27,21 @@ import pendulum
 from airflow.sdk import dag, get_current_context, task, Param
 from airflow.sdk.definitions.param import DagParam
 from dedl.tasks.common import show_params
+from dedl.tasks.reporting import generate_run_report
 
 # [END import_module]
 
-from typing import TypedDict
+from typing import Literal, TypedDict
+
+
+class DownloadRecordDict(TypedDict):
+    """Data contract: outcome of a single per-product download attempt"""
+    product_id: str
+    title: str
+    status: Literal["success", "failed"]
+    duration_seconds: float
+    error: str | None
+    downloaded_path: str | None
 
 
 class SearchResultsDict(TypedDict):
@@ -39,12 +50,16 @@ class SearchResultsDict(TypedDict):
     downloaded_nat_files: list[str]
     collection_id: str
     bbox: tuple[float, float, float, float]
+    download_records: list[DownloadRecordDict]
+    num_downloads_succeeded: int
+    num_downloads_failed: int
 
 
 class TransformOneResultDict(TypedDict):
     """Data contract: transform_one task output (single .nat file)"""
     zarr_path: str
     nat_file: str
+    duration_seconds: float
 
 
 class TransformResultsDict(TypedDict):
@@ -66,6 +81,7 @@ class VisualiseOneResultDict(TypedDict):
     frame_count: int
     fps: int
     video_s3_uri: str
+    duration_seconds: float
 
 
 class LoadResultDict(TypedDict):
@@ -262,14 +278,14 @@ def _build_visualization_annotation_metadata(
             description="List of channel names to extract from the downloaded products",
         ),
         "search_start": Param(
-            "2026-07-12T12:00:00Z", # Initialise to 2026-07-12T12:00:00Z
+            None,
             type=["string", "null"],
             format="date-time",
             title="Search Start Date-Time",
             description="Start date-time for product search (ISO 8601 format, e.g., '2026-05-17T00:00:00Z'). Leave empty to use the collection's default search range.",
         ),
         "search_end": Param(
-            "2026-07-12T17:00:00Z", # Initialise to 2026-07-12T17:00:00Z
+            None,
             type=["string", "null"],
             format="date-time",
             title="Search End Date-Time",
@@ -285,10 +301,10 @@ def _build_visualization_annotation_metadata(
 
 )
 def tutorial_taskflow_api_demo2(
-    search_limit: int = 10,
-    channels: list[str] = ["ch9"],
-    search_start: str = None,  # e.g., "2026-05-17T00:00:00Z",
-    search_end: str = None,  # e.g., "2026-05-18T00:00:00Z",
+    search_limit: int = 5,
+    channels: list[str] = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"],
+    search_start: str = "2026-07-12T12:00:00Z",  # e.g., "2026-05-17T00:00:00Z",
+    search_end: str = "2026-07-12T17:00:00Z",  # e.g., "2026-05-18T00:00:00Z",
     dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI"
 ):
     """
@@ -502,27 +518,81 @@ def tutorial_taskflow_api_demo2(
                 f"Product ids: {[product.properties.get('id', product.properties.get('title')) for product in search_results]}"
             )
 
-            print(f"Downloading all {len(search_results)} products (parallel)...")
+            print(f"Downloading {len(search_results)} products individually (parallel)...")
             # Assure output directory is set. e.g. in env file: EODAG__DEDL__DOWNLOAD__OUTPUT_DIR=/home/eouser/eodag_downloads
-            from concurrent.futures import ThreadPoolExecutor
+            import time
+            from concurrent.futures import ThreadPoolExecutor, as_completed
 
+            # Download products one at a time (rather than dag.download_all) so that
+            # a single product's failure doesn't abort the whole batch and so each
+            # download's outcome/duration can be reported individually. eodag's
+            # download_all() swallows ordinary per-product errors and returns only
+            # a shorter list of successful paths, with no per-product identity or
+            # timing — dag.download() raises per-product instead, which we can catch.
+            def _download_one(product: Any) -> DownloadRecordDict:
+                product_id = str(
+                    product.properties.get("id", product.properties.get("title"))
+                )
+                start = time.perf_counter()
+                try:
+                    downloaded_path = dag.download(
+                        product,
+                        extract=True,
+                        delete_archive=False,
+                        progress_callback=None,
+                    )
+                    return {
+                        "product_id": product_id,
+                        "title": product_id,
+                        "status": "success",
+                        "duration_seconds": time.perf_counter() - start,
+                        "error": None,
+                        "downloaded_path": str(downloaded_path),
+                    }
+                except Exception as exc:
+                    return {
+                        "product_id": product_id,
+                        "title": product_id,
+                        "status": "failed",
+                        "duration_seconds": time.perf_counter() - start,
+                        "error": str(exc),
+                        "downloaded_path": None,
+                    }
 
-            import os
-            from eodag.utils import ProgressCallback
+            download_records: list[DownloadRecordDict] = []
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = [
+                    executor.submit(_download_one, product) for product in search_results
+                ]
+                for future in as_completed(futures):
+                    download_records.append(future.result())
 
-            progress_callback = None
-
-            if "AIRFLOW_CTX_DAG_ID" in os.environ:
-                progress_callback = ProgressCallback(disable=True)
-
-            downloaded_folder_list = dag.download_all(
-                search_results,
-                extract=True,
-                delete_archive=False,
-                executor=ThreadPoolExecutor(max_workers=4),
-                progress_callback=progress_callback
+            num_downloads_succeeded = sum(
+                1 for record in download_records if record["status"] == "success"
             )
-            print(f"Downloaded all {len(search_results)} products.")
+            num_downloads_failed = len(download_records) - num_downloads_succeeded
+
+            for record in download_records:
+                if record["status"] == "success":
+                    print(
+                        f"Downloaded product '{record['product_id']}' to: "
+                        f"{record['downloaded_path']} ({record['duration_seconds']:.2f}s)"
+                    )
+                else:
+                    print(
+                        f"Failed to download product '{record['product_id']}' after "
+                        f"{record['duration_seconds']:.2f}s: {record['error']}"
+                    )
+
+            downloaded_folder_list = [
+                record["downloaded_path"]
+                for record in download_records
+                if record["status"] == "success"
+            ]
+            print(
+                f"Downloaded {num_downloads_succeeded}/{len(search_results)} products "
+                f"({num_downloads_failed} failed)."
+            )
 
             print("starting to clean the output directory to ensure extracted files are in the correct location...")
             # Note: workaround for an eodag extract issue — some downloaded filenames arrive
@@ -533,9 +603,6 @@ def tutorial_taskflow_api_demo2(
             extract_zip_files(renamed_files, overwrite=True)
             print("Cleaned the output directory.")
 
-            for downloaded_folder in downloaded_folder_list:
-                print(f"Downloaded product to: {downloaded_folder}")
-            
             # Get the list of .nat files from the downloaded folders
             current_run_nat_files = get_files_with_extension(downloaded_folder_list, ".nat")
 
@@ -548,6 +615,9 @@ def tutorial_taskflow_api_demo2(
                 "downloaded_nat_files": [str(path) for path in ordered_nat_files],
                 "collection_id": dedl_collection_id,
                 "bbox": search_params["bbox"],
+                "download_records": download_records,
+                "num_downloads_succeeded": num_downloads_succeeded,
+                "num_downloads_failed": num_downloads_failed,
             }
 
         else:
@@ -560,6 +630,9 @@ def tutorial_taskflow_api_demo2(
             "downloaded_nat_files": [],
             "collection_id": dedl_collection_id,
             "bbox": search_params["bbox"],
+            "download_records": [],
+            "num_downloads_succeeded": 0,
+            "num_downloads_failed": 0,
         }
 
     # [END extract]
@@ -596,7 +669,11 @@ def tutorial_taskflow_api_demo2(
         Returns:
             TransformOneResultDict: Path to the per-file Zarr output
         """
+        import time
+
         from dedl.eodag.eodag_helper import change_extension
+
+        transform_start = time.perf_counter()
 
         print(f"Transforming file: {nat_file} for channels: {channels}")
         # Reference: https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/ai_ready_data_preparation/demos/01_msg_local_to_zarr_code.html
@@ -805,7 +882,11 @@ def tutorial_taskflow_api_demo2(
                 f"  Size change:       {(output_size - input_size) / input_size * 100:+.1f}%"
             )
 
-        return {"zarr_path": str(zarr_file), "nat_file": nat_file}
+        return {
+            "zarr_path": str(zarr_file),
+            "nat_file": nat_file,
+            "duration_seconds": time.perf_counter() - transform_start,
+        }
 
     @task(multiple_outputs=True)
     def concatenate_zarr_files(
@@ -969,6 +1050,7 @@ def tutorial_taskflow_api_demo2(
             VisualiseOneResultDict: Per-channel video metadata
         """
         import os
+        import time
 
         from dedl.s3.s3_helper import upload_file_to_s3
         from dedl.visualization.visualization_helper import (
@@ -976,6 +1058,8 @@ def tutorial_taskflow_api_demo2(
             open_s3_zarr_dataset,
             resolve_data_variable,
         )
+
+        visualise_start = time.perf_counter()
 
         endpoint_url = os.environ["S3_ENDPOINT_URL"]
         bucket_name = os.environ["MY_S3_BUCKET_NAME"]
@@ -1034,6 +1118,7 @@ def tutorial_taskflow_api_demo2(
             "frame_count": video_result["frame_count"],
             "fps": video_result["fps"],
             "video_s3_uri": upload_result["s3_uri"],
+            "duration_seconds": time.perf_counter() - visualise_start,
         }
 
     # [END visualise]
@@ -1072,9 +1157,32 @@ def tutorial_taskflow_api_demo2(
 
     # Visualise: render MP4 time-lapses — one mapped task instance per channel,
     # rendered in parallel
-    visualise_one.partial(
+    visualise_results = visualise_one.partial(
         load_result_dict=load_result_dict, search_results_dict=search_results_dict
     ).expand(channel_name=normalized_channels)
+
+    # Report: global run summary (criteria, download success/failure counts,
+    # per-product/per-channel timings). trigger_rule="all_done" (set on the
+    # task itself in dedl.tasks.reporting) so it still runs and reports
+    # accurately even if load/visualise fail downstream of a successful
+    # extract/transform.
+    generate_run_report(
+        criteria={
+            "search_limit": normalized_search_limit,
+            "channels": normalized_channels,
+            "search_start": search_start,
+            "search_end": search_end,
+            "dedl_collection_id": dedl_collection_id,
+            "reprojection_crs": reprojection_crs,
+            "resampling": reprojection_resampling,
+            "resolution": reprojection_resolution,
+            "resolution_unit": reprojection_resolution_unit,
+            "reprojection_bounds": reprojection_bounds,
+        },
+        search_results_dict=search_results_dict,
+        transform_results=transform_results,
+        visualise_results=visualise_results,
+    )
     # [END main_flow]
 
 
@@ -1086,5 +1194,5 @@ dag = tutorial_taskflow_api_demo2()
 if __name__ == "__main__":
 
     dag.test(
-        run_conf={"search_limit": 5, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
+        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
     )
