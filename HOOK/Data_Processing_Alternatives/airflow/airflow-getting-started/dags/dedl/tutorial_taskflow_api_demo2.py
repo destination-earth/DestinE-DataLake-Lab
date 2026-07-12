@@ -150,6 +150,27 @@ def _build_video_output_path(channel_name: str) -> str:
     return f"{base_dir}/{channel_name}_timelapse.mp4"
 
 
+_VISIBLE_CHANNELS = frozenset({"ch1", "ch2", "ch3"})
+_WATER_VAPOUR_CHANNELS = frozenset({"ch5", "ch6"})
+
+
+def _colormap_for_channel(channel_name: str) -> str:
+    """
+    Pick a matplotlib colormap appropriate to a SEVIRI channel's band type.
+
+    ch1-ch3 (VIS0.6/VIS0.8/NIR1.6) are reflectance channels displayed like
+    classic monochrome VIS satellite imagery; ch5/ch6 (WV6.2/WV7.3) are the
+    water-vapour channels; everything else (ch4, ch7-ch11) is an infrared
+    window channel, shown with reversed greyscale so cold/high cloud tops
+    render bright, per the standard IR enhancement convention.
+    """
+    if channel_name in _VISIBLE_CHANNELS:
+        return "gray"
+    if channel_name in _WATER_VAPOUR_CHANNELS:
+        return "cividis"
+    return "gray_r"
+
+
 def _normalize_channel(value: str | DagParam) -> str:
     channel = str(_resolve_runtime_param(value)).strip()
     if not channel:
@@ -1079,7 +1100,8 @@ def tutorial_taskflow_api_demo2(
         render in parallel. Each mapped instance is fully self-contained: it reads
         the S3-backed Zarr dataset for its channel, renders an MP4 time-lapse with:
         - 4 FPS, max 120 frames
-        - Inferno colormap
+        - Colormap chosen per channel's band type (visible/water-vapour/infrared),
+          see `_colormap_for_channel`
         - Metadata overlay: collection ID, bbox, CRS, resolution, channel attributes
 
         Uploads MP4 to S3 under 'visualization/{channel}/' prefix.
@@ -1143,7 +1165,7 @@ def tutorial_taskflow_api_demo2(
             fps=4,
             frame_stride=1,
             max_frames=120,
-            colormap_name="inferno",
+            colormap_name=_colormap_for_channel(channel_name),
             annotation_metadata=annotation_metadata,
         )
 

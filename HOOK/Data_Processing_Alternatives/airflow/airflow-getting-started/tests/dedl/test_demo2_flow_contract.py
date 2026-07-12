@@ -97,6 +97,21 @@ def test_normalize_channels_rejects_string_input() -> None:
         raise AssertionError("Expected TypeError for string channel input")
 
 
+def test_colormap_for_channel_uses_gray_for_visible_channels() -> None:
+    for channel in ["ch1", "ch2", "ch3"]:
+        assert demo2._colormap_for_channel(channel) == "gray"
+
+
+def test_colormap_for_channel_uses_cividis_for_water_vapour_channels() -> None:
+    for channel in ["ch5", "ch6"]:
+        assert demo2._colormap_for_channel(channel) == "cividis"
+
+
+def test_colormap_for_channel_defaults_to_reversed_gray_for_infrared_and_unknown() -> None:
+    for channel in ["ch4", "ch7", "ch8", "ch9", "ch10", "ch11", "ch99"]:
+        assert demo2._colormap_for_channel(channel) == "gray_r"
+
+
 def test_normalize_search_limit_rejects_non_positive_values() -> None:
     for invalid in [0, -1]:
         try:
