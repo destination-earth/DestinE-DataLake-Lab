@@ -1,58 +1,95 @@
 ---
 title: "DEFAIR"
-author: "Author: EUMETSAT"
+author: "EUMETSAT"
 ---
 
 <img src="../img/DestinE-banner.jpg"
      alt="Destination Earth banner"
 />
+Materials to learn how to use **DEFAIR** ,  for AI-Ready Data)** provides tools and workflows for preparing AI-ready datasets within the Destination Earth ecosystem.
 
+This folder contains examples to help you get started with DEFAIR.
 
+## Notebooks
 
-Materials to learn how to use **DEFAIR** , Destination Earth Framework for preparing AI-Ready Data
+- [DEFAIR Quick Start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/uick_start.ipynb)
+  Introduction to DEFAIR and its core features.
 
-**Notebook**
-- [DEFAIR Quickstart](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_quick_start.ipynb): Quick start using DEFAIR, key features
-- [DEFAIR heatwaves cube creation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_heatwaves_cube.ipynb)
+- [DEFAIR Heatwaves Cube Creation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR) workflow demonstrating the creation of a heatwaves data cube with DEFAIR.
 
-Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
+## Documentation
 
+Additional information is available in the DestinE Data Lake documentation:
 
-**How To Install DEFAIR in DEDL Jupyterlab**
+https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
 
-Install  a dedicated DEFAIR environment and kernels in the DEDL JupyterLab: 
+---
 
-- upload the last DEFAIR artifacts archive into your DEDL JupyterLab and unzip the archive
+# Installing DEFAIR in DEDL JupyterLab
 
-- open a terminal and create the defair environment.
+Follow the steps below to create a dedicated DEFAIR environment and kernel in DEDL JupyterLab.
 
-  
+## 1. Upload the DEFAIR distribution
+
+Upload the latest DEFAIR artifact archive to your DEDL JupyterLab workspace and extract its contents.
+
+## 2. Create a dedicated Conda environment
+
+Open a terminal and create a new environment:
+
 ```bash
 conda create -n defair python=3.12
 ```
 
-
-- activate the defair environment: 
+## 3. Activate the environment
 
 ```bash
 conda activate defair
 ```
 
-- install DEFAIR wheelspip 
+## 4. Install the DEFAIR package
+
+Install the DEFAIR wheel from the extracted distribution:
 
 ```bash
-install dist/*.whl
+pip install dist/*.whl
 ```
 
-- explicitly install tenacity needed for the HDA source plugin: 
+## 5. Install additional dependencies
+
+Install `tenacity`, which is required by the HDA source plugin:
+
 ```bash
 pip install tenacity
 ```
-- install ipykernel in the defair environment: 
+
+## 6. Install Jupyter kernel support
+
 ```bash
 conda install ipykernel
 ```
-- install the “Python (defair)“ kernel to run defair notebooks. To run a DEFAIR notebook, you then choose the "Python (defair)"
+
+## 7. Register the DEFAIR kernel
+
+Register the environment as a Jupyter kernel:
+
 ```bash
-kernel.python -m ipykernel install --user --name defair-env --display-name "Python (defair)"
+python -m ipykernel install --user --name defair-env --display-name "Python (defair)"
 ```
+
+## 8. Run DEFAIR notebooks
+
+When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
+
+---
+
+## Verification
+
+To verify the installation open a new notebook selecting the **Python (defair)** kernel and run:
+
+```python
+import defair 
+print(defair.__version__)"
+```
+
+If the command executes successfully and prints the installed version, DEFAIR is ready to use.
