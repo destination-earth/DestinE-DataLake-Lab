@@ -672,12 +672,12 @@ def tutorial_taskflow_api_demo2(
         print(f"EODAG version: {eodag.__version__}")
 
         # Initialize EODAG with DestinE provider
-        dag = EODataAccessGateway()
+        eodag_client = EODataAccessGateway()
         if verbose_tutorial_logging:
-            print(dag.available_providers())
+            print(eodag_client.available_providers())
 
         dedl_provider = "dedl"
-        dag.set_preferred_provider(dedl_provider)
+        eodag_client.set_preferred_provider(dedl_provider)
 
         print("EODAG configured for DestinE!")
 
@@ -685,14 +685,14 @@ def tutorial_taskflow_api_demo2(
             # ----------------------------------------------------
             # Show eodag collections for the provier "dedl"
             # ----------------------------------------------------
-            collections = dag.list_collections(provider=dedl_provider)
+            collections = eodag_client.list_collections(provider=dedl_provider)
             print(collections)
 
         # See https://data.destination-earth.eu/data-portfolio/EO.EUM.DAT.MSG.HRSEVIRI
         # dedl_collection_id = "EO.EUM.DAT.MSG.HRSEVIRI" by default
         eodag_collection_id = find_eodag_collection_id_by_dedl_id(
             dedl_collection_id,
-            dag=dag,
+            dag=eodag_client,
         )
 
         print(
@@ -705,13 +705,13 @@ def tutorial_taskflow_api_demo2(
             # (reverse of the mapping above; not needed for the search below)
             # ----------------------------------------------------
             retrieved_dedl_collection_id = find_dedl_collection_by_eodag_id(
-                eodag_collection_id, dag=dag
+                eodag_collection_id, dag=eodag_client
             )
             print(
                 f"DEDL collection id(s) for normalized EODAG collection id '{eodag_collection_id}': {retrieved_dedl_collection_id}"
             )
 
-        collection_info = get_eodag_collection_info(eodag_collection_id, dag=dag)
+        collection_info = get_eodag_collection_info(eodag_collection_id, dag=eodag_client)
 
         if verbose_tutorial_logging:
             print("Collection metadata:")
@@ -758,7 +758,7 @@ def tutorial_taskflow_api_demo2(
             search_kwargs["geom"] = search_params["geom"]
             print("Search spatial filter mode: geom")
 
-        search_results = dag.search(**search_kwargs)
+        search_results = eodag_client.search(**search_kwargs)
 
         if search_results:
             print(
@@ -786,7 +786,7 @@ def tutorial_taskflow_api_demo2(
                 )
                 start = time.perf_counter()
                 try:
-                    downloaded_path = dag.download(
+                    downloaded_path = eodag_client.download(
                         product,
                         extract=True,
                         delete_archive=False,
@@ -1303,6 +1303,7 @@ def tutorial_taskflow_api_demo2(
             access_key_id=access_key_id,
             secret_access_key=secret_access_key,
             destination_prefix=f"my_{channels_slug}_zarr_data",  # Optional: specify a prefix in the S3 bucket
+            max_concurrency=4,
         )
 
         print(f"Uploaded to: {upload_result['s3_uri']}")
@@ -1456,6 +1457,8 @@ def tutorial_taskflow_api_demo2(
             destination_key=(
                 f"visualization/{channel_name}/{channel_name}_timelapse.mp4"
             ),
+            multipart_threshold_bytes=16 * 1024 * 1024,
+            max_concurrency=4,
         )
 
         return {
