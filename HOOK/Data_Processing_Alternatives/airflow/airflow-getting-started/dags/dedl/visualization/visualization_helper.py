@@ -83,6 +83,7 @@ def _build_annotation_lines(*, time_value: Any, annotation_metadata: dict[str, A
     lines = [
         f"time: {_format_frame_time(time_value)}",
         f"collection: {annotation_metadata['collection_id']}",
+        "source: EUMETSAT via DestinE Data Lake (DEDL)",
         f"channel: {annotation_metadata['channel_name']}",
         f"bbox: {_format_bbox(annotation_metadata['bbox'])}",
         f"target: {annotation_metadata.get('reprojection_crs', 'N/A')}",
@@ -96,6 +97,10 @@ def _build_annotation_lines(*, time_value: Any, annotation_metadata: dict[str, A
         lines.append(f"platform_name: {annotation_metadata['platform_name']}")
     if "long_name" in annotation_metadata:
         lines.append(f"long_name: {annotation_metadata['long_name']}")
+    if "city_overlay_active" in annotation_metadata:
+        lines.append("city markers: satellite brightness temp, not ground station data")
+    if "country_borders_active" in annotation_metadata:
+        lines.append("borders: Natural Earth (public domain)")
 
     return lines
 

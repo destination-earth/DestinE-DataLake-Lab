@@ -38,12 +38,12 @@ before `extract`.
 Two things look like unnecessary indirection until you know why they're
 there:
 
-- **`get_downloaded_nat_files`** (demo2.py:776-785) exists purely because
+- **`get_downloaded_nat_files`** (demo2.py:891-900) exists purely because
   dynamic task mapping (`.expand()`) only accepts a task's raw `return_value`
   XCom, not a subscript of a dict-returning task. It just re-exposes
   `search_results_dict["downloaded_nat_files"]` so `transform_one` can
   `.expand()` over it.
-- **The `normalize_*` tasks** (demo2.py:451-500) pull validation/coercion that
+- **The `normalize_*` tasks** (demo2.py:567-617) pull validation/coercion that
   used to happen independently inside `extract`/`transform`/`load`/`visualise`
   (repeated work, repeated bugs) into a single upfront pass. Downstream tasks
   just consume the already-normalized value.
@@ -52,7 +52,7 @@ there:
 
 ### Params
 
-Defined in the `@dag(params={...})` block (demo2.py:324-420):
+Defined in the `@dag(params={...})` block (demo2.py:408-536):
 
 | Param | Default | Purpose |
 |---|---|---|
@@ -62,6 +62,8 @@ Defined in the `@dag(params={...})` block (demo2.py:324-420):
 | `dedl_collection_id` | `EO.EUM.DAT.MSG.HRSEVIRI` | DEDL collection to search |
 | `download_max_workers` | `4` | Parallel download concurrency in `extract` |
 | `verbose_tutorial_logging` | `True` | Extra demonstration output (collection listing, id-mapping examples) |
+| `enable_city_temperature_overlay` | `True` | Overlay European capital-city markers with sampled brightness temperature on rendered frames (thermal channels only) |
+| `enable_country_borders_overlay` | `True` | Draw European country border/coastline lines on rendered frames, sourced from Natural Earth via cartopy (fetched and cached on first use) |
 | `reprojection_lat_min/max`, `reprojection_lon_min/max` | Europe bbox | Crop/reprojection AOI |
 | `reprojection_crs` | `EPSG:4326` | Target CRS |
 | `reprojection_resampling` | `bilinear` | Resampling method |
@@ -71,7 +73,7 @@ Defined in the `@dag(params={...})` block (demo2.py:324-420):
 
 `retries=2`, `retry_delay=timedelta(minutes=2)` — covers transient
 eodag/S3 network failures. `execution_timeout` is deliberately left unset
-(demo2.py:317-320): run duration varies too widely with `search_limit` and
+(demo2.py:413-419): run duration varies too widely with `search_limit` and
 `channels` to pick one safe default across deployments.
 
 ### `DagParam` resolution
@@ -87,7 +89,7 @@ resolving via `_resolve_runtime_param`, wired up as its own upfront task.
 ## 3. Task-by-task walkthrough
 
 ### `normalize_search_limit` / `normalize_channels` / `normalize_reprojection_settings`
-(demo2.py:451-500)
+(demo2.py:567-617)
 
 Validate/coerce `search_limit` (must be > 0), dedupe+validate `channels` (no
 path separators, non-empty), and bundle the reprojection AOI/CRS/resampling
@@ -96,7 +98,7 @@ values/dicts (not closures) specifically so the *concrete* runtime values are
 available to `transform_one`/`concatenate_zarr_files`, which run in a
 different task's process than where the params were defined.
 
-### `extract` (demo2.py:505-772)
+### `extract` (demo2.py:621-889)
 
 1. Retrieves DEDL credentials from the Airflow connection `hda_api` via
    `BaseHook.get_connection`.
@@ -129,12 +131,12 @@ per-product download records/success/failure counts (consumed later by
 > (`_get_output_base_dir`, demo2.py:128-157). This is the first link in the
 > shared-local-filesystem chain — see §4.
 
-### `get_downloaded_nat_files` (demo2.py:776-785)
+### `get_downloaded_nat_files` (demo2.py:891-900)
 
 Bridge task — see §1. Just returns `search_results_dict["downloaded_nat_files"]`
 as a raw return value so `transform_one.expand()` can consume it.
 
-### `transform_one` (mapped, one instance per `.nat` file — demo2.py:789-1042)
+### `transform_one` (mapped, one instance per `.nat` file — demo2.py:904-1174)
 
 Per file:
 
@@ -148,7 +150,16 @@ Per file:
    is only readable before that happens.
 4. Crops to the AOI via `spatial_filter` (fast, no reprojection), then
    reprojects+resamples to the configured CRS/resolution via `.reproject()`.
-5. Selects the requested channels and writes a consolidated Zarr v2 file
+5. Restores the `time` coordinate if the reprojection backend dropped it
+   (`_restore_dropped_time_coordinate`, demo2.py:254-276). The HEALPix
+   backend rebuilds its output coords from scratch and keeps only a bare
+   `time` *dimension*, so xarray substitutes a virtual integer index
+   (0, 1, 2, ...) in its place; left uncorrected, the visualisation banner
+   later misreads that index as Unix-epoch seconds and every frame's
+   timestamp renders as `01/01/1970`. The rioxarray/EPSG:4326 backend
+   already preserves the real `time` coordinate, so this step is a no-op
+   for it.
+6. Selects the requested channels and writes a consolidated Zarr v2 file
    (`change_extension(nat_file, ".zarr")`), then re-opens it to verify
    variables/coordinates match and logs a storage-size comparison against
    the original `.nat`.
@@ -159,11 +170,11 @@ Returns a `TransformOneResultDict` (zarr path, source `.nat` path, duration,
 > **VM vs Kubernetes:** reads the `.nat` file `extract` wrote to local disk —
 > same shared-filesystem dependency as above. Separately, note that
 > `defair_data`, `xarray`, and `eodag` are imported **inside** the task body,
-> not at module scope (demo2.py:824-830) — this keeps DAG parsing cheap on
+> not at module scope (demo2.py:942-946) — this keeps DAG parsing cheap on
 > the scheduler regardless of executor, and on Kubernetes it's exactly the
 > boundary along which you'd split this task into its own custom image (§4).
 
-### `concatenate_zarr_files` (demo2.py:1044-1134)
+### `concatenate_zarr_files` (demo2.py:1176-1267)
 
 Opens every per-file Zarr with `xr.open_zarr` and concatenates along `time`
 with `xr.concat`. No re-sort by timestamp is needed here: `extract` already
@@ -176,7 +187,7 @@ the combined Zarr to `{base_dir}/concatenated.zarr`.
 Returns a `TransformResultsDict` (concatenated path, channel list,
 reprojection metadata, `source_channel_attrs`).
 
-### `load` (demo2.py:1139-1190)
+### `load` (demo2.py:1271-1320)
 
 Uploads the concatenated Zarr directory to S3 via
 `dedl.s3.s3_helper.upload_directory_to_s3`, under prefix
@@ -190,7 +201,7 @@ Forwards reprojection metadata and `source_channel_attrs` downstream to
 > sourced from `.env` on this VM. See §4 for the Kubernetes-native
 > alternative (Secret injection) already demonstrated in this repo.
 
-### `visualise_one` (mapped, one instance per channel — demo2.py:1193-1292)
+### `visualise_one` (mapped, one instance per channel — demo2.py:1325-1468)
 
 Each mapped instance is fully self-contained:
 
@@ -199,16 +210,31 @@ Each mapped instance is fully self-contained:
    already decoupled from the shared-filesystem assumption elsewhere in the
    pipeline.
 2. Resolves the channel's `DataArray` (`resolve_data_variable`).
-3. Builds the annotation overlay metadata
-   (`_build_visualization_annotation_metadata`, demo2.py:248-307) —
-   combines `extract`'s collection id/bbox with `load`'s reprojection
-   metadata, preferring `source_channel_attrs` for `grid_mapping`/
-   `platform_name` since reprojection overwrote the live attrs.
-4. Picks a colormap by channel band type (`_colormap_for_channel`,
+3. Picks a colormap by channel band type (`_colormap_for_channel`,
    demo2.py:176-190): `gray` for visible channels (ch1-ch3), `cividis` for
    water-vapour (ch5/ch6), `gray_r` (reversed greyscale, so cold/high cloud
    tops render bright) for everything else.
-5. Renders an MP4 (4 FPS, up to 120 frames) via
+4. Resolves the two optional overlays, gated independently of each other:
+   - **City temperature markers** — only when `enable_city_temperature_overlay`
+     is true **and** the channel is thermal (`_is_thermal_channel`; VIS/NIR
+     channels ch1-ch3 never get city markers regardless of the flag). Uses
+     the static `EUROPEAN_CAPITALS` list from
+     `dedl/visualization/capital_cities.py`.
+   - **Country borders/coastlines** — only when `enable_country_borders_overlay`
+     is true, via `load_country_border_lines()`
+     (`dedl/visualization/country_borders.py`, Natural Earth data fetched
+     through cartopy). Wrapped in a try/except: a fetch failure (no network,
+     first-run cache miss, etc.) is logged as a warning and the render falls
+     back silently to no borders overlay rather than failing the task.
+5. Builds the annotation overlay metadata
+   (`_build_visualization_annotation_metadata`, demo2.py:334-404) —
+   combines `extract`'s collection id/bbox with `load`'s reprojection
+   metadata, preferring `source_channel_attrs` for `grid_mapping`/
+   `platform_name` since reprojection overwrote the live attrs, and records
+   whether each overlay actually rendered this run (`city_overlay_active`,
+   `country_borders_active`) so the annotation banner can flag them — see
+   §4's "On-screen data provenance".
+6. Renders an MP4 (4 FPS, up to 120 frames) via
    `create_mp4_from_dataarray`, and uploads it to
    `visualization/{channel}/{channel}_timelapse.mp4`.
 
@@ -226,7 +252,7 @@ kept that way so it's unit-testable with plain fixtures
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 
-### `main_flow` (demo2.py:1296-1365)
+### `main_flow` (demo2.py:1472-1543)
 
 Wires everything above together: normalize → `extract` →
 `get_downloaded_nat_files` → `transform_one.partial(...).expand(...)` →
@@ -240,9 +266,28 @@ dynamic task mapping fan-out.
 Not every channel's pixel values mean "temperature," and even where they do,
 it isn't the temperature you'd read off a thermometer at ground level. This
 matters directly for the per-city °C labels `visualise_one` overlays on the
-MP4s (`_overlay_city_temperatures`, `visualization_helper.py:219-246`) and for
+MP4s (`_overlay_city_temperatures`, `visualization_helper.py:331-360`) and for
 choosing a `search_start`/`search_end` window where the signal you actually
 want is visible.
+
+### On-screen data provenance
+
+The distinctions below aren't only documented in this file — every rendered
+frame's annotation banner (`_build_annotation_lines`,
+`visualization_helper.py:82-107`) now states them directly, so a viewer of
+the MP4 alone (without this doc) still gets the key caveats:
+
+- `source: EUMETSAT via DestinE Data Lake (DEDL)` — always present, on every
+  frame.
+- `city markers: satellite brightness temp, not ground station data` —
+  present only when the city-temperature overlay actually rendered this run
+  (`enable_city_temperature_overlay=True` **and** the channel is thermal;
+  see `city_overlay_active` in `_build_visualization_annotation_metadata`,
+  demo2.py:334-404).
+- `borders: Natural Earth (public domain)` — present only when the
+  country-borders overlay actually rendered this run (Natural Earth fetch
+  succeeded and `enable_country_borders_overlay=True`; see
+  `country_borders_active` in the same function).
 
 ### Which channels have a temperature at all
 
@@ -250,7 +295,7 @@ want is visible.
 `brightness_temperature` calibration (float32 Kelvin) for every channel
 except `ch1`-`ch3`, and `radiance` for those three — `_is_thermal_channel`
 (demo2.py:215-223) encodes the same split, and it's what gates the
-city-temperature overlay in `visualise_one` (demo2.py:1340-1342: only passed
+city-temperature overlay in `visualise_one` (demo2.py:1422-1424: only passed
 `EUROPEAN_CAPITALS` when `_is_thermal_channel(channel_name)` is true).
 
 | Channels | Band | Calibration | Has a °C reading? |
@@ -284,7 +329,7 @@ genuinely clear:
   A city's overlay label under cloud will read as a cold cloud-top
   temperature (often well below 0°C) even on a warm day at street level —
   that's expected, not a bug in `_sample_city_temperatures_celsius`
-  (`visualization_helper.py:199-216`), which samples whatever raw Kelvin
+  (`visualization_helper.py:311-330`), which samples whatever raw Kelvin
   value is at that pixel with no cloud-masking.
 - **Water vapour channels (`ch5`/`ch6`):** these peak in absorption bands
   where the surface is *never* visible — the brightness temperature is
@@ -372,7 +417,10 @@ Kubernetes, a retried `@task.kubernetes`/`KubernetesPodOperator` task gets a
 on the shared-storage or S3-routing choice above, not on the retry count
 itself.
 
-**Local dry-run (`dag.test()`, demo2.py:1373-1377).** Bypasses the
+**Local dry-run (`dag.test()`, demo2.py:1554-1573).** The active example
+demos the HEALPix reprojection path (`reprojection_crs: "healpix:1024"`,
+`reprojection_resampling: "nearest"` — see the inline comments there for why
+HEALPix requires nearest-neighbour resampling). Bypasses the
 scheduler/executor entirely and always runs in-process, regardless of
 target deployment — useful for iterating on task logic quickly. Passing
 here says nothing about whether the shared-filesystem or

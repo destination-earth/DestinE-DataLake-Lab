@@ -251,6 +251,31 @@ def _build_channel_calibration_map(channels: list[str]) -> dict[str, str]:
     return calibration_map
 
 
+def _restore_dropped_time_coordinate(reprojected: Any, original: Any) -> Any:
+    """
+    Restore a "time" coordinate that some reprojection backends drop.
+
+    The rioxarray/EPSG:4326 reprojection backend preserves the real
+    datetime64 "time" coordinate attached during Dataset.from_source, but the
+    HEALPix backend rebuilds its output coords from scratch and keeps only
+    the bare "time" dimension. xarray then substitutes a virtual integer
+    index (0, 1, 2, ...) for it, which the visualisation code later misreads
+    as Unix-epoch seconds (rendering as 1970-01-01 in the MP4 overlay).
+
+    Args:
+        reprojected: The post-reprojection xr.Dataset.
+        original: The pre-reprojection xr.Dataset carrying the real "time"
+            coordinate values (reprojection only touches spatial dims).
+
+    Returns:
+        `reprojected` unchanged if it already has a "time" coordinate,
+        otherwise a copy with "time" assigned from `original`.
+    """
+    if "time" in reprojected.dims and "time" not in reprojected.coords:
+        return reprojected.assign_coords(time=original["time"])
+    return reprojected
+
+
 def _normalize_channel(value: str | DagParam) -> str:
     channel = str(_resolve_runtime_param(value)).strip()
     if not channel:
@@ -312,6 +337,8 @@ def _build_visualization_annotation_metadata(
     channel_name: str,
     channel_attrs: dict[str, Any] | None = None,
     source_channel_attrs: dict[str, Any] | None = None,
+    city_overlay_active: bool = False,
+    country_borders_active: bool = False,
 ) -> dict[str, Any]:
     """
     Build metadata dictionary for annotating a visualization (MP4 time-lapse).
@@ -333,6 +360,10 @@ def _build_visualization_annotation_metadata(
             transform_one — takes precedence over channel_attrs for
             grid_mapping since reprojection overwrites it, and is the only
             source of platform_name.
+        city_overlay_active: Whether the city-temperature overlay is
+            actually rendered this run (enable flag AND thermal channel).
+        country_borders_active: Whether the country-borders overlay was
+            successfully fetched and is actually rendered this run.
 
     Returns:
         dict: Annotation metadata with keys: collection_id, bbox (reprojection or search),
@@ -364,6 +395,11 @@ def _build_visualization_annotation_metadata(
             annotation_metadata["platform_name"] = source_channel_attrs["platform_name"]
 
     annotation_metadata.setdefault("grid_mapping", "spatial_ref")
+
+    if city_overlay_active:
+        annotation_metadata["city_overlay_active"] = True
+    if country_borders_active:
+        annotation_metadata["country_borders_active"] = True
 
     return annotation_metadata
 
@@ -1031,15 +1067,20 @@ def tutorial_taskflow_api_demo2(
             bounds=reprojection["bounds"],  # (lon_min, lat_min, lon_max, lat_max)
         )
 
+        # Some reprojection backends (HEALPix) drop the real "time" coordinate
+        # during reprojection; restore it when that happens. See
+        # _restore_dropped_time_coordinate for why this is needed.
+        reproj_data = _restore_dropped_time_coordinate(
+            ds_europe_reproj.data, ds_europe.data
+        )
+        if reproj_data is not ds_europe_reproj.data:
+            ds_europe_reproj = Dataset(reproj_data, cdm=ds_europe_reproj.cdm)
+
         # -----------------------------------------------------
         # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
         # -----------------------------------------------------
 
-        # Select all configured channels from the transformed dataset. The MSG15
-        # reader already attached a real datetime64 "time" dimension (from the
-        # scene's start_time attribute) during Dataset.from_source, and
-        # spatial_filter/reproject don't touch it, so concatenate_zarr_files'
-        # xr.concat(dim="time") gets a genuine, ordered time axis for free.
+        # Select all configured channels from the transformed dataset.
         xr_channel = ds_europe_reproj.data[channels]
 
         ds_channel = Dataset(xr_channel)
@@ -1361,15 +1402,6 @@ def tutorial_taskflow_api_demo2(
             )
 
         output_mp4_path = _build_video_output_path(channel_name)
-        annotation_metadata = _build_visualization_annotation_metadata(
-            search_results_dict,
-            load_result_dict,
-            channel_name,
-            channel_attrs=dict(selected_channel.attrs),
-            source_channel_attrs=load_result_dict.get("source_channel_attrs", {}).get(
-                channel_name
-            ),
-        )
 
         country_border_lines = None
         if enable_country_borders_overlay:
@@ -1387,6 +1419,22 @@ def tutorial_taskflow_api_demo2(
                     exc_info=True,
                 )
 
+        city_overlay_active = enable_city_temperature_overlay and _is_thermal_channel(
+            channel_name
+        )
+
+        annotation_metadata = _build_visualization_annotation_metadata(
+            search_results_dict,
+            load_result_dict,
+            channel_name,
+            channel_attrs=dict(selected_channel.attrs),
+            source_channel_attrs=load_result_dict.get("source_channel_attrs", {}).get(
+                channel_name
+            ),
+            city_overlay_active=city_overlay_active,
+            country_borders_active=country_border_lines is not None,
+        )
+
         video_result = create_mp4_from_dataarray(
             selected_channel,
             output_mp4_path,
@@ -1395,11 +1443,7 @@ def tutorial_taskflow_api_demo2(
             max_frames=120,
             colormap_name=_colormap_for_channel(channel_name),
             annotation_metadata=annotation_metadata,
-            city_temperature_overlay=(
-                EUROPEAN_CAPITALS
-                if (enable_city_temperature_overlay and _is_thermal_channel(channel_name))
-                else None
-            ),
+            city_temperature_overlay=(EUROPEAN_CAPITALS if city_overlay_active else None),
             country_border_lines=country_border_lines,
         )
 
@@ -1525,5 +1569,5 @@ if __name__ == "__main__":
     # nside=1024's bins. NearestResampler backward-fills empty bins from
     # their nearest filled neighbour and preserves the source min/max.
     dag.test(
-        run_conf={"search_limit": 3, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
+        run_conf={"search_limit": 10, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
     )

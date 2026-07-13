@@ -4,6 +4,10 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
+import pandas as pd
+import xarray as xr
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
@@ -267,6 +271,83 @@ def test_build_visualization_annotation_metadata_ignores_empty_source_fields() -
 
     assert result["grid_mapping"] == "spatial_ref"
     assert "platform_name" not in result
+
+
+def test_build_visualization_annotation_metadata_includes_city_overlay_active_when_true() -> None:
+    result = demo2._build_visualization_annotation_metadata(
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+        city_overlay_active=True,
+    )
+
+    assert result["city_overlay_active"] is True
+
+
+def test_build_visualization_annotation_metadata_includes_country_borders_active_when_true() -> None:
+    base_args = (
+        {
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "bbox": [-10.0, 35.0, 30.0, 65.0],
+        },
+        {
+            "reprojection_bounds": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+        "ch9",
+    )
+
+    result_active = demo2._build_visualization_annotation_metadata(
+        *base_args, country_borders_active=True
+    )
+    result_inactive = demo2._build_visualization_annotation_metadata(*base_args)
+
+    assert result_active["country_borders_active"] is True
+    assert "country_borders_active" not in result_inactive
+
+
+def test_restore_dropped_time_coordinate_recovers_healpix_backend_output() -> None:
+    # Mirrors what the astropy_healpix reprojection backend produces: "time"
+    # survives as a bare dimension but the coordinate itself is gone, so
+    # xarray substitutes a virtual 0, 1, 2, ... integer index.
+    original = xr.Dataset(
+        {"ch9": (("time", "y", "x"), np.zeros((2, 3, 3)))},
+        coords={"time": pd.to_datetime(["2004-01-19T10:30:00", "2004-01-19T10:45:00"])},
+    )
+    reprojected_values = xr.DataArray(
+        np.zeros((2, 5)), dims=("time", "healpix_index")
+    ).to_dataset(name="ch9")
+    assert "time" not in reprojected_values.coords
+
+    restored = demo2._restore_dropped_time_coordinate(reprojected_values, original)
+
+    assert "time" in restored.coords
+    np.testing.assert_array_equal(restored["time"].values, original["time"].values)
+
+
+def test_restore_dropped_time_coordinate_is_noop_when_time_coordinate_present() -> None:
+    # Mirrors the rioxarray/EPSG:4326 backend, which preserves "time" as a
+    # real coordinate; the helper must not touch it or return a copy.
+    original = xr.Dataset(
+        {"ch9": (("time", "y", "x"), np.zeros((2, 3, 3)))},
+        coords={"time": pd.to_datetime(["2004-01-19T10:30:00", "2004-01-19T10:45:00"])},
+    )
+
+    restored = demo2._restore_dropped_time_coordinate(original, original)
+
+    assert restored is original
 
 
 def test_build_visualization_annotation_metadata_falls_back_to_search_bbox() -> None:
