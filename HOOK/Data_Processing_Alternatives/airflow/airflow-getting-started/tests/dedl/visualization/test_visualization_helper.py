@@ -19,6 +19,8 @@ from dedl.visualization.visualization_helper import (  # noqa: E402
     _build_annotation_lines,
     _format_bbox,
     _format_frame_time,
+    _overlay_country_borders,
+    _resolve_border_line_pixels,
     _resolve_city_pixels,
     _resolve_spatial_coord_names,
     _sample_city_temperatures_celsius,
@@ -463,6 +465,77 @@ def test_resolve_city_pixels_skips_cities_outside_curvilinear_tolerance() -> Non
     assert resolved == []
 
 
+def test_resolve_border_line_pixels_maps_vertices_to_nearest_grid_index() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    resolved = _resolve_border_line_pixels(
+        x_coords, y_coords, [[(4.5, 44.0), (-9.0, 50.0)]]
+    )
+
+    assert resolved == [[(1, 3), (0, 0)]]
+
+
+def test_resolve_border_line_pixels_breaks_line_at_out_of_tolerance_vertex() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    # Two valid vertices, one far-outside-tolerance vertex, two more valid
+    # vertices — must split into two separate 2-point polylines rather than
+    # bridging the gap with a spurious straight line.
+    line = [
+        (-9.0, 50.0),
+        (-4.0, 45.0),
+        (500.0, 45.0),
+        (4.5, 44.0),
+        (9.0, 40.0),
+    ]
+
+    resolved = _resolve_border_line_pixels(x_coords, y_coords, [line])
+
+    assert resolved == [[(0, 0), (1, 1)], [(1, 3), (2, 4)]]
+
+
+def test_resolve_border_line_pixels_skips_lines_with_single_vertex() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    resolved = _resolve_border_line_pixels(x_coords, y_coords, [[(0.0, 40.0)]])
+
+    assert resolved == []
+
+
+def test_resolve_border_line_pixels_handles_curvilinear_2d_coordinates() -> None:
+    lon_grid = np.array([[0.0, 5.0, 10.0], [1.0, 6.0, 11.0]])
+    lat_grid = np.array([[40.0, 41.0, 42.0], [45.0, 46.0, 47.0]])
+
+    resolved = _resolve_border_line_pixels(
+        lon_grid, lat_grid, [[(6.0, 46.0), (0.0, 40.0)]]
+    )
+
+    assert resolved == [[(1, 1), (0, 0)]]
+
+
+def test_resolve_border_line_pixels_empty_input_returns_empty_list() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    assert _resolve_border_line_pixels(np.array([]), np.array([]), [[(0.0, 0.0), (1.0, 1.0)]]) == []
+    assert _resolve_border_line_pixels(x_coords, y_coords, []) == []
+
+
+def test_overlay_country_borders_draws_pixels_along_resolved_segment() -> None:
+    frame = np.zeros((4, 4, 3), dtype=np.uint8)
+
+    result = _overlay_country_borders(frame, [[(0, 0), (0, 3)]])
+
+    # Semi-transparent light-gray line composited over black: deterministic
+    # alpha-blend result, distinct from the untouched black background.
+    assert tuple(result[0, 0]) == (138, 138, 138)
+    assert tuple(result[0, 1]) == (138, 138, 138)
+    assert tuple(result[1, 0]) == (0, 0, 0)
+
+
 def test_resolve_spatial_coord_names_prefers_lon_lat_when_present() -> None:
     data_array = xr.DataArray(
         np.zeros((2, 2)),
@@ -673,3 +746,177 @@ def test_create_mp4_from_dataarray_city_overlay_defaults_to_none(
     )
 
     assert overlay_calls == []
+
+
+def _patch_dummy_writer_and_frame(monkeypatch: pytest.MonkeyPatch) -> list[np.ndarray]:
+    written_frames: list[np.ndarray] = []
+
+    class _DummyWriter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def append_data(self, frame: np.ndarray) -> None:
+            written_frames.append(frame)
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper.imageio",
+        SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
+    )
+    return written_frames
+
+
+def test_create_mp4_from_dataarray_applies_country_borders_overlay(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "y", "x"), np.ones((2, 2, 2), dtype=float))},
+        coords={
+            "time": np.array([np.datetime64("2024-07-09T00:00:00"), np.datetime64("2024-07-09T01:00:00")]),
+            "y": np.array([50.0, 40.0]),
+            "x": np.array([0.0, 10.0]),
+        },
+    )
+
+    written_frames = _patch_dummy_writer_and_frame(monkeypatch)
+    captured_border_pixels: list[list[list[tuple[int, int]]]] = []
+
+    def _capture_borders_overlay(
+        frame: np.ndarray, resolved_border_pixels: list[list[tuple[int, int]]]
+    ) -> np.ndarray:
+        captured_border_pixels.append(resolved_border_pixels)
+        return frame
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_country_borders",
+        _capture_borders_overlay,
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "borders_overlay.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+        country_border_lines=[[(0.0, 50.0), (10.0, 40.0)]],
+    )
+
+    assert len(written_frames) == 2
+    assert captured_border_pixels == [[[(0, 0), (1, 1)]], [[(0, 0), (1, 1)]]]
+
+
+def test_create_mp4_from_dataarray_applies_country_borders_overlay_with_lon_lat_coords(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Regression coverage mirroring the city-overlay lon/lat test: the DAG's
+    # default reprojection_crs is EPSG:4326, whose coordinates are named
+    # "lon"/"lat", not "x"/"y".
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "lat", "lon"), np.ones((2, 2, 2), dtype=float))},
+        coords={
+            "time": np.array([np.datetime64("2024-07-09T00:00:00"), np.datetime64("2024-07-09T01:00:00")]),
+            "lat": np.array([50.0, 40.0]),
+            "lon": np.array([0.0, 10.0]),
+        },
+    )
+
+    written_frames = _patch_dummy_writer_and_frame(monkeypatch)
+    captured_border_pixels: list[list[list[tuple[int, int]]]] = []
+
+    def _capture_borders_overlay(
+        frame: np.ndarray, resolved_border_pixels: list[list[tuple[int, int]]]
+    ) -> np.ndarray:
+        captured_border_pixels.append(resolved_border_pixels)
+        return frame
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_country_borders",
+        _capture_borders_overlay,
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "borders_overlay_lonlat.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+        country_border_lines=[[(0.0, 50.0), (10.0, 40.0)]],
+    )
+
+    assert len(written_frames) == 2
+    assert captured_border_pixels == [[[(0, 0), (1, 1)]], [[(0, 0), (1, 1)]]]
+
+
+def test_create_mp4_from_dataarray_country_borders_overlay_defaults_to_none(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    dataset = _build_dataset()
+    overlay_calls: list[object] = []
+
+    _patch_dummy_writer_and_frame(monkeypatch)
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_country_borders",
+        lambda *args, **kwargs: overlay_calls.append(1),
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "no_borders_overlay.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+    )
+
+    assert overlay_calls == []
+
+
+def test_create_mp4_from_dataarray_draws_borders_before_city_overlay_and_banner(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "y", "x"), np.ones((1, 2, 2), dtype=float))},
+        coords={
+            "time": np.array([np.datetime64("2024-07-09T00:00:00")]),
+            "y": np.array([50.0, 40.0]),
+            "x": np.array([0.0, 10.0]),
+        },
+    )
+
+    _patch_dummy_writer_and_frame(monkeypatch)
+    draw_order: list[str] = []
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_country_borders",
+        lambda frame, *args, **kwargs: (draw_order.append("borders"), frame)[1],
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        lambda frame, *args, **kwargs: (draw_order.append("city"), frame)[1],
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_annotation_banner",
+        lambda frame, *args, **kwargs: (draw_order.append("banner"), frame)[1],
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "draw_order.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+        city_temperature_overlay=[CityCoordinate("Testville", 40.0, 10.0)],
+        country_border_lines=[[(0.0, 50.0), (10.0, 40.0)]],
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+        },
+    )
+
+    assert draw_order == ["borders", "city", "banner"]

@@ -430,6 +430,23 @@ def _build_visualization_annotation_metadata(
             description="Print extra demonstration output (collection listing, id-mapping "
             "examples, full collection metadata) in the extract task. Disable for quieter logs.",
         ),
+        "enable_city_temperature_overlay": Param(
+            True,
+            type="boolean",
+            title="Enable City Temperature Overlay",
+            description="Overlay European capital-city markers with sampled temperature "
+            "(thermal channels only). Disable to render thermal-channel frames without "
+            "city markers/labels.",
+        ),
+        "enable_country_borders_overlay": Param(
+            True,
+            type="boolean",
+            title="Enable Country Borders Overlay",
+            description="Draw European country border lines and coastline outlines on "
+            "every frame, sourced from Natural Earth's admin_0_boundary_lines_land and "
+            "coastline shapefiles via cartopy (fetched over the network and cached on "
+            "first use).",
+        ),
         "reprojection_lat_min": Param(
             34.0,
             type="number",
@@ -489,6 +506,8 @@ def tutorial_taskflow_api_demo2(
     dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
     download_max_workers: int = 4,
     verbose_tutorial_logging: bool = True,
+    enable_city_temperature_overlay: bool = True,
+    enable_country_borders_overlay: bool = True,
     reprojection_lat_min: float = 34.0,
     reprojection_lat_max: float = 72.0,
     reprojection_lon_min: float = -25.0,
@@ -1016,8 +1035,13 @@ def tutorial_taskflow_api_demo2(
         # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
         # -----------------------------------------------------
 
-        # Select all configured channels from the transformed dataset.
+        # Select all configured channels from the transformed dataset. The MSG15
+        # reader already attached a real datetime64 "time" dimension (from the
+        # scene's start_time attribute) during Dataset.from_source, and
+        # spatial_filter/reproject don't touch it, so concatenate_zarr_files'
+        # xr.concat(dim="time") gets a genuine, ordered time axis for free.
         xr_channel = ds_europe_reproj.data[channels]
+
         ds_channel = Dataset(xr_channel)
 
         # Keep downstream logic unchanged by replacing dataset with the single-channel view.
@@ -1262,6 +1286,8 @@ def tutorial_taskflow_api_demo2(
         channel_name: str,
         load_result_dict: LoadResultDict,
         search_results_dict: SearchResultsDict,
+        enable_city_temperature_overlay: bool,
+        enable_country_borders_overlay: bool,
     ) -> VisualiseOneResultDict:
         """
         #### Visualise task (mapped): render + upload an annotated MP4 for one channel
@@ -1280,6 +1306,11 @@ def tutorial_taskflow_api_demo2(
             channel_name: Single channel to visualize (already normalized upstream)
             load_result_dict: From load(); contains S3 URI and reprojection metadata
             search_results_dict: From extract(); contains collection_id and search bbox
+            enable_city_temperature_overlay: Whether to overlay city temperature
+                markers (only applies to thermal channels regardless of this flag)
+            enable_country_borders_overlay: Whether to fetch and draw European
+                country border lines and coastline outlines (via cartopy/Natural
+                Earth); falls back to no overlay if the fetch fails
 
         Returns:
             VisualiseOneResultDict: Per-channel video metadata
@@ -1340,6 +1371,22 @@ def tutorial_taskflow_api_demo2(
             ),
         )
 
+        country_border_lines = None
+        if enable_country_borders_overlay:
+            from dedl.visualization.country_borders import load_country_border_lines
+
+            try:
+                country_border_lines = load_country_border_lines()
+            except Exception:
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    "Failed to fetch Natural Earth country-border geometry; "
+                    "rendering '%s' without the borders overlay.",
+                    channel_name,
+                    exc_info=True,
+                )
+
         video_result = create_mp4_from_dataarray(
             selected_channel,
             output_mp4_path,
@@ -1349,8 +1396,11 @@ def tutorial_taskflow_api_demo2(
             colormap_name=_colormap_for_channel(channel_name),
             annotation_metadata=annotation_metadata,
             city_temperature_overlay=(
-                EUROPEAN_CAPITALS if _is_thermal_channel(channel_name) else None
+                EUROPEAN_CAPITALS
+                if (enable_city_temperature_overlay and _is_thermal_channel(channel_name))
+                else None
             ),
+            country_border_lines=country_border_lines,
         )
 
         upload_result = upload_file_to_s3(
@@ -1423,7 +1473,10 @@ def tutorial_taskflow_api_demo2(
     # Visualise: render MP4 time-lapses — one mapped task instance per channel,
     # rendered in parallel
     visualise_results = visualise_one.partial(
-        load_result_dict=load_result_dict, search_results_dict=search_results_dict
+        load_result_dict=load_result_dict,
+        search_results_dict=search_results_dict,
+        enable_city_temperature_overlay=enable_city_temperature_overlay,
+        enable_country_borders_overlay=enable_country_borders_overlay,
     ).expand(channel_name=normalized_channels)
 
     # Report: global run summary (criteria, download success/failure counts,
@@ -1472,5 +1525,5 @@ if __name__ == "__main__":
     # nside=1024's bins. NearestResampler backward-fills empty bins from
     # their nearest filled neighbour and preserves the source min/max.
     dag.test(
-        run_conf={"search_limit": 3, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
+        run_conf={"search_limit": 3, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
     )
