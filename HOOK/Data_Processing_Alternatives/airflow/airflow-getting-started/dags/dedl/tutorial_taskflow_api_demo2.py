@@ -1291,6 +1291,7 @@ def tutorial_taskflow_api_demo2(
         from dedl.visualization.visualization_helper import (
             create_mp4_from_dataarray,
             open_s3_zarr_dataset,
+            reproject_healpix_dataarray_to_raster,
             resolve_data_variable,
         )
 
@@ -1318,6 +1319,16 @@ def tutorial_taskflow_api_demo2(
             )
 
         selected_channel = resolve_data_variable(dataset, preferred_name=channel_name)
+
+        if "healpix_index" in selected_channel.dims:
+            # HEALPix output is cell-indexed (no row/col raster) — scatter it
+            # onto a regular display grid before create_mp4_from_dataarray,
+            # which can only draw a 2-D raster per frame.
+            selected_channel = reproject_healpix_dataarray_to_raster(
+                selected_channel,
+                bounds=load_result_dict["reprojection_bounds"],
+            )
+
         output_mp4_path = _build_video_output_path(channel_name)
         annotation_metadata = _build_visualization_annotation_metadata(
             search_results_dict,
@@ -1443,6 +1454,23 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
+    # dag.test(
+    #     run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
+    # )
+
+    # dag.test with healpix reproject using defair
+    # Note: for the HEALPix backend, reprojection_resolution/resolution_unit
+    # below are ignored (AstropyHealpixBackend.reproject() docs it explicitly) —
+    # only the nside in "healpix:<nside>" controls output resolution. nside=64
+    # is ~0.92 deg (~102km) native pixels, which over this DAG's Europe bbox
+    # renders a ~77x42px video. nside=1024 (~0.057 deg, ~6.4km) instead gives a
+    # ~1224x665px video, comparable to the non-HEALPix EPSG:4326 default.
+    # resampling="nearest" (not "mean"): MeanResampler leaves any HEALPix bin
+    # with zero contributing source samples as NaN (rendered as artifact
+    # patches), which shows up at the north/east (top/right) of this bbox
+    # where MSG/SEVIRI's oblique-view pixel footprint is sparser than
+    # nside=1024's bins. NearestResampler backward-fills empty bins from
+    # their nearest filled neighbour and preserves the source min/max.
     dag.test(
-        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
+        run_conf={"search_limit": 3, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
     )
