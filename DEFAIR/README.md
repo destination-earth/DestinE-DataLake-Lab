@@ -12,10 +12,10 @@ This folder contains examples to help you get started with DEFAIR.
 
 ## Notebooks
 
-- [DEFAIR Quick Start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/uick_start.ipynb)
+- [DEFAIR Quick Start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEDL_DEFAIR_quick_start.ipynb)
   Introduction to DEFAIR and its core features.
 
-- [DEFAIR Heatwaves Cube Creation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR) workflow demonstrating the creation of a heatwaves data cube with DEFAIR.
+- [DEFAIR Monthly air temperature regression](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/Monthly_air_temperature_regression.ipynb)  estimates the mean 2 m air temperature of June 2026 over Central and Western Europe from satellite observations of surface temperature alone, using the DEFAIR AI-ready data framework end to end. 
 
 ## Documentation
 
