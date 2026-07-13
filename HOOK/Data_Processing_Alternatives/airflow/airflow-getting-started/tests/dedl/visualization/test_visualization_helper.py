@@ -24,8 +24,31 @@ from dedl.visualization.visualization_helper import (  # noqa: E402
     _sample_city_temperatures_celsius,
     compute_display_range,
     create_mp4_from_dataarray,
+    reproject_healpix_dataarray_to_raster,
     resolve_data_variable,
 )
+
+
+def _build_healpix_dataarray(nside: int = 2) -> xr.DataArray:
+    # Real HEALPix pixel centres (ring order), matching what
+    # defair_ops's AstropyHealpixBackend attaches as lon/lat coords on the
+    # "healpix_index" dim.
+    astropy_healpix = pytest.importorskip("astropy_healpix")
+    npix = 12 * nside * nside
+    hp = astropy_healpix.HEALPix(nside=nside, order="ring")
+    lon, lat = hp.healpix_to_lonlat(np.arange(npix))
+
+    data = np.tile(np.arange(npix, dtype=float), (2, 1))
+    return xr.DataArray(
+        data,
+        dims=("time", "healpix_index"),
+        coords={
+            "time": np.array([0, 1]),
+            "healpix_index": np.arange(npix),
+            "lon": ("healpix_index", lon.to("deg").value),
+            "lat": ("healpix_index", lat.to("deg").value),
+        },
+    )
 
 
 def _build_dataset() -> xr.Dataset:
@@ -82,6 +105,82 @@ def test_create_mp4_from_dataarray_requires_time_dimension(tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="must contain a 'time' dimension"):
         create_mp4_from_dataarray(arr, str(tmp_path / "out.mp4"))
+
+
+def test_create_mp4_from_dataarray_rejects_non_raster_spatial_dims(tmp_path: Path) -> None:
+    # Unstructured/cell-indexed data (e.g. HEALPix output) has a single
+    # spatial dim, not a (row, col) raster this function can draw frames for.
+    arr = xr.DataArray(np.ones((3, 10), dtype=float), dims=("time", "cell"))
+
+    with pytest.raises(ValueError, match="Unstructured/cell-indexed data"):
+        create_mp4_from_dataarray(arr, str(tmp_path / "out.mp4"))
+
+
+def test_reproject_healpix_dataarray_to_raster_requires_healpix_dim() -> None:
+    arr = xr.DataArray(np.ones((2, 2), dtype=float), dims=("y", "x"))
+
+    with pytest.raises(ValueError, match="requires a 'healpix_index' dim"):
+        reproject_healpix_dataarray_to_raster(arr, bounds=(-25.0, 34.0, 45.0, 72.0))
+
+
+def test_reproject_healpix_dataarray_to_raster_rejects_invalid_pixel_count() -> None:
+    arr = xr.DataArray(
+        np.ones((2, 10), dtype=float),
+        dims=("time", "healpix_index"),
+        coords={
+            "healpix_index": np.arange(10),
+            "lon": ("healpix_index", np.zeros(10)),
+            "lat": ("healpix_index", np.zeros(10)),
+        },
+    )
+
+    with pytest.raises(ValueError, match="not a valid HEALPix pixel count"):
+        reproject_healpix_dataarray_to_raster(arr, bounds=(-25.0, 34.0, 45.0, 72.0))
+
+
+def test_reproject_healpix_dataarray_to_raster_builds_regular_display_grid() -> None:
+    data_array = _build_healpix_dataarray(nside=2)
+    bounds = (-25.0, 34.0, 45.0, 72.0)
+
+    raster = reproject_healpix_dataarray_to_raster(data_array, bounds=bounds)
+
+    assert raster.dims == ("time", "y", "x")
+    assert "healpix_index" not in raster.coords
+    assert list(raster["time"].values) == [0, 1]
+
+    lon_min, lat_min, lon_max, lat_max = bounds
+    assert raster["lon"].values.min() == pytest.approx(lon_min)
+    assert raster["lon"].values.max() == pytest.approx(lon_max)
+    assert raster["lat"].values.min() == pytest.approx(lat_min)
+    assert raster["lat"].values.max() == pytest.approx(lat_max)
+    # row 0 is the northern edge, like a normal raster/image
+    assert raster["lat"].values[0] > raster["lat"].values[-1]
+
+
+def test_reproject_healpix_dataarray_to_raster_assigns_nearest_pixel_values() -> None:
+    astropy_healpix = pytest.importorskip("astropy_healpix")
+    nside = 2
+    npix = 12 * nside * nside
+    hp = astropy_healpix.HEALPix(nside=nside, order="ring")
+
+    data_array = _build_healpix_dataarray(nside=nside)
+    raster = reproject_healpix_dataarray_to_raster(data_array, bounds=(-25.0, 34.0, 45.0, 72.0))
+
+    frame = raster.isel(time=0).values
+    assert not np.isnan(frame).any()
+
+    # Every rasterized value must be one of the source HEALPix pixel
+    # indices (0..npix-1), since values are looked up, never interpolated.
+    assert set(np.unique(frame).astype(int)).issubset(set(range(npix)))
+
+    # Spot-check: the raster cell nearest a given pixel's own centre must
+    # resolve back to that pixel's value.
+    sample_pixel = npix // 2
+    lon, lat = hp.healpix_to_lonlat(sample_pixel)
+    lon_deg, lat_deg = lon.to("deg").value, lat.to("deg").value
+    if -25.0 <= lon_deg <= 45.0 and 34.0 <= lat_deg <= 72.0:
+        nearest = raster.sel(lon=lon_deg, lat=lat_deg, method="nearest").isel(time=0).item()
+        assert nearest == sample_pixel
 
 
 def test_create_mp4_from_dataarray_generates_expected_metadata(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -339,6 +438,27 @@ def test_resolve_city_pixels_skips_cities_outside_grid_tolerance() -> None:
     y_coords = np.array([50.0, 45.0, 40.0])
 
     resolved = _resolve_city_pixels(x_coords, y_coords, [CityCoordinate("FarAway", 44.0, 500.0)])
+
+    assert resolved == []
+
+
+def test_resolve_city_pixels_handles_curvilinear_2d_coordinates() -> None:
+    # Non-separable grid: both lat and lon vary along both dims, as on a
+    # curvilinear/polar-stereographic reprojection target rather than a
+    # plate-carrée raster.
+    lon_grid = np.array([[0.0, 5.0, 10.0], [1.0, 6.0, 11.0]])
+    lat_grid = np.array([[40.0, 41.0, 42.0], [45.0, 46.0, 47.0]])
+
+    resolved = _resolve_city_pixels(lon_grid, lat_grid, [CityCoordinate("Testville", 46.0, 6.0)])
+
+    assert resolved == [_ResolvedCityPixel(name="Testville", row=1, col=1)]
+
+
+def test_resolve_city_pixels_skips_cities_outside_curvilinear_tolerance() -> None:
+    lon_grid = np.array([[0.0, 5.0, 10.0], [1.0, 6.0, 11.0]])
+    lat_grid = np.array([[40.0, 41.0, 42.0], [45.0, 46.0, 47.0]])
+
+    resolved = _resolve_city_pixels(lon_grid, lat_grid, [CityCoordinate("FarAway", 90.0, 200.0)])
 
     assert resolved == []
 

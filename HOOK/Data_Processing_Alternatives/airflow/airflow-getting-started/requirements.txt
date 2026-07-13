@@ -5,6 +5,7 @@ boto3
 botocore
 python-dotenv
 matplotlib
+scipy
 imageio
 imageio-ffmpeg
 pillow

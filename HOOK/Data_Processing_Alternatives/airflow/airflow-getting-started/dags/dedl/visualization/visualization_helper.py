@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime, timezone
@@ -170,27 +171,53 @@ def _resolve_city_pixels(
     """
     Resolve each city's nearest (row, col) grid index once, before the
     per-frame loop (the grid is static across frames). x_coords/y_coords are
-    the DataArray's 1-D longitude/latitude coordinate arrays (named "lon"/
-    "lat" or "x"/"y" depending on the reprojection target — see
-    _resolve_spatial_coord_names); data dims are (y, x), so
-    values[row, col] corresponds to (y_coords[row], x_coords[col]).
+    the DataArray's longitude/latitude coordinate arrays (named "lon"/"lat"
+    or "x"/"y" depending on the reprojection target — see
+    _resolve_spatial_coord_names). They may be 1-D axis vectors (a regular,
+    axis-separable raster — today's EPSG:4326 default) or 2-D curvilinear
+    fields sharing the data's (y, x) dims (e.g. a polar-stereographic or
+    other non-separable reprojection target). Data dims are (y, x), so
+    values[row, col] corresponds to lat/lon grid[row, col].
 
-    A city is skipped if its nearest coordinate is farther than one grid
-    step away in either axis — i.e. it falls outside this render's actual
-    AOI extent (the reprojection bbox is a user-settable DAG param, so a
-    city's nominal coverage isn't guaranteed to match any given render).
+    A city is skipped if its nearest grid cell is farther than one local
+    grid step away in either axis — i.e. it falls outside this render's
+    actual AOI extent (the reprojection bbox is a user-settable DAG param,
+    so a city's nominal coverage isn't guaranteed to match any given
+    render).
     """
     if x_coords.size == 0 or y_coords.size == 0:
         return []
 
-    x_step = float(abs(x_coords[1] - x_coords[0])) if x_coords.size > 1 else float("inf")
-    y_step = float(abs(y_coords[1] - y_coords[0])) if y_coords.size > 1 else float("inf")
+    if x_coords.ndim == 1 and y_coords.ndim == 1:
+        lon_grid, lat_grid = np.meshgrid(x_coords, y_coords, indexing="xy")
+    else:
+        lon_grid, lat_grid = x_coords, y_coords
+
+    # Local per-axis grid spacing at every cell: the adjacent-cell diff,
+    # edge-padded by replication so boundary cells inherit their nearest
+    # interior step rather than collapsing to zero. Reduces to a constant
+    # step on a regular grid (matching the previous global-step behaviour)
+    # and adapts to local cell size on a curvilinear grid.
+    def _local_step(grid: np.ndarray, axis: int) -> np.ndarray:
+        if grid.shape[axis] < 2:
+            return np.full(grid.shape, np.inf)
+        diffs = np.abs(np.diff(grid, axis=axis))
+        pad_width = [(0, 0), (0, 0)]
+        pad_width[axis] = (0, 1)
+        return np.pad(diffs, pad_width, mode="edge")
+
+    lon_step = _local_step(lon_grid, axis=1)
+    lat_step = _local_step(lat_grid, axis=0)
 
     resolved: list[_ResolvedCityPixel] = []
     for city in cities:
-        col = int(np.argmin(np.abs(x_coords - city.lon)))
-        row = int(np.argmin(np.abs(y_coords - city.lat)))
-        if abs(x_coords[col] - city.lon) > x_step or abs(y_coords[row] - city.lat) > y_step:
+        distance_sq = (lat_grid - city.lat) ** 2 + (lon_grid - city.lon) ** 2
+        row, col = np.unravel_index(np.argmin(distance_sq), distance_sq.shape)
+        row, col = int(row), int(col)
+        if (
+            abs(lon_grid[row, col] - city.lon) > lon_step[row, col]
+            or abs(lat_grid[row, col] - city.lat) > lat_step[row, col]
+        ):
             continue
         resolved.append(_ResolvedCityPixel(name=city.name, row=row, col=col))
     return resolved
@@ -280,6 +307,123 @@ def resolve_data_variable(dataset, preferred_name: str = "ch9"):
     return dataset[data_var_names[0]]
 
 
+def _lonlat_deg_to_unit_vectors(lon_deg: np.ndarray, lat_deg: np.ndarray) -> np.ndarray:
+    """
+    Convert lon/lat (degrees) to unit vectors on the sphere, so nearest-
+    neighbour lookups use great-circle distance instead of raw degree-space
+    distance (which breaks down across the antimeridian and near the poles).
+    """
+    lon_rad = np.radians(lon_deg)
+    lat_rad = np.radians(lat_deg)
+    cos_lat = np.cos(lat_rad)
+    return np.stack(
+        [cos_lat * np.cos(lon_rad), cos_lat * np.sin(lon_rad), np.sin(lat_rad)],
+        axis=-1,
+    )
+
+
+def _nearest_healpix_pixel_grid(
+    healpix_lon_deg: np.ndarray,
+    healpix_lat_deg: np.ndarray,
+    lon_axis: np.ndarray,
+    lat_axis: np.ndarray,
+) -> np.ndarray:
+    """
+    For every cell of a regular (lat_axis x lon_axis) display grid, find the
+    index into the HEALPix pixel arrays (healpix_lon_deg/healpix_lat_deg,
+    i.e. the "healpix_index" dim) of the nearest HEALPix pixel centre.
+
+    Returns an array of shape (len(lat_axis), len(lon_axis)) of indices.
+    """
+    from scipy.spatial import cKDTree
+
+    tree = cKDTree(_lonlat_deg_to_unit_vectors(healpix_lon_deg, healpix_lat_deg))
+
+    lon_grid, lat_grid = np.meshgrid(lon_axis, lat_axis, indexing="xy")
+    grid_xyz = _lonlat_deg_to_unit_vectors(lon_grid.ravel(), lat_grid.ravel())
+
+    _, nearest_indices = tree.query(grid_xyz)
+    return nearest_indices.reshape(lat_grid.shape)
+
+
+def reproject_healpix_dataarray_to_raster(
+    data_array,
+    *,
+    bounds: tuple[float, float, float, float],
+    resolution_degrees: float | None = None,
+):
+    """
+    Scatter a HEALPix-indexed DataArray onto a regular lat/lon display
+    raster, via nearest-HEALPix-pixel lookup.
+
+    HEALPix cells are unstructured (no inherent row/col layout), but
+    create_mp4_from_dataarray needs a 2-D raster to draw frames from. Each
+    output grid cell is assigned the value of its nearest HEALPix pixel
+    centre (nearest on the sphere — see _nearest_healpix_pixel_grid). The
+    lon/lat grid step defaults to the HEALPix grid's own native angular
+    resolution (derived from nside), so the raster neither over- nor
+    under-samples the source data.
+
+    Args:
+        data_array: DataArray with a "healpix_index" dim and lon/lat
+            coordinates on that dim (as produced by
+            defair_ops's AstropyHealpixBackend reprojection).
+        bounds: Display grid extent (lon_min, lat_min, lon_max, lat_max) —
+            typically the same AOI bounds used for the upstream reprojection.
+        resolution_degrees: Output grid spacing in degrees. Defaults to the
+            HEALPix grid's native pixel resolution when not given.
+
+    Returns:
+        DataArray with "healpix_index" replaced by ("y", "x") dims and
+        regular 1-D "lon"/"lat" coordinates on "x"/"y" respectively.
+    """
+    if "healpix_index" not in data_array.dims:
+        raise ValueError(
+            "reproject_healpix_dataarray_to_raster requires a 'healpix_index' "
+            f"dim, got dims={data_array.dims!r}"
+        )
+
+    coord_names = _resolve_spatial_coord_names(data_array)
+    if coord_names is None:
+        raise ValueError(
+            "HEALPix DataArray is missing lon/lat coordinates on 'healpix_index'"
+        )
+    lon_name, lat_name = coord_names
+
+    npix = int(data_array.sizes["healpix_index"])
+    nside = round(math.sqrt(npix / 12))
+    if nside <= 0 or 12 * nside * nside != npix:
+        raise ValueError(
+            f"'healpix_index' size {npix} is not a valid HEALPix pixel count (12 * nside^2)"
+        )
+
+    if resolution_degrees is None:
+        # Native HEALPix angular resolution: sqrt(pixel solid angle).
+        resolution_degrees = math.degrees(math.sqrt(4 * math.pi / npix))
+
+    lon_min, lat_min, lon_max, lat_max = bounds
+    n_lon = max(2, round((lon_max - lon_min) / resolution_degrees) + 1)
+    n_lat = max(2, round((lat_max - lat_min) / resolution_degrees) + 1)
+    lon_axis = np.linspace(lon_min, lon_max, n_lon)
+    lat_axis = np.linspace(lat_max, lat_min, n_lat)  # north-to-south, so row 0 is the top of the image
+
+    nearest_pixel_grid = _nearest_healpix_pixel_grid(
+        np.asarray(data_array[lon_name].values),
+        np.asarray(data_array[lat_name].values),
+        lon_axis,
+        lat_axis,
+    )
+
+    import xarray as xr
+
+    index_da = xr.DataArray(nearest_pixel_grid, dims=("y", "x"))
+    raster = data_array.isel({"healpix_index": index_da})
+    raster = raster.drop_vars(
+        [name for name in (lon_name, lat_name, "healpix_index") if name in raster.coords]
+    )
+    return raster.assign_coords(lon=("x", lon_axis), lat=("y", lat_axis))
+
+
 def compute_display_range(values: np.ndarray, low_percentile: float = 2.0, high_percentile: float = 98.0) -> tuple[float, float]:
     finite_values = values[np.isfinite(values)]
     if finite_values.size == 0:
@@ -323,6 +467,15 @@ def create_mp4_from_dataarray(
 ) -> dict:
     if "time" not in data_array.dims:
         raise ValueError(f"DataArray must contain a 'time' dimension, got dims={data_array.dims}")
+    spatial_dims = [dim for dim in data_array.dims if dim != "time"]
+    if len(spatial_dims) != 2:
+        raise ValueError(
+            "create_mp4_from_dataarray renders a 2-D raster per frame, but got "
+            f"non-time dims={spatial_dims!r} (from data_array.dims={data_array.dims!r}). "
+            "Unstructured/cell-indexed data (e.g. a HEALPix grid) has no (row, col) "
+            "raster to draw — reproject it onto a 2-D display grid before calling "
+            "this function."
+        )
     if frame_stride < 1:
         raise ValueError("frame_stride must be >= 1")
 
