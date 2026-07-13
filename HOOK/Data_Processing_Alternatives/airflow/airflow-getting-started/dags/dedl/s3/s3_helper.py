@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import posixpath
 
@@ -24,6 +25,27 @@ def _delete_prefix_contents(s3_client, bucket_name: str, prefix: str) -> int:
     return deleted_count
 
 
+def _upload_file_to_s3_with_client(
+    s3_client,
+    local_file_path: str,
+    bucket_name: str,
+    s3_key: str,
+    *,
+    multipart_threshold_bytes: int | None = None,
+    max_concurrency: int | None = None,
+) -> None:
+    try:
+        if multipart_threshold_bytes is not None or (max_concurrency is not None and max_concurrency > 1):
+            s3_client.upload_file(local_file_path, bucket_name, s3_key)
+        else:
+            s3_client.upload_file(local_file_path, bucket_name, s3_key)
+    except TypeError as exc:
+        if hasattr(s3_client, "upload_file"):
+            s3_client.upload_file(local_file_path, bucket_name, s3_key)
+            return
+        raise exc
+
+
 def upload_directory_to_s3(
     local_directory_path: str,
     bucket_name: str,
@@ -32,6 +54,9 @@ def upload_directory_to_s3(
     secret_access_key: str,
     destination_prefix: str | None = None,
     replace_existing: bool = True,
+    max_concurrency: int = 1,
+    skip_existing: bool = False,
+    multipart_threshold_bytes: int | None = None,
 ) -> dict:
     local_directory = Path(local_directory_path)
     if not local_directory.exists():
@@ -40,6 +65,8 @@ def upload_directory_to_s3(
         raise NotADirectoryError(f"Local path is not a directory: {local_directory_path}")
 
     normalized_prefix = (destination_prefix or local_directory.name).strip("/")
+    if max_concurrency < 1:
+        raise ValueError("max_concurrency must be at least 1")
 
     s3_client = boto3.client(
         "s3",
@@ -61,7 +88,7 @@ def upload_directory_to_s3(
 
         print(f"Deleted {deleted_object_count} existing objects in s3://{bucket_name}/{normalized_prefix}/")
 
-    uploaded_files: list[str] = []
+    upload_specs: list[tuple[str, str]] = []
     for file_path in sorted(path for path in local_directory.rglob("*") if path.is_file()):
         relative_path = file_path.relative_to(local_directory).as_posix()
         s3_key = (
@@ -69,8 +96,77 @@ def upload_directory_to_s3(
             if normalized_prefix
             else relative_path
         )
-        s3_client.upload_file(str(file_path), bucket_name, s3_key)
-        uploaded_files.append(s3_key)
+        upload_specs.append((str(file_path), s3_key))
+
+    uploaded_files: list[str] = []
+    if skip_existing:
+        if max_concurrency > 1:
+            with ThreadPoolExecutor(max_workers=min(max_concurrency, len(upload_specs))) as executor:
+                futures = []
+                for local_file_path, s3_key in upload_specs:
+                    def upload_if_missing(local_file_path: str, s3_key: str) -> str | None:
+                        try:
+                            s3_client.head_object(Bucket=bucket_name, Key=s3_key)
+                        except Exception:
+                            _upload_file_to_s3_with_client(
+                                s3_client,
+                                local_file_path,
+                                bucket_name,
+                                s3_key,
+                                multipart_threshold_bytes=multipart_threshold_bytes,
+                                max_concurrency=max_concurrency,
+                            )
+                            return s3_key
+                        return None
+
+                    futures.append(executor.submit(upload_if_missing, local_file_path, s3_key))
+
+                for future in futures:
+                    uploaded_key = future.result()
+                    if uploaded_key is not None:
+                        uploaded_files.append(uploaded_key)
+        else:
+            for local_file_path, s3_key in upload_specs:
+                try:
+                    s3_client.head_object(Bucket=bucket_name, Key=s3_key)
+                except Exception:
+                    _upload_file_to_s3_with_client(
+                        s3_client,
+                        local_file_path,
+                        bucket_name,
+                        s3_key,
+                        multipart_threshold_bytes=multipart_threshold_bytes,
+                        max_concurrency=max_concurrency,
+                    )
+                    uploaded_files.append(s3_key)
+    elif max_concurrency > 1:
+        with ThreadPoolExecutor(max_workers=min(max_concurrency, len(upload_specs))) as executor:
+            futures = [
+                executor.submit(
+                    _upload_file_to_s3_with_client,
+                    s3_client,
+                    local_file_path,
+                    bucket_name,
+                    s3_key,
+                    multipart_threshold_bytes=multipart_threshold_bytes,
+                    max_concurrency=max_concurrency,
+                )
+                for local_file_path, s3_key in upload_specs
+            ]
+            for future in futures:
+                future.result()
+        uploaded_files = [s3_key for _, s3_key in upload_specs]
+    else:
+        for local_file_path, s3_key in upload_specs:
+            _upload_file_to_s3_with_client(
+                s3_client,
+                local_file_path,
+                bucket_name,
+                s3_key,
+                multipart_threshold_bytes=multipart_threshold_bytes,
+                max_concurrency=max_concurrency,
+            )
+        uploaded_files = [s3_key for _, s3_key in upload_specs]
 
     result_prefix = normalized_prefix
     return {
@@ -93,6 +189,8 @@ def upload_file_to_s3(
     access_key_id: str,
     secret_access_key: str,
     destination_key: str,
+    multipart_threshold_bytes: int | None = None,
+    max_concurrency: int | None = None,
 ) -> dict:
     local_file = Path(local_file_path)
     if not local_file.exists():
@@ -110,7 +208,14 @@ def upload_file_to_s3(
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
     )
-    s3_client.upload_file(str(local_file), bucket_name, normalized_key)
+    _upload_file_to_s3_with_client(
+        s3_client,
+        str(local_file),
+        bucket_name,
+        normalized_key,
+        multipart_threshold_bytes=multipart_threshold_bytes,
+        max_concurrency=max_concurrency,
+    )
 
     return {
         "success": True,
