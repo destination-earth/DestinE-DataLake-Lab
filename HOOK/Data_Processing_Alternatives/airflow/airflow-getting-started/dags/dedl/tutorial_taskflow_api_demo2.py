@@ -190,6 +190,67 @@ def _colormap_for_channel(channel_name: str) -> str:
     return "gray_r"
 
 
+# MSG15NativeReaderPlugin.CHANNEL_METADATA keys (the reader's "native" SEVIRI
+# channel names) indexed by the ch{n} names this DAG uses everywhere else.
+# Dataset.from_source(..., calibration=<mapping>) requires native names as
+# mapping keys (see the reader's docstring example and
+# _resolve_channels_and_calibrations/_validate_channel_names, which validate
+# mapping keys against CHANNEL_METADATA) — ch{n} is only restored afterwards
+# via use_channel_names=False. Standard 1-indexed SEVIRI channel order.
+_CHANNEL_NATIVE_NAMES: dict[str, str] = {
+    "ch1": "vis_0.6",
+    "ch2": "vis_0.8",
+    "ch3": "nir_1.6",
+    "ch4": "ir_3.9",
+    "ch5": "ir_6.2",
+    "ch6": "ir_7.3",
+    "ch7": "ir_8.7",
+    "ch8": "ir_9.7",
+    "ch9": "ir_10.8",
+    "ch10": "ir_12.0",
+    "ch11": "ir_13.4",
+}
+
+
+def _is_thermal_channel(channel_name: str) -> bool:
+    """
+    True if channel_name supports brightness_temperature calibration.
+
+    Mirrors MSG15NativeReaderPlugin._BT_SUPPORTED_TYPES ({"infrared",
+    "water-vapor"}): every channel except VIS/NIR (ch1-ch3) is BT-eligible,
+    i.e. ch4, ch5/ch6 (water vapour), ch7-ch11.
+    """
+    return channel_name not in _VISIBLE_CHANNELS
+
+
+def _build_channel_calibration_map(channels: list[str]) -> dict[str, str]:
+    """
+    Build the {native_channel_name: calibration} mapping for
+    Dataset.from_source(nat_file, calibration=...).
+
+    Thermal channels get "brightness_temperature" (float32 Kelvin, needed to
+    sample city temperatures); ch1-ch3 keep "radiance" (BT is undefined for
+    VIS/NIR channels). Passing a mapping (rather than channels=... plus a
+    scalar calibration=...) also makes the reader select exactly these
+    channels and load nothing else.
+
+    Raises:
+        ValueError: if a requested channel has no known native SEVIRI name.
+    """
+    calibration_map: dict[str, str] = {}
+    for channel in channels:
+        native_name = _CHANNEL_NATIVE_NAMES.get(channel)
+        if native_name is None:
+            raise ValueError(
+                f"Unknown channel {channel!r}: no native SEVIRI channel mapping. "
+                f"Known channels: {sorted(_CHANNEL_NATIVE_NAMES)}"
+            )
+        calibration_map[native_name] = (
+            "brightness_temperature" if _is_thermal_channel(channel) else "radiance"
+        )
+    return calibration_map
+
+
 def _normalize_channel(value: str | DagParam) -> str:
     channel = str(_resolve_runtime_param(value)).strip()
     if not channel:
@@ -838,8 +899,14 @@ def tutorial_taskflow_api_demo2(
         # Step 3 : Read MSG data with automatic reader detection
         # -----------------------------------------------------
 
-        # Automatically detect the reader based on the file extension and content
-        dataset = Dataset.from_source(nat_file)
+        # Automatically detect the reader based on the file extension and content.
+        # Request brightness_temperature (Kelvin) calibration for thermal
+        # channels (needed to sample city temperatures downstream) and keep
+        # radiance for VIS/NIR channels, where BT is undefined. Passing a
+        # per-channel calibration mapping also scopes the read to exactly
+        # these channels instead of the reader's 11 defaults.
+        calibration_map = _build_channel_calibration_map(channels)
+        dataset = Dataset.from_source(nat_file, calibration=calibration_map)
 
         print(f"Dataset loaded: {dataset}")
         print(f"\nData variables: {list(dataset.data.data_vars)}")
@@ -1220,6 +1287,7 @@ def tutorial_taskflow_api_demo2(
         import time
 
         from dedl.s3.s3_helper import upload_file_to_s3
+        from dedl.visualization.capital_cities import EUROPEAN_CAPITALS
         from dedl.visualization.visualization_helper import (
             create_mp4_from_dataarray,
             open_s3_zarr_dataset,
@@ -1269,6 +1337,9 @@ def tutorial_taskflow_api_demo2(
             max_frames=120,
             colormap_name=_colormap_for_channel(channel_name),
             annotation_metadata=annotation_metadata,
+            city_temperature_overlay=(
+                EUROPEAN_CAPITALS if _is_thermal_channel(channel_name) else None
+            ),
         )
 
         upload_result = upload_file_to_s3(

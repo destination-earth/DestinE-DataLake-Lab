@@ -235,7 +235,74 @@ Wires everything above together: normalize → `extract` →
 `.partial().expand()` calls are what create the per-file and per-channel
 dynamic task mapping fan-out.
 
-## 4. Running on a VM vs. Kubernetes
+## 4. Interpreting channel "temperatures"
+
+Not every channel's pixel values mean "temperature," and even where they do,
+it isn't the temperature you'd read off a thermometer at ground level. This
+matters directly for the per-city °C labels `visualise_one` overlays on the
+MP4s (`_overlay_city_temperatures`, `visualization_helper.py:219-246`) and for
+choosing a `search_start`/`search_end` window where the signal you actually
+want is visible.
+
+### Which channels have a temperature at all
+
+`_build_channel_calibration_map` (demo2.py:226-251) requests
+`brightness_temperature` calibration (float32 Kelvin) for every channel
+except `ch1`-`ch3`, and `radiance` for those three — `_is_thermal_channel`
+(demo2.py:215-223) encodes the same split, and it's what gates the
+city-temperature overlay in `visualise_one` (demo2.py:1340-1342: only passed
+`EUROPEAN_CAPITALS` when `_is_thermal_channel(channel_name)` is true).
+
+| Channels | Band | Calibration | Has a °C reading? |
+|---|---|---|---|
+| `ch1`, `ch2`, `ch3` | VIS0.6, VIS0.8, NIR1.6 (reflectance) | `radiance` | No — brightness temperature is undefined for visible/near-IR bands. Pixel value is reflected sunlight, not emitted heat. |
+| `ch4` | IR3.9 | `brightness_temperature` | Yes, but see the day/night caveat below. |
+| `ch5`, `ch6` | WV6.2, WV7.3 (water vapour) | `brightness_temperature` | Yes, but it's an atmospheric-layer temperature, not a surface one — see below. |
+| `ch7`-`ch11` | IR8.7, IR9.7, IR10.8, IR12.0, IR13.4 (IR window) | `brightness_temperature` | Yes, and (clear-sky, `ch9`) the closest of any channel here to actual surface skin temperature. |
+
+`_colormap_for_channel` (demo2.py:176-190) reflects this same three-way
+split: `ch1`-`ch3` render as plain `gray` (classic monochrome VIS imagery,
+nothing thermal implied), `ch5`/`ch6` use `cividis`, and everything else uses
+reversed greyscale (`gray_r`) so cold pixels render bright — the standard IR
+enhancement convention where high/cold cloud tops stand out.
+
+### Brightness temperature is not surface temperature
+
+Every Kelvin value produced here is a *brightness temperature*: the
+temperature a perfect blackbody would need to radiate the energy the sensor
+actually measured at that wavelength, from whatever was in the sensor's line
+of sight for that pixel — assuming no atmosphere/cloud interference. It is
+only a good proxy for physical surface temperature when the line of sight is
+genuinely clear:
+
+- **Clear sky:** in the `ch9` (IR10.8) atmospheric window, the atmosphere is
+  mostly transparent, so brightness temperature tracks land/sea-surface skin
+  temperature reasonably well. This is the channel/city-overlay combination
+  closest to "the temperature in that city right now."
+- **Cloud cover:** any cloud between the surface and the satellite is opaque
+  at these wavelengths, so the sensor sees the *cloud top*, not the ground.
+  A city's overlay label under cloud will read as a cold cloud-top
+  temperature (often well below 0°C) even on a warm day at street level —
+  that's expected, not a bug in `_sample_city_temperatures_celsius`
+  (`visualization_helper.py:199-216`), which samples whatever raw Kelvin
+  value is at that pixel with no cloud-masking.
+- **Water vapour channels (`ch5`/`ch6`):** these peak in absorption bands
+  where the surface is *never* visible — the brightness temperature is
+  always that of mid/upper-tropospheric water vapour (and cloud tops when
+  present), typically far colder than anything at ground level. Read the
+  city labels on these channels as "temperature of the air mass overhead,"
+  not "temperature in that city."
+- **`ch4` (IR3.9):** shares its band with reflected sunlight during the day,
+  so daytime brightness temperature is a mix of thermal emission and solar
+  reflectance, not a clean thermal signal — it reads most reliably as
+  temperature at night.
+
+In short: only `ch7`-`ch11` under clear sky (and `ch9` especially) approach
+"the temperature you'd expect for that place," `ch4` is day/night-dependent,
+`ch5`/`ch6` are describing the atmosphere rather than the ground, and
+`ch1`-`ch3` never had a temperature to begin with.
+
+## 5. Running on a VM vs. Kubernetes
 
 This project runs Airflow standalone with `LocalExecutor` on a single VM —
 every task is a process on that same machine, sharing its filesystem, its

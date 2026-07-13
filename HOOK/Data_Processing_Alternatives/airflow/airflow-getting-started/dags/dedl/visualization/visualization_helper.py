@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import numpy as np
+
+from dedl.visualization.capital_cities import CityCoordinate
 
 try:
     import imageio.v2 as imageio
@@ -133,6 +136,116 @@ def _overlay_annotation_banner(frame: np.ndarray, lines: list[str]) -> np.ndarra
     return np.asarray(image)
 
 
+class _ResolvedCityPixel(NamedTuple):
+    name: str
+    row: int
+    col: int
+
+
+_LON_COORD_CANDIDATES = ("lon", "x", "longitude")
+_LAT_COORD_CANDIDATES = ("lat", "y", "latitude")
+
+
+def _resolve_spatial_coord_names(data_array) -> tuple[str, str] | None:
+    """
+    Find the (lon_name, lat_name) coordinate pair on a reprojected
+    DataArray. The reprojection backend names them "lon"/"lat" for
+    geographic targets (e.g. EPSG:4326, this DAG's default) and "x"/"y" for
+    projected targets (defair_ops rioxarray_backend.py:
+    _build_reprojected_coordinates, target_crs.is_geographic branch).
+    Returns None if neither pair is present.
+    """
+    lon_name = next((c for c in _LON_COORD_CANDIDATES if c in data_array.coords), None)
+    lat_name = next((c for c in _LAT_COORD_CANDIDATES if c in data_array.coords), None)
+    if lon_name is None or lat_name is None:
+        return None
+    return lon_name, lat_name
+
+
+def _resolve_city_pixels(
+    x_coords: np.ndarray,
+    y_coords: np.ndarray,
+    cities: Sequence[CityCoordinate],
+) -> list[_ResolvedCityPixel]:
+    """
+    Resolve each city's nearest (row, col) grid index once, before the
+    per-frame loop (the grid is static across frames). x_coords/y_coords are
+    the DataArray's 1-D longitude/latitude coordinate arrays (named "lon"/
+    "lat" or "x"/"y" depending on the reprojection target — see
+    _resolve_spatial_coord_names); data dims are (y, x), so
+    values[row, col] corresponds to (y_coords[row], x_coords[col]).
+
+    A city is skipped if its nearest coordinate is farther than one grid
+    step away in either axis — i.e. it falls outside this render's actual
+    AOI extent (the reprojection bbox is a user-settable DAG param, so a
+    city's nominal coverage isn't guaranteed to match any given render).
+    """
+    if x_coords.size == 0 or y_coords.size == 0:
+        return []
+
+    x_step = float(abs(x_coords[1] - x_coords[0])) if x_coords.size > 1 else float("inf")
+    y_step = float(abs(y_coords[1] - y_coords[0])) if y_coords.size > 1 else float("inf")
+
+    resolved: list[_ResolvedCityPixel] = []
+    for city in cities:
+        col = int(np.argmin(np.abs(x_coords - city.lon)))
+        row = int(np.argmin(np.abs(y_coords - city.lat)))
+        if abs(x_coords[col] - city.lon) > x_step or abs(y_coords[row] - city.lat) > y_step:
+            continue
+        resolved.append(_ResolvedCityPixel(name=city.name, row=row, col=col))
+    return resolved
+
+
+def _sample_city_temperatures_celsius(
+    values: np.ndarray, resolved_city_pixels: list[_ResolvedCityPixel]
+) -> list[tuple[str, int, int, float]]:
+    """
+    Sample the raw (pre-colormap, pre-clip) Kelvin value at each resolved
+    pixel from the already-loaded 2D frame array and convert to Celsius.
+    Skips a city if its sample is NaN (off-disk / no data this frame).
+
+    Returns (name, row, col, celsius) tuples — row/col are passed through so
+    the drawing function doesn't need to re-resolve them.
+    """
+    samples: list[tuple[str, int, int, float]] = []
+    for city in resolved_city_pixels:
+        kelvin = values[city.row, city.col]
+        if not np.isfinite(kelvin):
+            continue
+        samples.append((city.name, city.row, city.col, float(kelvin) - 273.15))
+    return samples
+
+
+def _overlay_city_temperatures(frame: np.ndarray, samples: list[tuple[str, int, int, float]]) -> np.ndarray:
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ModuleNotFoundError as exc:  # pragma: no cover - depends on optional runtime deps
+        raise RuntimeError(
+            "Pillow is required to render city-temperature overlays. Install pillow to enable overlays."
+        ) from exc
+
+    image = Image.fromarray(frame, mode="RGB")
+    draw = ImageDraw.Draw(image, mode="RGBA")
+    font = ImageFont.load_default()
+
+    marker_radius = 3
+    for name, row, col, celsius in samples:
+        x, y = int(col), int(row)
+        draw.ellipse(
+            [(x - marker_radius, y - marker_radius), (x + marker_radius, y + marker_radius)],
+            fill=(255, 80, 0, 255),
+            outline=(0, 0, 0, 255),
+        )
+        label = f"{name} {celsius:.0f}°C"
+        text_x, text_y = x + marker_radius + 3, y - marker_radius - 3
+        # Cheap 1px black halo so the label stays legible over any colormap.
+        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            draw.text((text_x + dx, text_y + dy), label, fill=(0, 0, 0, 255), font=font)
+        draw.text((text_x, text_y), label, fill=(255, 255, 255, 255), font=font)
+
+    return np.asarray(image)
+
+
 def open_s3_zarr_dataset(
     *,
     bucket_name: str,
@@ -206,6 +319,7 @@ def create_mp4_from_dataarray(
     low_percentile: float = 2.0,
     high_percentile: float = 98.0,
     annotation_metadata: dict[str, Any] | None = None,
+    city_temperature_overlay: Sequence[CityCoordinate] | None = None,
 ) -> dict:
     if "time" not in data_array.dims:
         raise ValueError(f"DataArray must contain a 'time' dimension, got dims={data_array.dims}")
@@ -236,11 +350,24 @@ def create_mp4_from_dataarray(
             "imageio is required to create MP4 output. Install imageio and imageio-ffmpeg."
         )
 
+    resolved_city_pixels: list[_ResolvedCityPixel] = []
+    if city_temperature_overlay:
+        coord_names = _resolve_spatial_coord_names(data_array)
+        if coord_names is not None:
+            lon_name, lat_name = coord_names
+            resolved_city_pixels = _resolve_city_pixels(
+                data_array[lon_name].values, data_array[lat_name].values, city_temperature_overlay
+            )
+
     try:
         with imageio.get_writer(str(output_file), fps=fps, codec="libx264", format="FFMPEG") as writer:
             for idx in time_indexes:
                 values = data_array.isel(time=idx).load().values
                 frame = _to_uint8_rgb_frame(values, vmin=vmin, vmax=vmax, colormap_name=colormap_name)
+                if resolved_city_pixels:
+                    frame = _overlay_city_temperatures(
+                        frame, _sample_city_temperatures_celsius(values, resolved_city_pixels)
+                    )
                 if annotation_metadata is not None:
                     frame = _overlay_annotation_banner(
                         frame,

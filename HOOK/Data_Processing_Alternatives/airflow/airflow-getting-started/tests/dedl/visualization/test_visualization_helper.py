@@ -13,10 +13,15 @@ DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
+from dedl.visualization.capital_cities import CityCoordinate  # noqa: E402
 from dedl.visualization.visualization_helper import (  # noqa: E402
+    _ResolvedCityPixel,
     _build_annotation_lines,
     _format_bbox,
     _format_frame_time,
+    _resolve_city_pixels,
+    _resolve_spatial_coord_names,
+    _sample_city_temperatures_celsius,
     compute_display_range,
     create_mp4_from_dataarray,
     resolve_data_variable,
@@ -318,3 +323,233 @@ def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytes
             "long_name: High-resolution visible channel",
         ],
     ]
+
+
+def test_resolve_city_pixels_finds_nearest_grid_index() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    resolved = _resolve_city_pixels(x_coords, y_coords, [CityCoordinate("Testville", 44.0, 4.5)])
+
+    assert resolved == [_ResolvedCityPixel(name="Testville", row=1, col=3)]
+
+
+def test_resolve_city_pixels_skips_cities_outside_grid_tolerance() -> None:
+    x_coords = np.array([-10.0, -5.0, 0.0, 5.0, 10.0])
+    y_coords = np.array([50.0, 45.0, 40.0])
+
+    resolved = _resolve_city_pixels(x_coords, y_coords, [CityCoordinate("FarAway", 44.0, 500.0)])
+
+    assert resolved == []
+
+
+def test_resolve_spatial_coord_names_prefers_lon_lat_when_present() -> None:
+    data_array = xr.DataArray(
+        np.zeros((2, 2)),
+        dims=("lat", "lon"),
+        coords={"lat": np.array([50.0, 40.0]), "lon": np.array([0.0, 10.0])},
+    )
+
+    assert _resolve_spatial_coord_names(data_array) == ("lon", "lat")
+
+
+def test_resolve_spatial_coord_names_falls_back_to_x_y() -> None:
+    data_array = xr.DataArray(
+        np.zeros((2, 2)),
+        dims=("y", "x"),
+        coords={"y": np.array([50.0, 40.0]), "x": np.array([0.0, 10.0])},
+    )
+
+    assert _resolve_spatial_coord_names(data_array) == ("x", "y")
+
+
+def test_resolve_spatial_coord_names_returns_none_when_absent() -> None:
+    data_array = xr.DataArray(np.zeros((2, 2)), dims=("row", "col"))
+
+    assert _resolve_spatial_coord_names(data_array) is None
+
+
+def test_sample_city_temperatures_celsius_converts_and_skips_nan() -> None:
+    values = np.array([[293.15, np.nan], [300.0, 310.0]])
+    resolved_city_pixels = [
+        _ResolvedCityPixel(name="Finite", row=0, col=0),
+        _ResolvedCityPixel(name="Missing", row=0, col=1),
+    ]
+
+    samples = _sample_city_temperatures_celsius(values, resolved_city_pixels)
+
+    assert samples == [("Finite", 0, 0, 20.0)]
+
+
+def test_create_mp4_from_dataarray_applies_city_temperature_overlay(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    values = np.array(
+        [
+            [[300.0, 301.0], [302.0, 293.15]],
+            [[300.0, 301.0], [302.0, np.nan]],
+        ],
+        dtype=float,
+    )
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "y", "x"), values)},
+        coords={
+            "time": np.array([np.datetime64("2024-07-09T00:00:00"), np.datetime64("2024-07-09T01:00:00")]),
+            "y": np.array([50.0, 40.0]),
+            "x": np.array([0.0, 10.0]),
+        },
+    )
+
+    written_frames: list[np.ndarray] = []
+    captured_samples: list[list[tuple[str, int, int, float]]] = []
+
+    class _DummyWriter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def append_data(self, frame: np.ndarray) -> None:
+            written_frames.append(frame)
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper.imageio",
+        SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
+    )
+
+    def _capture_city_overlay(frame: np.ndarray, samples: list[tuple[str, int, int, float]]) -> np.ndarray:
+        captured_samples.append(samples)
+        return frame
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        _capture_city_overlay,
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "city_overlay.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+        city_temperature_overlay=[CityCoordinate("Testville", 40.0, 10.0)],
+    )
+
+    assert len(written_frames) == 2
+    assert captured_samples == [
+        [("Testville", 1, 1, 20.0)],
+        [],
+    ]
+
+
+def test_create_mp4_from_dataarray_applies_city_temperature_overlay_with_lon_lat_coords(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Regression test: the DAG's default reprojection_crs is EPSG:4326
+    # (geographic), and defair_ops' rioxarray backend names reprojected
+    # coordinates "lon"/"lat" for geographic targets (only "x"/"y" for
+    # projected targets) — this is the real-world shape the overlay must
+    # handle, not just the "x"/"y" case above.
+    values = np.array(
+        [
+            [[300.0, 301.0], [302.0, 293.15]],
+            [[300.0, 301.0], [302.0, np.nan]],
+        ],
+        dtype=float,
+    )
+    dataset = xr.Dataset(
+        data_vars={"ch9": (("time", "lat", "lon"), values)},
+        coords={
+            "time": np.array([np.datetime64("2024-07-09T00:00:00"), np.datetime64("2024-07-09T01:00:00")]),
+            "lat": np.array([50.0, 40.0]),
+            "lon": np.array([0.0, 10.0]),
+        },
+    )
+
+    written_frames: list[np.ndarray] = []
+    captured_samples: list[list[tuple[str, int, int, float]]] = []
+
+    class _DummyWriter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def append_data(self, frame: np.ndarray) -> None:
+            written_frames.append(frame)
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper.imageio",
+        SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
+    )
+
+    def _capture_city_overlay(frame: np.ndarray, samples: list[tuple[str, int, int, float]]) -> np.ndarray:
+        captured_samples.append(samples)
+        return frame
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        _capture_city_overlay,
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "city_overlay_lonlat.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+        city_temperature_overlay=[CityCoordinate("Testville", 40.0, 10.0)],
+    )
+
+    assert len(written_frames) == 2
+    assert captured_samples == [
+        [("Testville", 1, 1, 20.0)],
+        [],
+    ]
+
+
+def test_create_mp4_from_dataarray_city_overlay_defaults_to_none(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    dataset = _build_dataset()
+    overlay_calls: list[object] = []
+
+    class _DummyWriter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def append_data(self, frame: np.ndarray) -> None:
+            pass
+
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper.imageio",
+        SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
+    )
+    monkeypatch.setattr(
+        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        lambda *args, **kwargs: overlay_calls.append(1),
+    )
+
+    create_mp4_from_dataarray(
+        dataset["ch9"],
+        str(tmp_path / "no_city_overlay.mp4"),
+        low_percentile=0.0,
+        high_percentile=100.0,
+    )
+
+    assert overlay_calls == []
