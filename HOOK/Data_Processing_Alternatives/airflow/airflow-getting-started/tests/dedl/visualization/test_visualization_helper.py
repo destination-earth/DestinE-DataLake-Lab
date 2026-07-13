@@ -279,6 +279,7 @@ def test_build_annotation_lines_includes_time_collection_channel_and_bbox() -> N
     assert result == [
         "time: 09/07/2024 12:34:56",
         "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "source: EUMETSAT via DestinE Data Lake (DEDL)",
         "channel: ch9",
         "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
         "target: EPSG:4326",
@@ -308,6 +309,7 @@ def test_build_annotation_lines_includes_platform_name_when_present() -> None:
     assert result == [
         "time: 09/07/2024 12:34:56",
         "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "source: EUMETSAT via DestinE Data Lake (DEDL)",
         "channel: ch9",
         "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
         "target: EPSG:4326",
@@ -335,12 +337,51 @@ def test_build_annotation_lines_skips_missing_optional_channel_metadata() -> Non
     assert result == [
         "time: 09/07/2024 12:34:56",
         "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+        "source: EUMETSAT via DestinE Data Lake (DEDL)",
         "channel: ch9",
         "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
         "target: EPSG:4326",
         "resampling: bilinear",
         "resolution: 0.05 degrees",
     ]
+    assert not any(line.startswith("city markers:") for line in result)
+    assert not any(line.startswith("borders:") for line in result)
+
+
+def test_build_annotation_lines_includes_city_overlay_note_when_active() -> None:
+    result = _build_annotation_lines(
+        time_value=np.datetime64("2024-07-09T12:34:56"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+            "city_overlay_active": True,
+        },
+    )
+
+    assert "city markers: satellite brightness temp, not ground station data" in result
+
+
+def test_build_annotation_lines_includes_country_borders_note_when_active() -> None:
+    result = _build_annotation_lines(
+        time_value=np.datetime64("2024-07-09T12:34:56"),
+        annotation_metadata={
+            "collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "channel_name": "ch9",
+            "bbox": [-25.0, 34.0, 45.0, 72.0],
+            "reprojection_crs": "EPSG:4326",
+            "resampling": "bilinear",
+            "resolution": 0.05,
+            "resolution_unit": "degrees",
+            "country_borders_active": True,
+        },
+    )
+
+    assert "borders: Natural Earth (public domain)" in result
 
 
 def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -404,6 +445,7 @@ def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytes
         [
             "time: 09/07/2024 00:00:00",
             "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+            "source: EUMETSAT via DestinE Data Lake (DEDL)",
             "channel: ch9",
             "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
             "target: EPSG:4326",
@@ -415,6 +457,7 @@ def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytes
         [
             "time: 09/07/2024 01:00:00",
             "collection: EO.EUM.DAT.MSG.HRSEVIRI",
+            "source: EUMETSAT via DestinE Data Lake (DEDL)",
             "channel: ch9",
             "bbox: -25.0000, 34.0000, 45.0000, 72.0000",
             "target: EPSG:4326",
