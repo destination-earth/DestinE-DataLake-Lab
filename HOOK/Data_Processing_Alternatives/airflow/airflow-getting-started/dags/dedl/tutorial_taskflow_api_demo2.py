@@ -1569,5 +1569,5 @@ if __name__ == "__main__":
     # nside=1024's bins. NearestResampler backward-fills empty bins from
     # their nearest filled neighbour and preserves the source min/max.
     dag.test(
-        run_conf={"search_limit": 10, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1000, "reprojection_resolution_unit": "m"},
+        run_conf={"search_limit": 10, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1024, "reprojection_resolution_unit": "m"},
     )

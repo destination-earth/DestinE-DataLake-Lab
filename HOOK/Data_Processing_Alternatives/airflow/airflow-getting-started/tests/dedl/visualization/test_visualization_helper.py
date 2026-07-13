@@ -185,6 +185,47 @@ def test_reproject_healpix_dataarray_to_raster_assigns_nearest_pixel_values() ->
         assert nearest == sample_pixel
 
 
+def test_reproject_healpix_dataarray_to_raster_corrects_authalic_to_geodetic_latitude() -> None:
+    # HEALPix pixel centres are authalic latitude (CF-1.13), not geodetic,
+    # and diverge from geodetic latitude by up to ~0.19 deg (WGS84) around
+    # 45 deg N. Two candidate pixels are placed asymmetrically around a
+    # display-grid latitude of 45.0 deg such that comparing raw
+    # (uncorrected) authalic values picks pixel "far" (index 1), while
+    # comparing geodetic-converted values picks pixel "near" (index 0) —
+    # proving the conversion actually changes which source pixel gets
+    # assigned, not just relabelling coordinates that were already correct.
+    pytest.importorskip("astropy_healpix")
+    from defair_ops.transformations.reprojection.backends._authalic import (
+        geodetic_to_authalic,
+    )
+
+    nside = 2
+    data_array = _build_healpix_dataarray(nside=nside)
+
+    lon_vals = data_array["lon"].values.copy()
+    lat_vals = data_array["lat"].values.copy()
+    lon_vals[0], lat_vals[0] = 10.0, 43.5   # pixel "near": geodetic lat ~43.63
+    lon_vals[1], lat_vals[1] = 10.0, 46.38  # pixel "far": geodetic lat ~46.51
+    data_array = data_array.assign_coords(
+        lon=("healpix_index", lon_vals), lat=("healpix_index", lat_vals)
+    )
+
+    near_geodetic = float(geodetic_to_authalic(np.array([43.5]), inverse=True)[0])
+    far_geodetic = float(geodetic_to_authalic(np.array([46.38]), inverse=True)[0])
+    # Raw authalic values: "far" (46.38) is nominally closer to 45.0 than
+    # "near" (43.5) is.
+    assert abs(46.38 - 45.0) < abs(43.5 - 45.0)
+    # Once converted to geodetic, "near" becomes the closer of the two.
+    assert abs(near_geodetic - 45.0) < abs(far_geodetic - 45.0)
+
+    raster = reproject_healpix_dataarray_to_raster(
+        data_array, bounds=(9.0, 43.0, 11.0, 47.0), resolution_degrees=0.1
+    )
+
+    nearest = raster.sel(lon=10.0, lat=45.0, method="nearest").isel(time=0).item()
+    assert nearest == 0
+
+
 def test_create_mp4_from_dataarray_generates_expected_metadata(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     dataset = _build_dataset()
 

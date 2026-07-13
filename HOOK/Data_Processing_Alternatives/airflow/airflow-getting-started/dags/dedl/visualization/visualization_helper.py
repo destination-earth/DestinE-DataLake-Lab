@@ -469,6 +469,16 @@ def reproject_healpix_dataarray_to_raster(
     resolution (derived from nside), so the raster neither over- nor
     under-samples the source data.
 
+    AstropyHealpixBackend's "lat" coordinate is *authalic* latitude (the
+    equal-area latitude HEALPix requires on an ellipsoid — CF-1.13), not
+    ordinary geodetic latitude. The display grid built from `bounds` (and
+    everything overlaid on top of it, e.g. Natural Earth country borders
+    and city markers) is geodetic, so the HEALPix pixel latitudes are
+    converted to geodetic before the nearest-pixel match below. Without
+    this, imagery is shifted north/south by up to ~0.2 degrees relative to
+    its own coordinate labels, while borders/markers — placed by trusting
+    those labels — stay put, producing a visible misalignment.
+
     Args:
         data_array: DataArray with a "healpix_index" dim and lon/lat
             coordinates on that dim (as produced by
@@ -512,9 +522,20 @@ def reproject_healpix_dataarray_to_raster(
     lon_axis = np.linspace(lon_min, lon_max, n_lon)
     lat_axis = np.linspace(lat_max, lat_min, n_lat)  # north-to-south, so row 0 is the top of the image
 
+    # defair_ops has no public geodetic<->authalic conversion; this reaches
+    # into its private backend module to reuse the exact Karney series that
+    # produced the authalic values, guaranteeing an exact round-trip.
+    from defair_ops.transformations.reprojection.backends._authalic import (
+        geodetic_to_authalic,
+    )
+
+    healpix_lat_geodetic = geodetic_to_authalic(
+        np.asarray(data_array[lat_name].values), inverse=True
+    )
+
     nearest_pixel_grid = _nearest_healpix_pixel_grid(
         np.asarray(data_array[lon_name].values),
-        np.asarray(data_array[lat_name].values),
+        healpix_lat_geodetic,
         lon_axis,
         lat_axis,
     )
