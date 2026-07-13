@@ -6,6 +6,7 @@ botocore
 python-dotenv
 matplotlib
 scipy
+cartopy
 imageio
 imageio-ffmpeg
 pillow

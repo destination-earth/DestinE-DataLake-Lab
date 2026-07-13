@@ -163,6 +163,23 @@ def _resolve_spatial_coord_names(data_array) -> tuple[str, str] | None:
     return lon_name, lat_name
 
 
+def _local_grid_step(grid: np.ndarray, axis: int) -> np.ndarray:
+    """
+    Local per-axis grid spacing at every cell: the adjacent-cell diff,
+    edge-padded by replication so boundary cells inherit their nearest
+    interior step rather than collapsing to zero. Reduces to a constant
+    step on a regular grid (matching a global-step computation) and adapts
+    to local cell size on a curvilinear grid. Shared by _resolve_city_pixels
+    and _resolve_border_line_pixels.
+    """
+    if grid.shape[axis] < 2:
+        return np.full(grid.shape, np.inf)
+    diffs = np.abs(np.diff(grid, axis=axis))
+    pad_width = [(0, 0), (0, 0)]
+    pad_width[axis] = (0, 1)
+    return np.pad(diffs, pad_width, mode="edge")
+
+
 def _resolve_city_pixels(
     x_coords: np.ndarray,
     y_coords: np.ndarray,
@@ -193,21 +210,8 @@ def _resolve_city_pixels(
     else:
         lon_grid, lat_grid = x_coords, y_coords
 
-    # Local per-axis grid spacing at every cell: the adjacent-cell diff,
-    # edge-padded by replication so boundary cells inherit their nearest
-    # interior step rather than collapsing to zero. Reduces to a constant
-    # step on a regular grid (matching the previous global-step behaviour)
-    # and adapts to local cell size on a curvilinear grid.
-    def _local_step(grid: np.ndarray, axis: int) -> np.ndarray:
-        if grid.shape[axis] < 2:
-            return np.full(grid.shape, np.inf)
-        diffs = np.abs(np.diff(grid, axis=axis))
-        pad_width = [(0, 0), (0, 0)]
-        pad_width[axis] = (0, 1)
-        return np.pad(diffs, pad_width, mode="edge")
-
-    lon_step = _local_step(lon_grid, axis=1)
-    lat_step = _local_step(lat_grid, axis=0)
+    lon_step = _local_grid_step(lon_grid, axis=1)
+    lat_step = _local_grid_step(lat_grid, axis=0)
 
     resolved: list[_ResolvedCityPixel] = []
     for city in cities:
@@ -221,6 +225,82 @@ def _resolve_city_pixels(
             continue
         resolved.append(_ResolvedCityPixel(name=city.name, row=row, col=col))
     return resolved
+
+
+def _resolve_border_line_pixels(
+    x_coords: np.ndarray,
+    y_coords: np.ndarray,
+    border_lines: Sequence[Sequence[tuple[float, float]]],
+) -> list[list[tuple[int, int]]]:
+    """
+    Resolve each border-line vertex's nearest (row, col) grid index once,
+    before the per-frame loop (borders are static across frames, exactly
+    like city pixels — see _resolve_city_pixels). x_coords/y_coords are the
+    same lon/lat coordinate arrays described there (1-D axis-separable or
+    2-D curvilinear).
+
+    Unlike _resolve_city_pixels' per-point skip, a border-line vertex that
+    falls outside this render's AOI/grid tolerance must *break* the line
+    rather than silently drop the vertex — otherwise the next in-tolerance
+    vertex after a dropped one would be linked directly to the prior
+    in-tolerance vertex with a straight line cutting across the whole frame.
+    Each returned polyline has >= 2 points; input lines are split into as
+    many output polylines as needed at out-of-bounds crossings.
+
+    Nearest-vertex lookup uses a KD-tree over the grid's unit-sphere
+    coordinates (via _lonlat_deg_to_unit_vectors, the same great-circle
+    approach _nearest_healpix_pixel_grid uses), queried once per line's full
+    vertex batch — a per-vertex full-grid argmin (as in _resolve_city_pixels,
+    fine for a few dozen cities) would be far too slow across the thousands
+    of vertices in a Natural Earth boundary-lines layer.
+    """
+    if x_coords.size == 0 or y_coords.size == 0:
+        return []
+
+    if x_coords.ndim == 1 and y_coords.ndim == 1:
+        lon_grid, lat_grid = np.meshgrid(x_coords, y_coords, indexing="xy")
+    else:
+        lon_grid, lat_grid = x_coords, y_coords
+
+    lon_step = _local_grid_step(lon_grid, axis=1)
+    lat_step = _local_grid_step(lat_grid, axis=0)
+
+    from scipy.spatial import cKDTree
+
+    grid_xyz = _lonlat_deg_to_unit_vectors(lon_grid.ravel(), lat_grid.ravel())
+    # Grid points lie on a 2-D manifold (a sphere surface) embedded in 3-D:
+    # cKDTree's default compact_nodes/balanced_tree construction degrades to
+    # near-linear query time on this shape (measured 126s to resolve a full
+    # border+coastline set on a ~1M-cell grid). These kwargs, plus workers=-1
+    # below, bring the same query down to ~0.05s with identical results.
+    tree = cKDTree(grid_xyz, balanced_tree=False, compact_nodes=False)
+
+    resolved_polylines: list[list[tuple[int, int]]] = []
+    for line in border_lines:
+        if len(line) < 2:
+            continue
+        lons = np.array([point[0] for point in line])
+        lats = np.array([point[1] for point in line])
+        _, flat_indices = tree.query(_lonlat_deg_to_unit_vectors(lons, lats), workers=-1)
+        rows, cols = np.unravel_index(flat_indices, lon_grid.shape)
+
+        current_segment: list[tuple[int, int]] = []
+        for i in range(len(line)):
+            row, col = int(rows[i]), int(cols[i])
+            within_tolerance = (
+                abs(lon_grid[row, col] - lons[i]) <= lon_step[row, col]
+                and abs(lat_grid[row, col] - lats[i]) <= lat_step[row, col]
+            )
+            if within_tolerance:
+                current_segment.append((row, col))
+            else:
+                if len(current_segment) >= 2:
+                    resolved_polylines.append(current_segment)
+                current_segment = []
+        if len(current_segment) >= 2:
+            resolved_polylines.append(current_segment)
+
+    return resolved_polylines
 
 
 def _sample_city_temperatures_celsius(
@@ -269,6 +349,26 @@ def _overlay_city_temperatures(frame: np.ndarray, samples: list[tuple[str, int, 
         for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             draw.text((text_x + dx, text_y + dy), label, fill=(0, 0, 0, 255), font=font)
         draw.text((text_x, text_y), label, fill=(255, 255, 255, 255), font=font)
+
+    return np.asarray(image)
+
+
+def _overlay_country_borders(
+    frame: np.ndarray, resolved_border_pixels: list[list[tuple[int, int]]]
+) -> np.ndarray:
+    try:
+        from PIL import Image, ImageDraw
+    except ModuleNotFoundError as exc:  # pragma: no cover - depends on optional runtime deps
+        raise RuntimeError(
+            "Pillow is required to render country-border overlays. Install pillow to enable overlays."
+        ) from exc
+
+    image = Image.fromarray(frame, mode="RGB")
+    draw = ImageDraw.Draw(image, mode="RGBA")
+
+    for segment in resolved_border_pixels:
+        points = [(col, row) for row, col in segment]  # PIL expects (x, y) = (col, row)
+        draw.line(points, fill=(220, 220, 220, 160), width=1)
 
     return np.asarray(image)
 
@@ -464,6 +564,7 @@ def create_mp4_from_dataarray(
     high_percentile: float = 98.0,
     annotation_metadata: dict[str, Any] | None = None,
     city_temperature_overlay: Sequence[CityCoordinate] | None = None,
+    country_border_lines: Sequence[Sequence[tuple[float, float]]] | None = None,
 ) -> dict:
     if "time" not in data_array.dims:
         raise ValueError(f"DataArray must contain a 'time' dimension, got dims={data_array.dims}")
@@ -504,19 +605,27 @@ def create_mp4_from_dataarray(
         )
 
     resolved_city_pixels: list[_ResolvedCityPixel] = []
-    if city_temperature_overlay:
+    resolved_border_pixels: list[list[tuple[int, int]]] = []
+    if city_temperature_overlay or country_border_lines:
         coord_names = _resolve_spatial_coord_names(data_array)
         if coord_names is not None:
             lon_name, lat_name = coord_names
-            resolved_city_pixels = _resolve_city_pixels(
-                data_array[lon_name].values, data_array[lat_name].values, city_temperature_overlay
-            )
+            if city_temperature_overlay:
+                resolved_city_pixels = _resolve_city_pixels(
+                    data_array[lon_name].values, data_array[lat_name].values, city_temperature_overlay
+                )
+            if country_border_lines:
+                resolved_border_pixels = _resolve_border_line_pixels(
+                    data_array[lon_name].values, data_array[lat_name].values, country_border_lines
+                )
 
     try:
         with imageio.get_writer(str(output_file), fps=fps, codec="libx264", format="FFMPEG") as writer:
             for idx in time_indexes:
                 values = data_array.isel(time=idx).load().values
                 frame = _to_uint8_rgb_frame(values, vmin=vmin, vmax=vmax, colormap_name=colormap_name)
+                if resolved_border_pixels:
+                    frame = _overlay_country_borders(frame, resolved_border_pixels)
                 if resolved_city_pixels:
                     frame = _overlay_city_temperatures(
                         frame, _sample_city_temperatures_celsius(values, resolved_city_pixels)
