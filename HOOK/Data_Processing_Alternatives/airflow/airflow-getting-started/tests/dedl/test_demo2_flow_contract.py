@@ -112,6 +112,42 @@ def test_colormap_for_channel_defaults_to_reversed_gray_for_infrared_and_unknown
         assert demo2._colormap_for_channel(channel) == "gray_r"
 
 
+def test_is_thermal_channel_true_for_non_visible_channels() -> None:
+    for channel in ["ch4", "ch5", "ch6", "ch7", "ch8", "ch9", "ch10", "ch11"]:
+        assert demo2._is_thermal_channel(channel) is True
+
+
+def test_is_thermal_channel_false_for_visible_channels() -> None:
+    for channel in ["ch1", "ch2", "ch3"]:
+        assert demo2._is_thermal_channel(channel) is False
+
+
+def test_build_channel_calibration_map_selects_brightness_temperature_for_thermal_channels() -> None:
+    assert demo2._build_channel_calibration_map(["ch1", "ch9"]) == {
+        "vis_0.6": "radiance",
+        "ir_10.8": "brightness_temperature",
+    }
+
+
+def test_build_channel_calibration_map_covers_default_channel_param() -> None:
+    # Mirrors the DAG's default "channels" Param value (ch1-ch9).
+    default_channels = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"]
+    calibration_map = demo2._build_channel_calibration_map(default_channels)
+    assert len(calibration_map) == len(default_channels)
+    assert set(calibration_map.values()) <= {"radiance", "brightness_temperature"}
+    assert calibration_map["vis_0.6"] == "radiance"
+    assert calibration_map["ir_10.8"] == "brightness_temperature"
+
+
+def test_build_channel_calibration_map_rejects_unknown_channel() -> None:
+    try:
+        demo2._build_channel_calibration_map(["ch99"])
+    except ValueError as exc:
+        assert "ch99" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError for unknown channel")
+
+
 def test_normalize_search_limit_rejects_non_positive_values() -> None:
     for invalid in [0, -1]:
         try:
