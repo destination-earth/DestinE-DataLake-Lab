@@ -1269,19 +1269,12 @@ def tutorial_taskflow_api_demo2(
         """
         #### Load task: Upload transformed Zarr dataset to S3
 
-        Writes the concatenated Zarr directly to S3 via defair's
-        Dataset.to_file(), under a channel-based prefix. S3 credentials
-        (endpoint, bucket, keys) come from environment variables.
-
-        Uses defair (Dataset.to_file to an s3:// URI) instead of the
-        directory-upload helper in dedl.s3.s3_helper — that helper is still
-        used elsewhere (visualise_one's MP4 upload) and kept around for
-        reuse, but defair's writer removes the local-write-then-upload round
-        trip for Zarr specifically. A defair mode="w" write to S3 does NOT
-        clear pre-existing objects at the target prefix the way a local
-        mode="w" write clears a stale local store, so clear_s3_prefix() is
-        called first to keep the same "clean overwrite per run" guarantee
-        upload_directory_to_s3's replace_existing=True used to provide.
+        Uploads the concatenated local Zarr directory to S3 under a
+        channel-based prefix via dedl.s3.s3_helper.upload_directory_to_s3,
+        which clears any pre-existing objects at the target prefix first
+        (replace_existing=True) for a clean overwrite per run. S3
+        credentials (endpoint, bucket, keys) come from environment
+        variables.
 
         Args:
             transform_results_dict: From concatenate_zarr_files(); contains
@@ -1292,10 +1285,7 @@ def tutorial_taskflow_api_demo2(
             LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
                            plus reprojection metadata for downstream tasks
         """
-        import xarray as xr
-        from defair_data.core import Dataset
-
-        from dedl.s3.s3_helper import clear_s3_prefix
+        from dedl.s3.s3_helper import upload_directory_to_s3
 
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
         endpoint_url = _require_env("S3_ENDPOINT_URL")
@@ -1307,29 +1297,15 @@ def tutorial_taskflow_api_demo2(
         destination_prefix = f"my_{channels_slug}_zarr_data"
         s3_uri = f"s3://{bucket_name}/{destination_prefix}"
 
-        print(f"Clearing existing objects at {s3_uri} before write...")
-        deleted_object_count = clear_s3_prefix(
+        print(f"Uploading Zarr directory to S3: {concatenated_zarr_path} -> {s3_uri}")
+        upload_directory_to_s3(
+            local_directory_path=concatenated_zarr_path,
             bucket_name=bucket_name,
             endpoint_url=endpoint_url,
             access_key_id=access_key_id,
             secret_access_key=secret_access_key,
-            prefix=destination_prefix,
-        )
-        print(f"Deleted {deleted_object_count} existing objects at {s3_uri}")
-
-        print(f"Writing Zarr directly to S3 via defair: {concatenated_zarr_path} -> {s3_uri}")
-        local_ds = xr.open_zarr(concatenated_zarr_path, consolidated=True)
-        dataset = Dataset(local_ds)
-        dataset.to_file(
-            s3_uri,
-            writer="zarrv2",
-            mode="w",
-            consolidated=True,
-            storage_options={
-                "key": access_key_id,
-                "secret": secret_access_key,
-                "endpoint_url": endpoint_url,
-            },
+            destination_prefix=destination_prefix,
+            replace_existing=True,
         )
         print(f"Uploaded to: {s3_uri}")
 
