@@ -1269,8 +1269,19 @@ def tutorial_taskflow_api_demo2(
         """
         #### Load task: Upload transformed Zarr dataset to S3
 
-        Uploads the concatenated Zarr directory to S3 under a channel-based prefix.
-        S3 credentials (endpoint, bucket, keys) come from environment variables.
+        Writes the concatenated Zarr directly to S3 via defair's
+        Dataset.to_file(), under a channel-based prefix. S3 credentials
+        (endpoint, bucket, keys) come from environment variables.
+
+        Uses defair (Dataset.to_file to an s3:// URI) instead of the
+        directory-upload helper in dedl.s3.s3_helper — that helper is still
+        used elsewhere (visualise_one's MP4 upload) and kept around for
+        reuse, but defair's writer removes the local-write-then-upload round
+        trip for Zarr specifically. A defair mode="w" write to S3 does NOT
+        clear pre-existing objects at the target prefix the way a local
+        mode="w" write clears a stale local store, so clear_s3_prefix() is
+        called first to keep the same "clean overwrite per run" guarantee
+        upload_directory_to_s3's replace_existing=True used to provide.
 
         Args:
             transform_results_dict: From concatenate_zarr_files(); contains
@@ -1281,7 +1292,10 @@ def tutorial_taskflow_api_demo2(
             LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
                            plus reprojection metadata for downstream tasks
         """
-        from dedl.s3.s3_helper import upload_directory_to_s3
+        import xarray as xr
+        from defair_data.core import Dataset
+
+        from dedl.s3.s3_helper import clear_s3_prefix
 
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
         endpoint_url = _require_env("S3_ENDPOINT_URL")
@@ -1289,20 +1303,41 @@ def tutorial_taskflow_api_demo2(
         access_key_id = _require_env("MY_S3_ACCESS_KEY_ID")
         secret_access_key = _require_env("MY_S3_SECRET_ACCESS_KEY")
 
-        print(f"Uploading Zarr directory to S3: {concatenated_zarr_path}")
-
         channels_slug = "_".join(channels)
-        upload_result = upload_directory_to_s3(
-            local_directory_path=concatenated_zarr_path,
+        destination_prefix = f"my_{channels_slug}_zarr_data"
+        s3_uri = f"s3://{bucket_name}/{destination_prefix}"
+
+        print(f"Clearing existing objects at {s3_uri} before write...")
+        deleted_object_count = clear_s3_prefix(
             bucket_name=bucket_name,
             endpoint_url=endpoint_url,
             access_key_id=access_key_id,
             secret_access_key=secret_access_key,
-            destination_prefix=f"my_{channels_slug}_zarr_data",  # Optional: specify a prefix in the S3 bucket
-            max_concurrency=4,
+            prefix=destination_prefix,
         )
+        print(f"Deleted {deleted_object_count} existing objects at {s3_uri}")
 
-        print(f"Uploaded to: {upload_result['s3_uri']}")
+        print(f"Writing Zarr directly to S3 via defair: {concatenated_zarr_path} -> {s3_uri}")
+        local_ds = xr.open_zarr(concatenated_zarr_path, consolidated=True)
+        dataset = Dataset(local_ds)
+        dataset.to_file(
+            s3_uri,
+            writer="zarrv2",
+            mode="w",
+            consolidated=True,
+            storage_options={
+                "key": access_key_id,
+                "secret": secret_access_key,
+                "endpoint_url": endpoint_url,
+            },
+        )
+        print(f"Uploaded to: {s3_uri}")
+
+        upload_result: LoadResultDict = {
+            "success": True,
+            "s3_uri": s3_uri,
+            "destination_prefix": destination_prefix,
+        }
         upload_result["channels"] = channels
         upload_result["reprojection_bounds"] = transform_results_dict[
             "reprojection_bounds"
@@ -1568,5 +1603,5 @@ if __name__ == "__main__":
     # nside=1024's bins. NearestResampler backward-fills empty bins from
     # their nearest filled neighbour and preserves the source min/max.
     dag.test(
-        run_conf={"search_limit": 10, "channels": ["ch1", "ch5", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1024, "reprojection_resolution_unit": "m"},
+        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1024, "reprojection_resolution_unit": "m"},
     )

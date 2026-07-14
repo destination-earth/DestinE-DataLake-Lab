@@ -25,6 +25,33 @@ def _delete_prefix_contents(s3_client, bucket_name: str, prefix: str) -> int:
     return deleted_count
 
 
+def clear_s3_prefix(
+    bucket_name: str,
+    endpoint_url: str,
+    access_key_id: str,
+    secret_access_key: str,
+    prefix: str,
+) -> int:
+    """Delete every object under `prefix` in `bucket_name`. Returns the count deleted.
+
+    Exposes `_delete_prefix_contents` (already used internally by
+    `upload_directory_to_s3`'s `replace_existing=True` path) as a standalone
+    helper, for callers that write to S3 by some other means (e.g. a
+    defair `Dataset.to_file("s3://...", ...)` call) but still need the same
+    "clean overwrite per run" guarantee: unlike a local `mode="w"` Zarr
+    write, a `mode="w"` write straight to S3 does not clear pre-existing
+    objects at that prefix, so a run producing fewer variables/timesteps
+    than a prior run would otherwise leave stale objects behind.
+    """
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        aws_access_key_id=access_key_id,
+        aws_secret_access_key=secret_access_key,
+    )
+    return _delete_prefix_contents(s3_client=s3_client, bucket_name=bucket_name, prefix=prefix.strip("/"))
+
+
 def _upload_file_to_s3_with_client(
     s3_client,
     local_file_path: str,
