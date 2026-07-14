@@ -10,7 +10,7 @@ DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.s3.s3_helper import upload_directory_to_s3, upload_file_to_s3  # noqa: E402
+from dedl.s3.s3_helper import clear_s3_prefix, upload_directory_to_s3, upload_file_to_s3  # noqa: E402
 
 
 class _DummyS3Client:
@@ -281,6 +281,56 @@ def test_upload_directory_to_s3_rejects_non_directory(tmp_path: Path) -> None:
             access_key_id="access",
             secret_access_key="secret",
         )
+
+
+def test_clear_s3_prefix_deletes_existing_objects_and_returns_count(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_client = _DummyS3Client()
+
+    def fake_boto3_client(service_name: str, **kwargs):
+        assert service_name == "s3"
+        assert kwargs["endpoint_url"] == "https://example.invalid"
+        assert kwargs["aws_access_key_id"] == "access"
+        assert kwargs["aws_secret_access_key"] == "secret"
+        return dummy_client
+
+    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+
+    deleted_count = clear_s3_prefix(
+        bucket_name="my-bucket",
+        endpoint_url="https://example.invalid",
+        access_key_id="access",
+        secret_access_key="secret",
+        prefix="my_ch9_zarr_data",
+    )
+
+    assert deleted_count == 2
+    assert dummy_client.paginator_prefixes == ["my_ch9_zarr_data/"]
+    assert dummy_client.deleted_payloads == [
+        {
+            "Bucket": "my-bucket",
+            "Delete": {
+                "Objects": [
+                    {"Key": "my_ch9_zarr_data/stale.json"},
+                    {"Key": "my_ch9_zarr_data/old/chunk-1"},
+                ]
+            },
+        }
+    ]
+
+
+def test_clear_s3_prefix_strips_leading_and_trailing_slashes(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_client = _DummyS3Client()
+    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
+
+    clear_s3_prefix(
+        bucket_name="my-bucket",
+        endpoint_url="https://example.invalid",
+        access_key_id="access",
+        secret_access_key="secret",
+        prefix="/my_ch9_zarr_data/",
+    )
+
+    assert dummy_client.paginator_prefixes == ["my_ch9_zarr_data/"]
 
 
 def test_upload_file_to_s3_uploads_single_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
