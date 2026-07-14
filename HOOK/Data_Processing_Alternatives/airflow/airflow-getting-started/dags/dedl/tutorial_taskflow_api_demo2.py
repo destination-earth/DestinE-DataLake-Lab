@@ -1003,16 +1003,14 @@ def tutorial_taskflow_api_demo2(
             }
 
         # -----------------------------------------------------
-        # Step 5 : Check CF 1.8 Compliance
+        # Step 5 : Check CF-1.13 Compliance (defair's built-in validator)
         # -----------------------------------------------------
-        print("Global Attributes:")
-        for key in ["Conventions", "title", "institution", "source", "history"]:
-            if key in dataset.data.attrs:
-                value = dataset.data.attrs[key]
-                # Truncate long values
-                if isinstance(value, str) and len(value) > 100:
-                    value = value[:100] + "..."
-                print(f"  {key}: {value}")
+        cf_result = dataset.validate_cf(strict=False)
+        print(f"CF-1.13 compliance: {'PASS' if cf_result.is_valid else 'FAIL'}")
+        if cf_result.errors:
+            print(f"  Errors: {cf_result.errors}")
+        if cf_result.warnings:
+            print(f"  Warnings: {cf_result.warnings}")
 
         print("\nCoordinate Reference System:")
         if "spatial_ref" in dataset.data.coords:
@@ -1077,16 +1075,14 @@ def tutorial_taskflow_api_demo2(
             ds_europe_reproj = Dataset(reproj_data, cdm=ds_europe_reproj.cdm)
 
         # -----------------------------------------------------
-        # Step X2 : Focus on a subset of channels (bands) for further processing: Question on cdm here
+        # Step X2 : Focus on a subset of channels (bands) for further processing
         # -----------------------------------------------------
 
-        # Select all configured channels from the transformed dataset.
-        xr_channel = ds_europe_reproj.data[channels]
-
-        ds_channel = Dataset(xr_channel)
-
-        # Keep downstream logic unchanged by replacing dataset with the single-channel view.
-        dataset = ds_channel
+        # Use defair's content_filter transformation (rather than raw xarray
+        # indexing) so the selection is tracked in the dataset's CF history,
+        # same as spatial_filter/reproject above. It only touches data_vars
+        # and restores any coord (e.g. spatial_ref) it would otherwise drop.
+        dataset = ds_europe_reproj.transform("content_filter", include_vars=channels)
 
         # -----------------------------------------------------
         # Step 6 : Write a cloud-optimized Zarr file with consolidated metadata
