@@ -26,7 +26,7 @@ from typing import Any
 import pendulum
 from airflow.sdk import dag, get_current_context, task, Param
 from airflow.sdk.definitions.param import DagParam
-from dedl.tasks.common import show_params
+from dedl.common.tasks.common import show_params
 from dedl.demo2.tasks.reporting import generate_run_report
 
 # [END import_module]
