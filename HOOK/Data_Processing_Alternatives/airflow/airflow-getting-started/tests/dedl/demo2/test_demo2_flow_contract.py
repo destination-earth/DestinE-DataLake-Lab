@@ -8,14 +8,14 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
 from airflow.sdk.definitions.param import DagParam  # noqa: E402
-from dedl.eodag.eodag_helper import filter_and_sort_nat_files  # noqa: E402
-from dedl import tutorial_taskflow_api_demo2 as demo2  # noqa: E402
+from dedl.demo2.eodag.eodag_helper import filter_and_sort_nat_files  # noqa: E402
+from dedl.demo2 import tutorial_taskflow_api_demo2 as demo2  # noqa: E402
 
 
 def test_transform_contract_ignores_stale_folder_files() -> None:

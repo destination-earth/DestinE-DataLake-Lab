@@ -3,12 +3,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.visualization.capital_cities import CityCoordinate, EUROPEAN_CAPITALS  # noqa: E402
+from dedl.demo2.visualization.capital_cities import CityCoordinate, EUROPEAN_CAPITALS  # noqa: E402
 
 
 def test_european_capitals_non_empty() -> None:

@@ -27,7 +27,7 @@ import pendulum
 from airflow.sdk import dag, get_current_context, task, Param
 from airflow.sdk.definitions.param import DagParam
 from dedl.tasks.common import show_params
-from dedl.tasks.reporting import generate_run_report
+from dedl.demo2.tasks.reporting import generate_run_report
 
 # [END import_module]
 
@@ -638,7 +638,7 @@ def tutorial_taskflow_api_demo2(
             SearchResultsDict: Contains num_search_results, downloaded_nat_files list,
                               collection_id, and spatial bbox
         """
-        from dedl.eodag.eodag_helper import (
+        from dedl.demo2.eodag.eodag_helper import (
             clean_directory,
             extract_zip_files,
             filter_and_sort_nat_files,
@@ -926,7 +926,7 @@ def tutorial_taskflow_api_demo2(
         """
         import time
 
-        from dedl.eodag.eodag_helper import change_extension
+        from dedl.demo2.eodag.eodag_helper import change_extension
 
         transform_start = time.perf_counter()
 
@@ -1270,7 +1270,7 @@ def tutorial_taskflow_api_demo2(
         #### Load task: Upload transformed Zarr dataset to S3
 
         Uploads the concatenated local Zarr directory to S3 under a
-        channel-based prefix via dedl.s3.s3_helper.upload_directory_to_s3,
+        channel-based prefix via dedl.demo2.s3.s3_helper.upload_directory_to_s3,
         which clears any pre-existing objects at the target prefix first
         (replace_existing=True) for a clean overwrite per run. S3
         credentials (endpoint, bucket, keys) come from environment
@@ -1285,7 +1285,7 @@ def tutorial_taskflow_api_demo2(
             LoadResultDict: S3 upload result (success, s3_uri, destination_prefix)
                            plus reprojection metadata for downstream tasks
         """
-        from dedl.s3.s3_helper import upload_directory_to_s3
+        from dedl.demo2.s3.s3_helper import upload_directory_to_s3
 
         concatenated_zarr_path = transform_results_dict["concatenated_zarr_path"]
         endpoint_url = _require_env("S3_ENDPOINT_URL")
@@ -1366,9 +1366,9 @@ def tutorial_taskflow_api_demo2(
         """
         import time
 
-        from dedl.s3.s3_helper import upload_file_to_s3
-        from dedl.visualization.capital_cities import EUROPEAN_CAPITALS
-        from dedl.visualization.visualization_helper import (
+        from dedl.demo2.s3.s3_helper import upload_file_to_s3
+        from dedl.demo2.visualization.capital_cities import EUROPEAN_CAPITALS
+        from dedl.demo2.visualization.visualization_helper import (
             create_mp4_from_dataarray,
             open_s3_zarr_dataset,
             reproject_healpix_dataarray_to_raster,
@@ -1413,7 +1413,7 @@ def tutorial_taskflow_api_demo2(
 
         country_border_lines = None
         if enable_country_borders_overlay:
-            from dedl.visualization.country_borders import load_country_border_lines
+            from dedl.demo2.visualization.country_borders import load_country_border_lines
 
             try:
                 country_border_lines = load_country_border_lines()
@@ -1535,7 +1535,7 @@ def tutorial_taskflow_api_demo2(
 
     # Report: global run summary (criteria, download success/failure counts,
     # per-product/per-channel timings). trigger_rule="all_done" (set on the
-    # task itself in dedl.tasks.reporting) so it still runs and reports
+    # task itself in dedl.demo2.tasks.reporting) so it still runs and reports
     # accurately even if load/visualise fail downstream of a successful
     # extract/transform.
     generate_run_report(

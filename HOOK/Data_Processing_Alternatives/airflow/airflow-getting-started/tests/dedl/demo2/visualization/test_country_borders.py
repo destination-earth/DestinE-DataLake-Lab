@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.visualization.country_borders import load_country_border_lines  # noqa: E402
+from dedl.demo2.visualization.country_borders import load_country_border_lines  # noqa: E402
 
 
 def test_load_country_border_lines_extracts_linestring_and_multilinestring(

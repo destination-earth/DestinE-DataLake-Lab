@@ -1,6 +1,6 @@
 # Walkthrough: `tutorial_taskflow_api_demo2.py`
 
-This is a task-by-task guide to `dags/dedl/tutorial_taskflow_api_demo2.py`, the
+This is a task-by-task guide to `dags/dedl/demo2/tutorial_taskflow_api_demo2.py`, the
 real Extract → Transform → Load → Visualise pipeline in this repo. It searches
 and downloads MSG/SEVIRI products from the DestinE Data Lake (DEDL) via
 `eodag`, converts them to Zarr via `defair`, uploads to S3, and renders an
@@ -190,7 +190,7 @@ reprojection metadata, `source_channel_attrs`).
 ### `load` (demo2.py:1271-1320)
 
 Uploads the concatenated Zarr directory to S3 via
-`dedl.s3.s3_helper.upload_directory_to_s3`, under prefix
+`dedl.demo2.s3.s3_helper.upload_directory_to_s3`, under prefix
 `my_{channels_slug}_zarr_data`. Requires `S3_ENDPOINT_URL`,
 `MY_S3_BUCKET_NAME`, `MY_S3_ACCESS_KEY_ID`, `MY_S3_SECRET_ACCESS_KEY` (read
 via `_require_env`, demo2.py:118-125 — raises a clear error if any is unset).
@@ -374,7 +374,7 @@ workers/pods, unless either:
   "Execution Isolation" sections, and the runnable examples
   `tutorial_taskflow_api_test7_kpo_hello_world_custom_image_s3.py` /
   `test8_..._all_env.py`. Note `load` and `visualise_one` in demo2 are
-  *already* S3-native (`dedl.s3.s3_helper`, `open_s3_zarr_dataset`), so this
+  *already* S3-native (`dedl.demo2.s3.s3_helper`, `open_s3_zarr_dataset`), so this
   second option is really "extend the same pattern earlier in the
   pipeline," not a new approach.
 
@@ -432,8 +432,8 @@ project's README lays out a learning order from plain `@task` through
 `@task.virtualenv`, `KubernetesPodOperator`, and `@task.kubernetes` with
 Secrets/ConfigMaps/custom images/S3 (`test1` → `test8`) — follow that
 progression rather than converting every task at once.
-`dedl.s3.s3_helper` and `dedl.visualization.visualization_helper` can be
+`dedl.demo2.s3.s3_helper` and `dedl.demo2.visualization.visualization_helper` can be
 reused as-is in that migration since they're already S3-native and
-executor-agnostic; `dedl.eodag.eodag_helper` and the local-path assumptions
+executor-agnostic; `dedl.demo2.eodag.eodag_helper` and the local-path assumptions
 in `extract`/`transform_one`/`concatenate_zarr_files` are the parts that
 need the shared-storage-or-S3 decision above.
