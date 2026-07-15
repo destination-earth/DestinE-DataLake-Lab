@@ -241,14 +241,14 @@ Each mapped instance is fully self-contained:
 Returns a `VisualiseOneResultDict` (channel, video path, frame count, fps,
 S3 URI, duration).
 
-### `generate_run_report` (`dedl/tasks/reporting.py`)
+### `generate_run_report` (`dedl/demo2/tasks/reporting.py`)
 
 Runs with `trigger_rule="all_done"` so it still reports download/transform
 outcomes even if `load`/`visualise` fail downstream of a healthy
 `extract`/`transform`. Delegates to `build_run_report`, a pure
 dict-in/dict-out function with no Airflow/eodag/S3 imports — deliberately
 kept that way so it's unit-testable with plain fixtures
-(`tests/dedl/tasks/...`). Aggregates the run's criteria, download
+(`tests/dedl/demo2/tasks/...`). Aggregates the run's criteria, download
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 

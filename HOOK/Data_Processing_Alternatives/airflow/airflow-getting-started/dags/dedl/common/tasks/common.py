@@ -1,7 +1,7 @@
 import json
 
 from airflow.sdk import task
-from dedl.config.collections import fetch_collection_ids
+from dedl.common.config.collections import fetch_collection_ids
 
 
 @task(task_display_name="Show run parameters")
