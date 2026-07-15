@@ -8,13 +8,13 @@ import pytest
 import xarray as xr
 from types import SimpleNamespace
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.visualization.capital_cities import CityCoordinate  # noqa: E402
-from dedl.visualization.visualization_helper import (  # noqa: E402
+from dedl.demo2.visualization.capital_cities import CityCoordinate  # noqa: E402
+from dedl.demo2.visualization.visualization_helper import (  # noqa: E402
     _ResolvedCityPixel,
     _build_annotation_lines,
     _format_bbox,
@@ -246,11 +246,11 @@ def test_create_mp4_from_dataarray_generates_expected_metadata(monkeypatch: pyte
             written_frames.append(frame)
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
 
@@ -445,11 +445,11 @@ def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytes
             written_frames.append(frame)
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
 
@@ -458,7 +458,7 @@ def test_create_mp4_from_dataarray_applies_annotation_overlay(monkeypatch: pytes
         return frame
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_annotation_banner",
+        "dedl.demo2.visualization.visualization_helper._overlay_annotation_banner",
         _capture_overlay,
     )
 
@@ -691,11 +691,11 @@ def test_create_mp4_from_dataarray_applies_city_temperature_overlay(
             written_frames.append(frame)
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
 
@@ -704,7 +704,7 @@ def test_create_mp4_from_dataarray_applies_city_temperature_overlay(
         return frame
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        "dedl.demo2.visualization.visualization_helper._overlay_city_temperatures",
         _capture_city_overlay,
     )
 
@@ -761,11 +761,11 @@ def test_create_mp4_from_dataarray_applies_city_temperature_overlay_with_lon_lat
             written_frames.append(frame)
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
 
@@ -774,7 +774,7 @@ def test_create_mp4_from_dataarray_applies_city_temperature_overlay_with_lon_lat
         return frame
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        "dedl.demo2.visualization.visualization_helper._overlay_city_temperatures",
         _capture_city_overlay,
     )
 
@@ -810,15 +810,15 @@ def test_create_mp4_from_dataarray_city_overlay_defaults_to_none(
             pass
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        "dedl.demo2.visualization.visualization_helper._overlay_city_temperatures",
         lambda *args, **kwargs: overlay_calls.append(1),
     )
 
@@ -846,11 +846,11 @@ def _patch_dummy_writer_and_frame(monkeypatch: pytest.MonkeyPatch) -> list[np.nd
             written_frames.append(frame)
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper.imageio",
+        "dedl.demo2.visualization.visualization_helper.imageio",
         SimpleNamespace(get_writer=lambda *args, **kwargs: _DummyWriter()),
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._to_uint8_rgb_frame",
+        "dedl.demo2.visualization.visualization_helper._to_uint8_rgb_frame",
         lambda values, vmin, vmax, colormap_name: np.zeros((*values.shape, 3), dtype=np.uint8),
     )
     return written_frames
@@ -878,7 +878,7 @@ def test_create_mp4_from_dataarray_applies_country_borders_overlay(
         return frame
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_country_borders",
+        "dedl.demo2.visualization.visualization_helper._overlay_country_borders",
         _capture_borders_overlay,
     )
 
@@ -919,7 +919,7 @@ def test_create_mp4_from_dataarray_applies_country_borders_overlay_with_lon_lat_
         return frame
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_country_borders",
+        "dedl.demo2.visualization.visualization_helper._overlay_country_borders",
         _capture_borders_overlay,
     )
 
@@ -943,7 +943,7 @@ def test_create_mp4_from_dataarray_country_borders_overlay_defaults_to_none(
 
     _patch_dummy_writer_and_frame(monkeypatch)
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_country_borders",
+        "dedl.demo2.visualization.visualization_helper._overlay_country_borders",
         lambda *args, **kwargs: overlay_calls.append(1),
     )
 
@@ -973,15 +973,15 @@ def test_create_mp4_from_dataarray_draws_borders_before_city_overlay_and_banner(
     draw_order: list[str] = []
 
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_country_borders",
+        "dedl.demo2.visualization.visualization_helper._overlay_country_borders",
         lambda frame, *args, **kwargs: (draw_order.append("borders"), frame)[1],
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_city_temperatures",
+        "dedl.demo2.visualization.visualization_helper._overlay_city_temperatures",
         lambda frame, *args, **kwargs: (draw_order.append("city"), frame)[1],
     )
     monkeypatch.setattr(
-        "dedl.visualization.visualization_helper._overlay_annotation_banner",
+        "dedl.demo2.visualization.visualization_helper._overlay_annotation_banner",
         lambda frame, *args, **kwargs: (draw_order.append("banner"), frame)[1],
     )
 

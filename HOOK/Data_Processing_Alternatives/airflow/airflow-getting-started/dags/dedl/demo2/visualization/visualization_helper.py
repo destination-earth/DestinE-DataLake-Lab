@@ -9,7 +9,7 @@ from typing import Any, NamedTuple
 
 import numpy as np
 
-from dedl.visualization.capital_cities import CityCoordinate
+from dedl.demo2.visualization.capital_cities import CityCoordinate
 
 try:
     import imageio.v2 as imageio

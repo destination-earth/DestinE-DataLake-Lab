@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.s3.s3_helper import clear_s3_prefix, upload_directory_to_s3, upload_file_to_s3  # noqa: E402
+from dedl.demo2.s3.s3_helper import clear_s3_prefix, upload_directory_to_s3, upload_file_to_s3  # noqa: E402
 
 
 class _DummyS3Client:
@@ -60,7 +60,7 @@ def test_upload_directory_to_s3_uploads_nested_files(monkeypatch: pytest.MonkeyP
         assert kwargs["aws_secret_access_key"] == "secret"
         return dummy_client
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", fake_boto3_client)
 
     result = upload_directory_to_s3(
         local_directory_path=str(source_dir),
@@ -106,7 +106,7 @@ def test_upload_directory_to_s3_can_preserve_existing_prefix(monkeypatch: pytest
     def fake_boto3_client(service_name: str, **kwargs):
         return dummy_client
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", fake_boto3_client)
 
     result = upload_directory_to_s3(
         local_directory_path=str(source_dir),
@@ -157,7 +157,7 @@ def test_upload_directory_to_s3_uploads_concurrently_when_requested(monkeypatch:
 
     dummy_client = _ConcurrentDummyS3Client()
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
 
     result = upload_directory_to_s3(
         local_directory_path=str(source_dir),
@@ -205,7 +205,7 @@ def test_upload_directory_to_s3_skips_existing_files_when_requested(monkeypatch:
             return None
 
     dummy_client = _SkipExistingDummyS3Client()
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
 
     result = upload_directory_to_s3(
         local_directory_path=str(source_dir),
@@ -234,7 +234,7 @@ def test_upload_file_to_s3_accepts_transfer_options_without_crashing(monkeypatch
             self.upload_kwargs.append({"filename": filename, "bucket": bucket, "key": key, **kwargs})
 
     dummy_client = _MultipartDummyS3Client()
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
 
     result = upload_file_to_s3(
         local_file_path=str(file_path),
@@ -293,7 +293,7 @@ def test_clear_s3_prefix_deletes_existing_objects_and_returns_count(monkeypatch:
         assert kwargs["aws_secret_access_key"] == "secret"
         return dummy_client
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", fake_boto3_client)
 
     deleted_count = clear_s3_prefix(
         bucket_name="my-bucket",
@@ -320,7 +320,7 @@ def test_clear_s3_prefix_deletes_existing_objects_and_returns_count(monkeypatch:
 
 def test_clear_s3_prefix_strips_leading_and_trailing_slashes(monkeypatch: pytest.MonkeyPatch) -> None:
     dummy_client = _DummyS3Client()
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", lambda *args, **kwargs: dummy_client)
 
     clear_s3_prefix(
         bucket_name="my-bucket",
@@ -343,7 +343,7 @@ def test_upload_file_to_s3_uploads_single_file(monkeypatch: pytest.MonkeyPatch, 
         assert service_name == "s3"
         return dummy_client
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", fake_boto3_client)
 
     result = upload_file_to_s3(
         local_file_path=str(file_path),
@@ -403,7 +403,7 @@ def test_upload_file_to_s3_rejects_empty_destination_key(monkeypatch: pytest.Mon
     def fake_boto3_client(service_name: str, **kwargs):
         return dummy_client
 
-    monkeypatch.setattr("dedl.s3.s3_helper.boto3.client", fake_boto3_client)
+    monkeypatch.setattr("dedl.demo2.s3.s3_helper.boto3.client", fake_boto3_client)
 
     with pytest.raises(ValueError, match="destination_key must not be empty"):
         upload_file_to_s3(
