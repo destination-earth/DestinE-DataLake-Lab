@@ -434,6 +434,6 @@ Secrets/ConfigMaps/custom images/S3 (`test1` → `test8`) — follow that
 progression rather than converting every task at once.
 `dedl.demo2.s3.s3_helper` and `dedl.demo2.visualization.visualization_helper` can be
 reused as-is in that migration since they're already S3-native and
-executor-agnostic; `dedl.demo2.eodag.eodag_helper` and the local-path assumptions
+executor-agnostic; `dedl.demo2.eodag_helpers.eodag_helper` and the local-path assumptions
 in `extract`/`transform_one`/`concatenate_zarr_files` are the parts that
 need the shared-storage-or-S3 decision above.

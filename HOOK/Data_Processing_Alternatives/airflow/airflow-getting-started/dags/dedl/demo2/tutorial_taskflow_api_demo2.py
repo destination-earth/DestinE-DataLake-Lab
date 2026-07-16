@@ -638,7 +638,7 @@ def tutorial_taskflow_api_demo2(
             SearchResultsDict: Contains num_search_results, downloaded_nat_files list,
                               collection_id, and spatial bbox
         """
-        from dedl.demo2.eodag.eodag_helper import (
+        from dedl.demo2.eodag_helpers.eodag_helper import (
             clean_directory,
             extract_zip_files,
             filter_and_sort_nat_files,
@@ -926,7 +926,7 @@ def tutorial_taskflow_api_demo2(
         """
         import time
 
-        from dedl.demo2.eodag.eodag_helper import change_extension
+        from dedl.demo2.eodag_helpers.eodag_helper import change_extension
 
         transform_start = time.perf_counter()
 
