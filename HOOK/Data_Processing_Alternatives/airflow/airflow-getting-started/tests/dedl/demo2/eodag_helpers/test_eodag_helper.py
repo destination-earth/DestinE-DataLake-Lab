@@ -12,7 +12,7 @@ DAGS_PATH = PROJECT_ROOT / "dags"
 if str(DAGS_PATH) not in sys.path:
     sys.path.insert(0, str(DAGS_PATH))
 
-from dedl.demo2.eodag.eodag_helper import (  # noqa: E402
+from dedl.demo2.eodag_helpers.eodag_helper import (  # noqa: E402
     clean_directory,
     extract_zip_files,
     filename_timestamp_sort_key,
