@@ -76,13 +76,13 @@ def main():
 
     print("Starting S3 structure mirroring...")
 
-    endpoint_url: str = "https://s3.central.data.destination-earth.eu"
-    region: str | None = None
+    endpoint_url: str | None = os.getenv("S3_ENDPOINT_URL", "https://s3.central.data.destination-earth.eu")
+    bucket: str | None = os.getenv("S3_BUCKET_NAME")
     access_key: str | None = os.getenv("AWS_ACCESS_KEY_ID")
     secret_key: str | None = os.getenv("AWS_SECRET_ACCESS_KEY")
     
-    bucket = "usergenerated-proposal-eo.vito.dat.urban-heats-maps"
-    output = "EO.VITO.DAT.URBAN_HEAT_MAPS"
+    region: str | None = None
+    output = "tmp_structure_mirror"
     
     #bucket: str = "test-bucket-2"
     #output: str = "test-bucket-2-structure"
@@ -92,6 +92,14 @@ def main():
         raise RuntimeError(
             "AWS credentials not found.\n\n"
             "Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY via:\n"
+            "  .env file\n"
+            "  or environment variables\n"
+        )
+
+    if not endpoint_url or not bucket:
+        raise RuntimeError(
+            "S3 endpoint URL and bucket name must be specified.\n\n"
+            "Set S3_ENDPOINT_URL and S3_BUCKET_NAME via:\n"
             "  .env file\n"
             "  or environment variables\n"
         )
