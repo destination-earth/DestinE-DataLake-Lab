@@ -3,17 +3,19 @@ title: "DEFAIR"
 author: "EUMETSAT"
 ---
 
-<img src="../img/DestinE-banner.jpg"
+<img src="../../img/DestinE-banner.jpg"
      alt="Destination Earth banner"
 />
-Materials to learn how to use **DEFAIR** ,  for AI-Ready Data)** provides tools and workflows for preparing AI-ready datasets within the Destination Earth ecosystem.
+Materials to learn how to use **DEFAIR** ,  **(Destination Earth Framework for AI-Ready Data)** provides tools and workflows for preparing AI-ready datasets within the Destination Earth ecosystem.
 
-This folder contains examples to help you get started with DEFAIR.
+This folder contains examples to help you get started with DEFAIR as well as more structured ML use cases examples.
 
 ## Notebooks
 
 - [DEFAIR Quick Start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEDL_DEFAIR_quick_start.ipynb)
   Introduction to DEFAIR and its core features.
+
+- readers
 
 - [DEFAIR Monthly air temperature regression](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/Monthly_air_temperature_regression.ipynb)  estimates the mean 2 m air temperature of June 2026 over Central and Western Europe from satellite observations of surface temperature alone, using the DEFAIR AI-ready data framework end to end. 
 
@@ -31,7 +33,7 @@ Follow the steps below to create a dedicated DEFAIR environment and kernel in DE
 
 ## 1. Upload the DEFAIR distribution
 
-Upload the latest DEFAIR artifact archive to your DEDL JupyterLab workspace and extract its contents.
+Upload the latest DEFAIR artifact archive (https://gitlab.eumetsat.int/defair/defair-core/-/jobs/2119950/artifacts/browse/dist/) to your DEDL JupyterLab workspace and extract its contents.
 
 ## 2. Create a dedicated Conda environment
 
