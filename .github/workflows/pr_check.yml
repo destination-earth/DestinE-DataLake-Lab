@@ -20,7 +20,7 @@ jobs:
       - name: List changed notebooks
         id: changes
         run: |
-          FILES=$(git diff --name-only origin/main...HEAD | grep ".ipynb" || true)
+          FILES=$(git diff --name-only --diff-filter=d origin/main...HEAD | grep ".ipynb" || true)
           {
             echo 'CHANGED<<EOF'
             echo "$FILES"
