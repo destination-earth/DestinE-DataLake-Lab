@@ -40,6 +40,8 @@ jobs:
             "HDA/DestinE_Digital_Twins/ClimateDT-ExtractLocationValues.ipynb" \
             "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb" \
             "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb" \
+            "HDA/DestinE_Digital_Twins/img/climatePlotter.svg" \
+            "HDA/DestinE_Digital_Twins/img/extremePlotter.drawio.svg" \
             "HDA/REST/HDA-REST-Queryables.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
@@ -56,6 +58,8 @@ jobs:
             "HDA/DestinE_Digital_Twins/ClimateDT-ExtractLocationValues.ipynb" \
             "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_CLIMATE-Series.ipynb" \
             "HDA/DestinE_Digital_Twins/DEDL-HDA-EO.ECMWF.DAT.DT_EXTREMES.ipynb" \
+            "HDA/DestinE_Digital_Twins/img/extremePlotter.drawio.svg" \
+            "HDA/DestinE_Digital_Twins/img/climatePlotter.svg" \
             "HDA/REST/HDA-REST-Queryables.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"

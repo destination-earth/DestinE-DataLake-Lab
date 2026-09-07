@@ -3,7 +3,7 @@ title: "DestinE Harmonised Data Access (HDA)"
 author: "Author: EUMETSAT"
 ---
 
-<img style="float:left; width:5%" src="../../img/EUMETSAT-icon.png"/>  
+<img style="float:left; width:5%" src="../img/EUMETSAT-icon.png"/>  
 <br>
 Materials to learn how to use Harmonised Data Access API and examples 
 
