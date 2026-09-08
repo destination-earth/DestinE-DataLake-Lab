@@ -4,6 +4,8 @@ matplotlib==3.10.9
 matplotlib-inline==0.2.2
 
 cf-units >= 3.3.1
+covjson-pydantic==0.7.0
+covjsonkit==0.2.12
 
 earthkit==0.13.2
 earthkit-data==0.19.3
