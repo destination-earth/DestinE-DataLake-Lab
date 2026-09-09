@@ -45,6 +45,7 @@ jobs:
             "HDA/REST/HDA-REST-Queryables.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
+            "HDA/insula-requirements.txt" \
             "README.md" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
 
@@ -65,6 +66,7 @@ jobs:
             "HDA/REST/HDA-REST-Queryables.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
+            "HDA/insula-requirements.txt" \
             "README.md" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
 
