@@ -27,27 +27,33 @@ https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
 
 # Prerequisites
 - Python 3.12
----
+- The following instructions asuumes that the users have the latest DEFAIR artifact archive
+
 # Installation Instructions
 
+-----
 ## Installing DEFAIR in Insula
 Follow the steps below to create a dedicated DEFAIR environment and kernel in Insula code.
 
 ### 1. Upload the DEFAIR distribution
-Upload the latest DEFAIR artifact archive (https://gitlab.eumetsat.int/defair/defair-core/-/jobs/2119950/artifacts/browse/dist/) to your Insula workspace and extract its contents.
+Upload the latest DEFAIR artifact archive (https://gitlab.eumetsat.int/defair/defair-core/-/jobs/2263273/artifacts/browse/dist) to your Insula workspace and extract its contents.
+
+```bash
+unzip artifacts.zip
+```
 
 ### 2. Create a dedicated environment
 
 Open a terminal window (File-> New-> Terminal) and run the following command to create a new environment:
 
 ```bash
-python -m venv /home/jovyan/defair
+python -m venv /home/jovyan/defair_venv
 ```
 
 ### 3. Activate the environment
 
 ```bash
-source /home/jovyan/defair/bin/activate
+source /home/jovyan/defair_venv/bin/activate
 ```
 
 ### 4. Install the required dependencies
@@ -55,20 +61,24 @@ source /home/jovyan/defair/bin/activate
 Install required dependencies for these example Notebooks:
      
 ```bash
-pip install -r /home/jovyan/datalake-lab-insula/DEFAIR/requirements-insula.txt
+
+python -m pip install -r /home/jovyan/datalake-lab-insula/DEFAIR/requirements-insula.txt \
+       ./dist/defair-0.4.0rc2-py3-none-any.whl \
+       ./dist/defair_data-0.4.0rc2-py3-none-any.whl \
+       ./dist/defair_ops-0.4.0rc2-py3-none-any.whl
 ```
 
 ### 5. Install defair kernel
 
 ```bash
-     python -m ipykernel install --name defair --user
+     python -m ipykernel install --user --name defair_env --display-name "Python (defair)"
 ```
 
 Select the kernel defair from the top-right menu of these notebooks.
 
 ### 6. Run DEFAIR notebooks
 
-When opening a DEFAIR notebook, select the **defair)* kernel from the JupyterLab kernel list.
+When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
 
 ### 7. Verification
 
@@ -82,64 +92,58 @@ print(defair.__version__)"
 If the command executes successfully and prints the installed version, DEFAIR is ready to use.
 
 
-
-## Installing DEFAIR in DEDL JupyterLab
+-----
+## Installing DEFAIR in DEDL STACK JupyterLab
 
 Follow the steps below to create a dedicated DEFAIR environment and kernel in DEDL JupyterLab.
 
 ### 1. Upload the DEFAIR distribution
 
-Upload the latest DEFAIR artifact archive (https://gitlab.eumetsat.int/defair/defair-core/-/jobs/2119950/artifacts/browse/dist/) to your DEDL JupyterLab workspace and extract its contents.
-
-### 2. Create a dedicated Conda environment
-
-Open a terminal and create a new environment:
+Upload the latest DEFAIR artifact archive (https://gitlab.eumetsat.int/defair/defair-core/-/jobs/2263273/artifacts/browse/dist) to your Insula workspace and extract its contents.
 
 ```bash
-conda create -n defair python=3.12
+unzip artifacts.zip
+```
+
+### 2. Create a dedicated environment
+
+Open a terminal window (File-> New-> Terminal) and run the following command to create a new environment:
+
+```bash
+python -m venv /home/jovyan/defair_venv
 ```
 
 ### 3. Activate the environment
 
 ```bash
-conda activate defair
+source /home/jovyan/defair_venv/bin/activate
 ```
 
-### 4. Install the DEFAIR package
+### 4. Install the required dependencies
 
-Install the DEFAIR wheel from the extracted distribution:
+Install required dependencies for these example Notebooks:
+     
+```bash
+
+python -m pip install -r /home/jovyan/DestinE-DataLake-Lab/DEFAIR/requirements-stack.txt \
+       ./dist/defair-0.4.0rc2-py3-none-any.whl \
+       ./dist/defair_data-0.4.0rc2-py3-none-any.whl \
+       ./dist/defair_ops-0.4.0rc2-py3-none-any.whl
+```
+
+### 5. Install defair kernel
 
 ```bash
-pip install dist/*.whl
+     python -m ipykernel install --user --name defair_env --display-name "Python (defair)"
 ```
 
-### 5. Install additional dependencies
+Select the kernel defair from the top-right menu of these notebooks.
 
-Install `tenacity`, which is required by the HDA source plugin:
-
-```bash
-pip install tenacity
-```
-
-### 6. Install Jupyter kernel support
-
-```bash
-conda install ipykernel
-```
-
-### 7. Register the DEFAIR kernel
-
-Register the environment as a Jupyter kernel:
-
-```bash
-python -m ipykernel install --user --name defair-env --display-name "Python (defair)"
-```
-
-### 8. Run DEFAIR notebooks
+### 6. Run DEFAIR notebooks
 
 When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
 
-### 9. Verification
+### 7. Verification
 
 To verify the installation open a new notebook selecting the **Python (defair)** kernel and run:
 
@@ -150,11 +154,21 @@ print(defair.__version__)"
 
 If the command executes successfully and prints the installed version, DEFAIR is ready to use.
 
+-----
 ## Installing DEFAIR locally
-TBW
+
+https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/defair/installation.html
 
 # Troubleshooting
-TBW
+
+If you encounter any issues:
+
+1. Log in to the DESP platform.
+2. Open a support ticket at: https://platform.destine.eu/contact/
+3. When submitting the ticket, select "DEFAIR" as the affected service.
+4. The support team will assist you in diagnosing and resolving the issue.
 
 # Additional Resources
-TBW
+For more information about DEFAIR, please refer to the documentation:
+
+https://cloudferro-dedl-staging.readthedocs-hosted.com/en/latest/working_with_ai_in_the_data_lake/defair

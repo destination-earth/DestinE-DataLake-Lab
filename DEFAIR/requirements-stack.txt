@@ -1,0 +1,56 @@
+# DEFAIR kernel for Insula (DESP JupyterHub) - tested top-level constraints
+# Drawn from the DEDL JupyterStack staging campaign, 2026-08-03.
+# Clean Python 3.11 install + pip check + import smoke verified 2026-08-05.
+# Python >= 3.10 required; all testing was on Python 3.11.
+# This is not a fully frozen transitive lock file.
+#
+# Install in one resolver pass:
+#   python -m pip install -r requirements-insula.txt \
+#       ./defair-0.4.0rc1-py3-none-any.whl \
+#       ./defair_data-0.4.0rc1-py3-none-any.whl \
+#       ./defair_ops-0.4.0rc1-py3-none-any.whl
+#      (use the wheels supplied alongside this file - see the covering email;
+#       remaining transitive dependencies resolve from the wheel metadata)
+#   python -m ipykernel install --name defair
+#
+# NOTE: the supplied wheels report version 0.4.0rc1 but are newer than the
+# 0.4.0rc1 release (they include the JupyterStack compatibility fix set merged
+# 2026-08-03). Install from these exact files. A follow-up release will replace
+# this arrangement with a normal versioned pin.
+# Supplied-wheel SHA-256 checksums:
+# f142a7d4d77e16726234b9e3828ca12eb261ec03e58094f0d4ce13692e609028  defair-0.4.0rc1-py3-none-any.whl
+# 578895edde655ce1a42904d9065d9663fbdb25acd33ff9e6d8e819d4f9450396  defair_data-0.4.0rc1-py3-none-any.whl
+# bb4d8a6f2ab8fc2b0302ec598f751ed8db5a79832940628e739a10aad8b5993b  defair_ops-0.4.0rc1-py3-none-any.whl
+
+# Core scientific line exercised across the staging client/workers
+numpy==2.4.6
+pandas==2.3.2
+xarray==2026.7.0
+zarr==3.1.6
+
+# Dask + serialization line from the tested DEDL staging gateway. If Insula
+# provides a different external cluster, verify these against its scheduler and
+# worker environment before rollout. For pod-local use no gateway is required.
+dask[distributed]==2023.8.0
+dask-gateway==2023.1.1
+cloudpickle==2.2.1
+msgpack==1.0.5
+toolz==0.12.0
+tblib==3.2.2
+tornado==6.3.2
+lz4==4.3.2
+
+# Remote data access (>=2025.9.0 is a hard DEFAIR requirement)
+fsspec>=2025.9.0
+s3fs>=2025.9.0
+
+# Reprojection incl. HEALPix (needs the numpy-2 / astropy-7 line above)
+astropy==7.1.1
+astropy-healpix>=1.1.2
+
+# ERA5 GRIB support (DEFAIR pins the earthkit pair below the 1.0 line)
+earthkit-data>=0.17.0,<1
+earthkit-utils>=0.1.1,<0.2
+
+# Jupyter kernel
+ipykernel
