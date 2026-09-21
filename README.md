@@ -27,8 +27,8 @@ Further information available in DestinE Data Lake documentation: https://destin
 
 These notebooks in this repository are designed to run in the [**DEDL STACK**](https://jupyter.central.data.destination-earth.eu/hub/) environment using the default **Python DEDL** kernel.
 
-For users planning to run these notebooks outside the DEDL Stack environment, the file [`dedl-python-kernel-packages.txt`](dedl-python-kernel-packages.txt) provides the list of libraries currently available in the default **Python DEDL** kernel and can be used as a reference when setting up a local environment (dedl-python-kernel-packages.txt file obtained via the *pip list --format=freeze > dedl-python-kernel-packages.txt* command in the DEDL STACK).
-
+For users planning to run these notebooks outside the DEDL Stack environment, the file [`dedl-python-kernel-packages.txt`](dedl-python-kernel-packages.txt) provides the list of libraries currently available in the default **Python DEDL** kernel and can be used as a reference when setting up a local environment.
+> **Note:** dedl-python-kernel-packages.txt file obtained via the *pip list --format=freeze > dedl-python-kernel-packages.txt* command in the DEDL STACK.
 
 ### Availability in Insula
 
@@ -40,13 +40,13 @@ When running the notebooks in Insula, please follow the environment-specific ins
 
 #### DestinE Platform Insula Service Users
 <br>
-Please perform the following and select my-datalake-lab kernel when running the provided Notebooks<br>
+Please perform the following and select my_datalake_lab kernel when running the provided Notebooks<br>
 
 Open a terminal window (File -> New -> Terminal) and run the following commands in sequence:
 
 Create a virtual environment: 
      
-     python -m venv /home/jovyan/my-datalake-lab
+     python -m venv /home/jovyan/my_datalake_lab
 
 Activate it: 
      
@@ -64,7 +64,7 @@ This should give:
 
 destinelab         1.14
 
-Install kernel my_env. Run the command:
+Install kernel my_datalake_lab. Run the command:
 
      python -m ipykernel install --name my_datalake_lab --user
 
