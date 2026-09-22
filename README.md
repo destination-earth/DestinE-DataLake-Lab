@@ -50,7 +50,7 @@ Create a virtual environment:
 
 Activate it: 
      
-     source /home/jovyan/my_datalake_lab/bin/activate
+     source /home/jovyan/my-datalake-lab/bin/activate
 
 Install required dependencies for this example Notebooks:
 
@@ -66,10 +66,10 @@ destinelab         1.14
 
 Install kernel my_env. Run the command:
 
-     python -m ipykernel install --name my_datalake_lab --user
+     python -m ipykernel install --name my-datalake-lab --user
 
-**Select the kernel my_datalake_lab from the top-right menu of these notebooks.**
+**Select the kernel my-datalake-lab from the top-right menu of these notebooks.**
 
-Users who already have a previous version of the 'my_datalake_lab' environment installed, should delete the kernel before running the steps above. 
+Users who already have a previous version of the 'my-datalake-lab' environment installed, should delete the kernel before running the steps above. 
 
-To delete the my_datalake_lab kernel please run the following command: 'jupyter kernelspec uninstall my_datalake_lab' from a terminal window.
+To delete the my-datalake-lab kernel please run the following command: 'jupyter kernelspec uninstall my-datalake-lab' from a terminal window.
