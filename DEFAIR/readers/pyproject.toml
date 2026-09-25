@@ -1,0 +1,13 @@
+[project]
+name = "lsa-readers"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[project.entry-points."defair_data.readers"]
+lsa_frm = "lsa_readers.lsa_frm:LSAFRMReaderPlugin"
+lsa509_frp = "lsa_readers.lsa509_frp:LSA509FRPReaderPlugin"
+hsaf_h61 = "lsa_readers.hsaf_h61:HSAFH61ReaderPlugin"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
