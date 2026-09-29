@@ -6,10 +6,10 @@
 
 <img style="float:left; width:5%" src="./img/EUMETSAT-icon.png"/> **Author:** EUMETSAT
 
-Destination Earth Data Lake Laboratory, which contains additional information for working with DestinE Data Lake services:
+Destination Earth Data Lake Laboratory, this repository provides example notebooks and supporting documentation for accessing and processing data through the DestinE Data Lake services:
 - [Harmonised Data Access](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HDA) (Juypter notebooks examples on how to use HDA for *DestinE Data Portfolio* data access)
-- [STACK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/STACK) (Juypter Notebook examples on how to use DASK for near data processing)
-- [HOOK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HOOK) (Juypter Notebook examples on how to use HOOK for workflows)
+- [STACK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/STACK) (Juypter notebook examples on how to use DASK for near data processing)
+- [HOOK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HOOK) (Juypter notebook examples on how to use HOOK for workflows)
 
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
@@ -27,7 +27,12 @@ Further information available in DestinE Data Lake documentation: https://destin
 
 These notebooks in this repository are designed to run in the [**DEDL STACK**](https://jupyter.central.data.destination-earth.eu/hub/) environment using the default **Python DEDL** kernel.
 
-For users planning to run these notebooks outside the DEDL Stack environment, the file [`dedl-python-kernel-packages.txt`](dedl-python-kernel-packages.txt) provides the list of libraries currently available in the default **Python DEDL** kernel and can be used as a reference when setting up a local environment (dedl-python-kernel-packages.txt file obtained via the *pip list --format=freeze > dedl-python-kernel-packages.txt* command in the DEDL STACK).
+The file  [`dedl-python-kernel-packages.txt`](dedl-python-kernel-packages.txt)  contains the list of packages available in the default Python DEDL kernel and can be used as a reference when reproducing the environment locally.
+> **Note:** This file was generated from the DEDL Stack environment using:
+>
+> ```bash
+> pip list --format=freeze > dedl-python-kernel-packages.txt
+> ```
 
 
 ### Availability in Insula
@@ -40,36 +45,70 @@ When running the notebooks in Insula, please follow the environment-specific ins
 
 #### DestinE Platform Insula Service Users
 <br>
-Please perform the following and select my-datalake-lab kernel when running the provided Notebooks<br>
+To run these notebooks in Insula, create the `my_datalake_lab` environment and kernel by following the steps below.<br>
 
 Open a terminal window (File -> New -> Terminal) and run the following commands in sequence:
 
-Create a virtual environment: 
+1. Create a virtual environment.: 
      
-     python -m venv /home/jovyan/my-datalake-lab
+     python -m venv /home/jovyan/my_datalake_lab
 
-Activate it: 
+2. Activate the environment: 
      
      source /home/jovyan/my_datalake_lab/bin/activate
 
-Install required dependencies for this example Notebooks:
+3. Install the required dependencies:
 
      pip install -r /home/jovyan/datalake-lab-insula/HDA/insula-requirements.txt
 
-Verify the installation:
+4. Verify the installation:
      
      pip list | grep destinelab
 
-This should give:
+     This should give:
 
-destinelab         1.14
+     destinelab         1.14
 
-Install kernel my_env. Run the command:
+5. Install the Jupyter kernel:
 
      python -m ipykernel install --name my_datalake_lab --user
 
-**Select the kernel my_datalake_lab from the top-right menu of these notebooks.**
+6. **Select the `my_datalake_lab` kernel from the notebook kernel menu.**
 
-Users who already have a previous version of the 'my_datalake_lab' environment installed, should delete the kernel before running the steps above. 
+> ⚠️ **Kernel update notice**
+>
+> Users who created the `my_datalake_lab` kernel before September 2026 should recreate it by following the installation steps below.
+>
+> First, remove the existing kernel:
+>
+> ```bash
+> jupyter kernelspec uninstall my_datalake_lab
+> ```
+>
+>
+> Then follow the instructions in this section to create a new environment and install the latest version of the kernel.
 
-To delete the my_datalake_lab kernel please run the following command: 'jupyter kernelspec uninstall my_datalake_lab' from a terminal window.
+
+> 💡 **Keeping notebooks up to date**
+>
+> To ensure you are using the latest versions of the notebooks available in this repository, you may occasionally need to update your local clone.
+>
+> If you have modified notebooks locally, Git may not automatically replace them with newer versions from the repository. To reset your local copy and retrieve the latest notebook versions:
+>
+> 1. Select any file or notebook within the repository in the left file browser.
+> 2. Open **Git** from the top menu.
+> 3. Choose **Reset to Remote**.
+>
+> This action discards all local changes and makes your local branch exactly match the corresponding branch on the remote repository.
+>
+> **Warning:** Any local modifications to notebooks or other files will be permanently lost.
+>
+
+##### Troubleshooting
+
+If the `my_datalake_lab` kernel does not appear in the notebook interface:
+
+1. Verify that the kernel was installed successfully:
+    - Confirm that my_datalake_lab appears in the output.
+    - Refresh the browser page and reopen the notebook.
+    - If necessary, recreate the kernel following the instructions above.
