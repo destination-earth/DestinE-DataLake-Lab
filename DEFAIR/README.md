@@ -6,32 +6,62 @@ author: "EUMETSAT"
 <img src="../img/DestinE-banner.jpg"
      alt="Destination Earth banner"
 />
-Materials to learn how to use **DEFAIR** ,  **(Destination Earth Framework for AI-Ready Data)** provides tools and workflows for preparing AI-ready datasets within the Destination Earth ecosystem.
+**DEFAIR (Destination Earth Framework for AI-Ready Data)** learning materials. DEFAIR provides tools and workflows for preparing AI-ready datasets within the Destination Earth ecosystem.
 
-This folder contains examples to help you get started with DEFAIR as well as more structured ML use cases examples.
+This folder contains a collection of examples ranging from introductory tutorials to more structured machine learning use cases, helping you get started and explore DEFAIR's capabilities.
 
-# Notebooks Overview
+# DEFAIR Documentation
 
-- [DEFAIR Quick Start](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEDL_DEFAIR_quick_start.ipynb)
-  Introduction to DEFAIR and its core features.
+The complete DEFAIR documentation is available as part of the DestinE Data Lake documentation: [DEFAIR documentation](https://destine-data-lake-docs.data.destination-earth.eu/en/latest/working_with_ai_in_the_data_lake/defair/defair.html)
 
-- [DEFAIR readers & writers](DEDL_DEFAIR_readers_writers_tour.ipynb) Overview of the available DEFAIR readers and writers, with practical usage examples.
+# Examples Overview
 
-- [DEFAIR Monthly air temperature regression](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/Monthly_air_temperature_regression.ipynb)  estimates the mean 2 m air temperature of June 2026 over Central and Western Europe from satellite observations of surface temperature alone, using the DEFAIR AI-ready data framework end to end. 
+## Getting Started
+- [DEDL_DEFAIR_quick_start.ipynb](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb) A hands-on introduction to DEFAIR covering the core concepts and APIs needed to start working with AI-ready Earth observation data.
 
-# Documentation
+- [DEDL_DEFAIR_Reading_geostationary_product](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Reading_geostationary_product.ipynb)  Demonstrates how to read, explore, and visualize geostationary satellite products with DEFAIR.
 
-Additional information is available in the DestinE Data Lake documentation:
+- [DEDL_DEFAIR_Reading_polar_orbiter_products](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb) Demonstrates how to read and work with polar-orbiting satellite products using DEFAIR readers.
 
-https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
+- [DEDL_DEFAIR_geo_leo_collocation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb) Illustrates the collocation of geostationary and low-Earth-orbit (LEO) observations to build harmonized datasets.
+
+- [DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair.ipynb) Demonstrates how to integrate multiple heterogeneous datasets into a common data cube using DEFAIR.
+
+## Machine Learning Use Cases
+- [LightningCast_create_data_cube_using_defair](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/LightningCast_create_data_cube_using_defair.ipynb) Builds the data cube required for the LightningCast use case by combining satellite and auxiliary datasets.
+ **Goal**: Learn how to prepare structured training data for deep-learning applications with DEFAIR.
+
+- [DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DeepLearning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb) Applies a deep-learning workflow to perform short-term lightning prediction using a DEFAIR-generated data cube.**Goal**: Demonstrate an end-to-end AI workflow, from data preparation to lightning nowcasting.
+
+- [DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb)
+ Explores a machine-learning use case focused on predicting lightning-induced fire ignition risk from Earth observation data.
+ **Goal**: Show how DEFAIR supports model development for environmental monitoring applications.
 
 # Prerequisites
-- Python 3.12
-- The following instructions asuumes that the users have the latest DEFAIR artifact archive
+- Python>= 3.10
 
-# Installation Instructions
+# DEFAIR Installation Instructions
 
------
+[Install DEFAIR locally](https://destine-data-lake-docs.data.destination-earth.eu/en/latest/working_with_ai_in_the_data_lake/defair/installation/installation.html)
+
+# Runnning these notebooks in Insula
+
+When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
+
+# Runnning these notebooks in DEDL STACK JupyterLab
+
+When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
+
+# Troubleshooting
+
+If you encounter any issues:
+
+1. Log in to the [DESP platform](https://platform.destine.eu).
+2. Open a support ticket at: https://platform.destine.eu/contact/
+3. When submitting the ticket, select "DEFAIR" as the affected service.
+4. The support team will assist you in diagnosing and resolving the issue.
+------------
+# THE BELOW SECTIONS MUST BE REMOVED ALMOST TOTALLY WHEN THE PREDEFINED KERNELS ARE READY
 ## Installing DEFAIR in Insula
 Follow the steps below to create a dedicated DEFAIR environment and kernel in Insula code.
 
