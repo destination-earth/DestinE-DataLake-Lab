@@ -43,6 +43,14 @@ jobs:
             "HDA/DestinE_Digital_Twins/img/climatePlotter.drawio.svg" \
             "HDA/DestinE_Digital_Twins/img/extremePlotter.drawio.svg" \
             "HDA/REST/HDA-REST-Queryables.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_product.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb" \
+            "DEFAIR/README.md" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
             "HDA/insula-requirements.txt" \
@@ -64,6 +72,14 @@ jobs:
             "HDA/DestinE_Digital_Twins/img/extremePlotter.drawio.svg" \
             "HDA/DestinE_Digital_Twins/img/climatePlotter.drawio.svg" \
             "HDA/REST/HDA-REST-Queryables.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_product.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb" \
+            "DEFAIR/README.md" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
             "HDA/insula-requirements.txt" \
