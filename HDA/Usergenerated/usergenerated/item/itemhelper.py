@@ -1,10 +1,9 @@
-import pystac
 import os
-from pathlib import Path
 import re
-import magic
-from datetime import datetime
-from typing import List, Dict, Any
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pystac
 
 from config import (
     ITEM_FOLDER_LEVEL,
@@ -120,7 +119,7 @@ def get_asset_role(
 def get_item_properties(
     item_id: str,
     collection_id: str,
-    additional_property_keys: List[str],
+    additional_property_keys: list[str],
     item_folder_naming_convention_type: str,
 ):
     """
@@ -192,12 +191,16 @@ def get_item_properties(
     if start and end:
 
         # Parse the original string into a datetime object
-        start_datetime = datetime.strptime(start, "%Y%m%dT%H%M%S")
+        start_datetime = datetime.strptime(start, "%Y%m%dT%H%M%S").replace(
+            tzinfo=timezone.utc
+        )
         # Format the datetime object to the desired string format
         formatted_start_datetime = start_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Parse the original string into a datetime object
-        end_datetime = datetime.strptime(end, "%Y%m%dT%H%M%S")
+        end_datetime = datetime.strptime(end, "%Y%m%dT%H%M%S").replace(
+            tzinfo=timezone.utc
+        )
         # Format the datetime object to the desired string format
         formatted_end_datetime = end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -210,7 +213,9 @@ def get_item_properties(
         # e.g. EO.XXX.YYY.ZZZ_20241115T000000
 
         # Parse the original string into a datetime object
-        item_datetime = datetime.strptime(start, "%Y%m%dT%H%M%S")
+        item_datetime = datetime.strptime(start, "%Y%m%dT%H%M%S").replace(
+            tzinfo=timezone.utc
+        )
 
     else:
         raise ValueError("Item must have a start and end datetime.")
@@ -228,6 +233,9 @@ def guess_mime_type_advanced(file_path):
     Returns:
     str: The guessed MIME type.
     """
+    # Imported here as python-magic needs the native libmagic library, which is only required by this function
+    import magic
+
     mime = magic.Magic(mime=True)
     return mime.from_file(file_path)
 
@@ -289,6 +297,7 @@ def get_datetime_from_folder_path(
         int(year_from_folder_path),
         int(month_from_folder_path),
         int(day_from_folder_path),
+        tzinfo=timezone.utc,
     )
 
     return datetime_from_folder_path
@@ -306,7 +315,9 @@ def get_item_date_overide(config_list):
 
     if item_date_overide:
         # If there is an overide, use it.
-        return datetime.strptime(item_date_overide, "%Y%m%d")
+        return datetime.strptime(item_date_overide, "%Y%m%d").replace(
+            tzinfo=timezone.utc
+        )
 
     else:
 

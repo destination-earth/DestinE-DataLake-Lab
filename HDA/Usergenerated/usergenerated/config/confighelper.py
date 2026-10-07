@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 from config import (
     APP_LOGGER_NAME,
     ITEM_FOLDER_NAMING_CONVENTION_TYPE,
-    ROOT_DIR,
+    STAC_VERSION,
     ItemFolderNamingConventionType,
 )
 
@@ -138,8 +138,7 @@ def load_and_validate_collection(
     Returns:
         The loaded and validated STAC collection, or None if loading/validation fails
     """
-    # Set the STAC version to 1.0.0
-    set_stac_version("1.0.0")
+    set_stac_version(STAC_VERSION)
 
     try:
         with open(collection_path, "r", encoding="utf-8") as f:
@@ -319,18 +318,19 @@ def get_item_folder_naming_convention_type(collection_config: Dict[str, Any]) ->
     if item_folder_naming_convention_type:
 
         # Validate and apply the override
-        if item_folder_naming_convention_type in ItemFolderNamingConventionType:
-
-            logger.info(
-                f"Overriding ITEM_FOLDER_NAMING_CONVENTION_TYPE to: {item_folder_naming_convention_type}"
-            )
-            return item_folder_naming_convention_type
-
-        else:
+        # (a plain `in` check against the Enum class only accepts string values on Python 3.12+)
+        try:
+            ItemFolderNamingConventionType(item_folder_naming_convention_type)
+        except ValueError:
             logger.warning(
                 f"Invalid item_folder_naming_convention_type: {item_folder_naming_convention_type}. "
                 f"Using default: {ITEM_FOLDER_NAMING_CONVENTION_TYPE}"
             )
+        else:
+            logger.info(
+                f"Overriding ITEM_FOLDER_NAMING_CONVENTION_TYPE to: {item_folder_naming_convention_type}"
+            )
+            return item_folder_naming_convention_type
 
     # Return the default if no valid override is found
     return ITEM_FOLDER_NAMING_CONVENTION_TYPE

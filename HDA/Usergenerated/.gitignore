@@ -1,0 +1,50 @@
+# Credentials (README tells users to create this at the project root)
+.env
+
+# Log output (config.py: usergenerated.log, rotated with 5 backups)
+usergenerated.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Real collections prepared by users. Only the sample deliverable is tracked.
+EO.*/
+!EO.XXX.YYY.ZZZ/
+
+# Local/editor
+.vscode/
+.idea/
+.DS_Store
+
+# Big EO / archive data: never commit (applies inside the sample collection as well)
+*.nc
+*.nc4
+*.cdf
+*.grib
+*.grib2
+*.grb
+*.grb2
+*.zarr/
+*.zarr.zip
+*.tif
+*.tiff
+*.jp2
+*.h5
+*.hdf
+*.hdf5
+*.he5
+*.SAFE/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.bz2
+*.7z
+*.parquet
+*.npy
+*.npz

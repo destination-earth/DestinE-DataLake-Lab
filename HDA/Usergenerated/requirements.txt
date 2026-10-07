@@ -2,6 +2,7 @@ pystac
 pystac[validation]
 pystac[orjson]
 shapely
+#python-magic needs the native libmagic library (e.g. apt install libmagic1, conda install libmagic). It is only used by guess_mime_type_advanced
 python-magic
 requests
 beautifulsoup4

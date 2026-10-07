@@ -1,5 +1,9 @@
 # User Generated Data - Process
 
+> **Maintenance release:** assures Python 3.10 support. Also updated dependencies handling and comments. STAC Collections and Items are now STAC 1.1.0
+>
+> **A new v2 with additional features is available on PyPI: <https://pypi.org/project/usergenerated/>.** This code here can still be used but we would recommend using the new version for any new work.
+
 - This project demonstrates the integration of a **User Generated** Collection into Destination Earth Data Lake - HDA (Harmonised Data Access)
     - Using this project to propose **new data** assumes you have already contacted the Destination Earth Data Lake Support Team and that your proposal has been accepted by the **Data Lake - Review Board**.
     - **Note**: Proposing new data is a manual process, and requires review with the **Data Lake - Review Board**. For this reason data cannot be continually updated. Each update will require a new request.
@@ -66,6 +70,10 @@ AWS_SECRET_ACCESS_KEY="[Replace with your credentials secret_access_key]"
 - In order to provide data and metadata in the expected format, you will likely need a VM with adequate storage to allow you to:
     - Manipulate/Move files into the expected folders
     - Generate preliminary item specific metadata (See item_config.json) that will later be used to generate the final STAC Item metadata.
+- **Python 3.10 or newer** is required.
+    - Current state: the code imports and runs its configuration helpers on Python 3.10 and 3.12 (checked locally). There is no automated CI for this code yet, and other versions are not tested.
+    - Install the dependencies in a virtual environment, for example with [uv](https://docs.astral.sh/uv/): `uv venv && uv pip install -r requirements.txt`
+- `python-magic` needs the native **libmagic** library (e.g. `apt install libmagic1` or `conda install libmagic`). It is only used by `guess_mime_type_advanced` in `itemhelper.py`, which the metadata generation does not currently call, so you can ignore it unless you use that function.
 
 
 
