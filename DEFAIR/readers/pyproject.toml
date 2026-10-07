@@ -1,7 +1,7 @@
 [project]
 name = "lsa-readers"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 
 [project.entry-points."defair_data.readers"]
 lsa_frm = "lsa_readers.lsa_frm:LSAFRMReaderPlugin"
