@@ -27,7 +27,7 @@ earthkit-hydro==1.2.0
 earthkit-maps==0.0.19
 earthkit-meteo==0.6.2
 earthkit-plots==0.6.1
-arthkit-plots-default-styles==0.1.3
+earthkit-plots-default-styles==0.1.3
 earthkit-regrid==0.5.1
 earthkit-time==0.1.8
 earthkit-transforms==0.5.4
