@@ -15,12 +15,14 @@ if str(DAGS_PATH) not in sys.path:
 from dedl.demo2.eodag_helpers.eodag_helper import (  # noqa: E402
     clean_directory,
     extract_zip_files,
+    fail_download_records_missing_extension,
     filename_timestamp_sort_key,
     filter_and_sort_nat_files,
     find_dedl_collection_by_eodag_id,
     find_eodag_collection_id_by_dedl_id,
     get_collection_search_params,
     get_eodag_collection_info,
+    reextract_folders_missing_extension,
     shift_iso_date,
 )
 
@@ -377,3 +379,82 @@ def test_extract_zip_files_overwrite_false_keeps_existing_member(tmp_path: Path)
     extract_zip_files([zip_path], overwrite=False)
 
     assert (extract_dir / "data.txt").read_text() == "original content"
+
+
+def _build_partially_extracted_product(tmp_path: Path, name: str) -> Path:
+    # Mirrors what eodag can leave behind: the zip holds the .nat, but the
+    # extracted folder only got EOPMetadata.xml.
+    with zipfile.ZipFile(tmp_path / f"{name}.zip", "w") as z:
+        z.writestr(f"{name}.nat", "nat bytes")
+        z.writestr("EOPMetadata.xml", "<xml/>")
+    folder = tmp_path / name
+    folder.mkdir()
+    (folder / "EOPMetadata.xml").write_text("<xml/>")
+    return folder
+
+
+def test_reextract_folders_missing_extension_restores_missing_nat(tmp_path: Path) -> None:
+    folder = _build_partially_extracted_product(tmp_path, "MSG3-SEVI-MSG15-0100-NA-20260710121243")
+
+    reextracted = reextract_folders_missing_extension([str(folder)], ".nat")
+
+    assert reextracted == [folder]
+    assert (folder / "MSG3-SEVI-MSG15-0100-NA-20260710121243.nat").read_text() == "nat bytes"
+
+
+def test_reextract_folders_missing_extension_skips_folders_with_nat(tmp_path: Path) -> None:
+    folder = _build_partially_extracted_product(tmp_path, "product")
+    (folder / "existing.nat").write_text("already here")
+
+    reextracted = reextract_folders_missing_extension([str(folder)], "nat")
+
+    assert reextracted == []
+    assert not (folder / "product.nat").exists()
+
+
+def test_reextract_folders_missing_extension_without_zip_or_with_bad_zip(tmp_path: Path) -> None:
+    no_zip = tmp_path / "no_zip"
+    no_zip.mkdir()
+    bad_zip = tmp_path / "bad_zip"
+    bad_zip.mkdir()
+    (tmp_path / "bad_zip.zip").write_text("not a zip")
+
+    reextracted = reextract_folders_missing_extension([str(no_zip), str(bad_zip)], ".nat")
+
+    assert reextracted == []
+
+
+def _download_record(product_id: str, status: str, downloaded_path: str | None) -> dict:
+    return {
+        "product_id": product_id,
+        "title": product_id,
+        "status": status,
+        "duration_seconds": 1.0,
+        "error": None if status == "success" else "network error",
+        "downloaded_path": downloaded_path,
+    }
+
+
+def test_fail_download_records_missing_extension(tmp_path: Path) -> None:
+    with_nat = tmp_path / "with_nat"
+    with_nat.mkdir()
+    (with_nat / "scene.nat").write_text("nat bytes")
+    without_nat = tmp_path / "without_nat"
+    without_nat.mkdir()
+    (without_nat / "EOPMetadata.xml").write_text("<xml/>")
+    records = [
+        _download_record("ok", "success", str(with_nat)),
+        _download_record("empty", "success", str(without_nat)),
+        _download_record("network", "failed", None),
+    ]
+
+    checked = fail_download_records_missing_extension(records, ".nat")
+
+    assert [record["status"] for record in checked] == ["success", "failed", "failed"]
+    assert checked[0] == records[0]
+    assert checked[1]["downloaded_path"] is None
+    assert "No .nat file found" in checked[1]["error"]
+    assert str(without_nat) in checked[1]["error"]
+    assert checked[2] == records[2]
+    # the input records are not mutated
+    assert records[1]["status"] == "success"

@@ -703,12 +703,14 @@ def tutorial_taskflow_api_demo2(
         from dedl.demo2.eodag_helpers.eodag_helper import (
             clean_directory,
             extract_zip_files,
+            fail_download_records_missing_extension,
             filter_and_sort_nat_files,
             find_dedl_collection_by_eodag_id,
             find_eodag_collection_id_by_dedl_id,
             get_collection_search_params,
             get_eodag_collection_info,
             get_files_with_extension,
+            reextract_folders_missing_extension,
             shift_iso_date,
         )
 
@@ -882,6 +884,34 @@ def tutorial_taskflow_api_demo2(
                 for future in as_completed(futures):
                     download_records.append(future.result())
 
+            downloaded_folder_list = [
+                record["downloaded_path"]
+                for record in download_records
+                if record["status"] == "success"
+            ]
+
+            print(
+                "starting to clean the output directory to ensure extracted files are in the correct location..."
+            )
+            # Note: workaround for an eodag extract issue — some downloaded filenames arrive
+            # with malformed Content-Disposition artifacts that break eodag's own extraction.
+            # Rename those files, then re-extract only the ones that needed renaming (files
+            # already correctly named/extracted by eodag, or renamed in a prior run, are skipped).
+            renamed_files = clean_directory(_get_output_base_dir())
+            extract_zip_files(renamed_files, overwrite=True)
+
+            # eodag can also leave a product folder without its .nat (e.g. only
+            # EOPMetadata.xml extracted) and, on later runs, return that folder
+            # as "already downloaded" without extracting again. Re-extract the
+            # sibling zip of any downloaded folder that has no .nat.
+            reextract_folders_missing_extension(downloaded_folder_list, ".nat")
+            print("Cleaned the output directory.")
+
+            # A product that still has no .nat would contribute nothing
+            # downstream, so count it as a failed download, not a success.
+            download_records = fail_download_records_missing_extension(
+                download_records, ".nat"
+            )
             num_downloads_succeeded = sum(
                 1 for record in download_records if record["status"] == "success"
             )
@@ -908,17 +938,6 @@ def tutorial_taskflow_api_demo2(
                 f"Downloaded {num_downloads_succeeded}/{len(search_results)} products "
                 f"({num_downloads_failed} failed)."
             )
-
-            print(
-                "starting to clean the output directory to ensure extracted files are in the correct location..."
-            )
-            # Note: workaround for an eodag extract issue — some downloaded filenames arrive
-            # with malformed Content-Disposition artifacts that break eodag's own extraction.
-            # Rename those files, then re-extract only the ones that needed renaming (files
-            # already correctly named/extracted by eodag, or renamed in a prior run, are skipped).
-            renamed_files = clean_directory(_get_output_base_dir())
-            extract_zip_files(renamed_files, overwrite=True)
-            print("Cleaned the output directory.")
 
             # Get the list of .nat files from the downloaded folders
             current_run_nat_files = get_files_with_extension(
@@ -1658,9 +1677,39 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
-    # dag.test(
-    #     run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI"},
-    # )
+    # dag.test with an EPSG:4326 reprojection (the equivalent of the HEALPix
+    # example below on a regular lat/lon grid).
+    # dag.test() runs the whole DAG in this one Python process, without the
+    # scheduler or UI (mapped task instances run one after another), so
+    # breakpoints and print() work. run_conf overrides the DAG params for
+    # this run; anything not set keeps its default, including the Europe
+    # AOI bounds (lon -25..45, lat 34..72), which this backend does use.
+    # Same search as the HEALPix example: 30 MSG/SEVIRI products from
+    # 2026-07-10 12:00Z, channel ch9 (IR 10.8 um, brightness temperature).
+    # reprojection_resolution=0.05 deg (~5.6 km N-S, ~3.9 km E-W at 45N) is
+    # the closest match to healpix:1024 (~0.057 deg, ~6.4 km) and to
+    # MSG/SEVIRI's ~4-6 km pixels over central Europe; it gives a
+    # ~1400x760 grid and video. resampling="bilinear" is DEFAIR's choice for
+    # continuous measurements like brightness temperature (docs/defair.md
+    # §12.5); HEALPix only needs "nearest" to avoid empty cells.
+    # dask_workers=0: this reprojection runs in GDAL, not GIL-bound Python,
+    # so DEFAIR's default threaded scheduler is faster than a process cluster.
+    # Needs .env (EODAG/S3 settings) and the hda_api Airflow connection.
+    dag.test(
+        run_conf={
+            "search_limit": 30,
+            "channels": ["ch9"],
+            "search_start": "2026-07-10T12:00:00Z",
+            "search_end": "2026-07-12T17:00:00Z",
+            "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "reprojection_crs": "EPSG:4326",
+            "reprojection_resampling": "bilinear",
+            "reprojection_resolution": 0.05,
+            "reprojection_resolution_unit": "degrees",
+            "dask_workers": 0,
+        },
+    )
+
 
     # dag.test with healpix reproject using defair
     # Note: for the HEALPix backend, reprojection_resolution/resolution_unit
@@ -1670,8 +1719,8 @@ if __name__ == "__main__":
     # cells, ~12.6M at nside=1024), almost all NaN outside the cropped AOI.
     # Each per-file Zarr, the concatenated Zarr and the S3 upload carry that
     # full grid; visualise_one scatters it back onto a Europe raster. Use an
-    # EPSG target when all you need is the Europe MP4 (docs/defair.md §12.5, §18). nside=64
-    # is ~0.92 deg (~102km) native pixels, which over this DAG's Europe bbox
+    # EPSG target when all you need is the Europe MP4 (docs/defair.md §12.5, §18).
+    # nside=64 is ~0.92 deg (~102km) native pixels, which over this DAG's Europe bbox
     # renders a ~77x42px video. nside=1024 (~0.057 deg, ~6.4km) instead gives a
     # ~1224x665px video, comparable to the non-HEALPix EPSG:4326 default.
     # resampling="nearest" (not "mean"): MeanResampler leaves any HEALPix bin
@@ -1685,17 +1734,17 @@ if __name__ == "__main__":
     # transform_one instances one after another, so give each one a local
     # process cluster. Measured per file (ch9, healpix:1024, 32-core VM):
     # 0 -> 121 s, 4 -> 44 s, 8 -> 30 s, 16 -> 24 s.
-    dag.test(
-        run_conf={
-            "search_limit": 30,
-            "channels": ["ch9"],
-            "search_start": "2026-07-10T12:00:00Z",
-            "search_end": "2026-07-12T17:00:00Z",
-            "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
-            "reprojection_crs": "healpix:1024",
-            "reprojection_resampling": "nearest",
-            "reprojection_resolution": 1024,
-            "reprojection_resolution_unit": "meters",
-            "dask_workers": 16,
-        },
-    )
+    # dag.test(
+    #     run_conf={
+    #         "search_limit": 30,
+    #         "channels": ["ch9"],
+    #         "search_start": "2026-07-10T12:00:00Z",
+    #         "search_end": "2026-07-12T17:00:00Z",
+    #         "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+    #         "reprojection_crs": "healpix:1024",
+    #         "reprojection_resampling": "nearest",
+    #         "reprojection_resolution": 1024,
+    #         "reprojection_resolution_unit": "meters",
+    #         "dask_workers": 16,
+    #     },
+    # )

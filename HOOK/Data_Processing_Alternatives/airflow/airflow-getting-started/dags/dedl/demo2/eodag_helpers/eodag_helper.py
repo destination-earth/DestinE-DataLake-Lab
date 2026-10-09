@@ -520,6 +520,79 @@ def get_files_with_extension(
     return sorted(results)
 
 
+def reextract_folders_missing_extension(
+    folder_paths: List[str], extension: str
+) -> list[Path]:
+    """
+    Re-extract the sibling zip of every folder that has no file with `extension`.
+
+    eodag can leave a product folder holding only part of its archive (e.g.
+    just EOPMetadata.xml, without the .nat), and on later runs it treats the
+    product as already downloaded and returns that folder as-is. The intact
+    archive sits next to it as <folder>.zip, so extract it again (overwriting)
+    into the folder. Folders without a sibling zip are left alone; a zip that
+    can't be read is logged and skipped.
+
+    Returns:
+        list[Path]: the folders that were re-extracted
+    """
+    if not extension.startswith("."):
+        extension = "." + extension
+
+    reextracted = []
+    for folder in folder_paths:
+        folder = Path(folder)
+        if not folder.is_dir() or get_files_with_extension([str(folder)], extension):
+            continue
+
+        zip_path = folder.with_name(folder.name + ".zip")
+        if not zip_path.is_file():
+            print(f"No {extension} file in {folder} and no {zip_path.name} to re-extract.")
+            continue
+
+        try:
+            extract_zip_files([zip_path], overwrite=True)
+        except zipfile.BadZipFile as exc:
+            print(f"Could not re-extract {zip_path}: {exc}")
+            continue
+
+        print(f"Re-extracted {zip_path.name}: {folder} had no {extension} file.")
+        reextracted.append(folder)
+
+    return reextracted
+
+
+def fail_download_records_missing_extension(
+    download_records: list[dict[str, Any]], extension: str
+) -> list[dict[str, Any]]:
+    """
+    Mark successful download records whose folder holds no `extension` file as failed.
+
+    A download that produced no usable file would otherwise count as a
+    success while silently contributing nothing downstream. Returns new
+    records; failed records keep the extract task's shape (status "failed",
+    error set, downloaded_path None).
+    """
+    if not extension.startswith("."):
+        extension = "." + extension
+
+    checked_records = []
+    for record in download_records:
+        downloaded_path = record.get("downloaded_path")
+        if record.get("status") == "success" and not get_files_with_extension(
+            [str(downloaded_path)], extension
+        ):
+            record = {
+                **record,
+                "status": "failed",
+                "error": f"No {extension} file found in {downloaded_path} after download/extraction",
+                "downloaded_path": None,
+            }
+        checked_records.append(record)
+
+    return checked_records
+
+
 _FILENAME_TIMESTAMP_PATTERNS = (
     re.compile(r"(20\d{2})(\d{2})(\d{2})[T_-]?(\d{2})(\d{2})(\d{2})"),
     re.compile(r"(20\d{2})-(\d{2})-(\d{2})[T_-]?(\d{2})(\d{2})(\d{2})"),

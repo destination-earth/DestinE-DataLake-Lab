@@ -46,7 +46,7 @@ receives (XComs), which Airflow turns into extra upstream dependencies.
 Two things look like unnecessary indirection until you know why they're
 there:
 
-- **`get_downloaded_nat_files`** (demo2.py:959-969) exists purely because
+- **`get_downloaded_nat_files`** (demo2.py:978-988) exists purely because
   dynamic task mapping (`.expand()`) only accepts a task's raw `return_value`
   XCom, not a subscript of a dict-returning task. It just re-exposes
   `search_results_dict["downloaded_nat_files"]` so `transform_one` can
@@ -123,7 +123,7 @@ values/dicts (not closures) specifically so the *concrete* runtime values are
 available to `transform_one`/`concatenate_zarr_files`, which run in a
 different task's process than where the params were defined.
 
-### `extract` (demo2.py:678-955)
+### `extract` (demo2.py:678-974)
 
 1. Retrieves DEDL credentials from the Airflow connection `hda_api` via
    `BaseHook.get_connection`.
@@ -144,8 +144,14 @@ different task's process than where the params were defined.
    caught and recorded in a `DownloadRecordDict` (status/duration/error).
 6. Cleans up malformed filenames left by broken `Content-Disposition`
    headers (`clean_directory`), re-extracts anything that needed renaming
-   (`extract_zip_files`), then collects and chronologically sorts the
-   resulting `.nat` files (`filter_and_sort_nat_files`).
+   (`extract_zip_files`), and re-extracts the sibling `<folder>.zip` of any
+   downloaded folder that has no `.nat` (`reextract_folders_missing_extension`).
+   eodag can leave a folder with only `EOPMetadata.xml` in it and, on later
+   runs, return it as "already downloaded" without extracting again.
+7. Marks any download that still has no `.nat` as **failed**
+   (`fail_download_records_missing_extension`), so the run report counts
+   it instead of it silently dropping out, then collects and
+   chronologically sorts the `.nat` files (`filter_and_sort_nat_files`).
 
 ```mermaid
 flowchart TD
@@ -158,8 +164,9 @@ flowchart TD
     F --> G
     G --> H["Download each product individually<br/>ThreadPoolExecutor, download_max_workers"]
     H --> I["One DownloadRecordDict per product:<br/>success or failed, duration, error"]
-    I --> J["clean_directory, extract_zip_files,<br/>filter_and_sort_nat_files"]
-    J --> K[["SearchResultsDict"]]
+    I --> J["clean_directory, extract_zip_files,<br/>re-extract folders missing a .nat"]
+    J --> J2["Count products still without a .nat as failed,<br/>filter_and_sort_nat_files"]
+    J2 --> K[["SearchResultsDict"]]
 ```
 
 Returns a `SearchResultsDict`: file list, collection id, bbox, and
@@ -171,12 +178,12 @@ per-product download records/success/failure counts (consumed later by
 > (`_get_output_base_dir`, demo2.py:134-164). This is the first link in the
 > shared-local-filesystem chain — see §4.
 
-### `get_downloaded_nat_files` (demo2.py:959-969)
+### `get_downloaded_nat_files` (demo2.py:978-988)
 
 Bridge task — see §1. Just returns `search_results_dict["downloaded_nat_files"]`
 as a raw return value so `transform_one.expand()` can consume it.
 
-### `transform_one` (mapped, one instance per `.nat` file — demo2.py:972-1255)
+### `transform_one` (mapped, one instance per `.nat` file — demo2.py:991-1274)
 
 The task itself only sets up Dask: it runs the per-file work
 (`_transform_one_file`) inside `local_process_cluster(dask_workers)`, which
@@ -243,11 +250,11 @@ Returns a `TransformOneResultDict` (zarr path, source `.nat` path, duration,
 > **VM vs Kubernetes:** reads the `.nat` file `extract` wrote to local disk —
 > same shared-filesystem dependency as above. Separately, note that
 > `defair_data`, `xarray`, and `eodag` are imported **inside** the task body,
-> not at module scope (demo2.py:1023-1029) — this keeps DAG parsing cheap on
+> not at module scope (demo2.py:1042-1048) — this keeps DAG parsing cheap on
 > the scheduler regardless of executor, and on Kubernetes it's exactly the
 > boundary along which you'd split this task into its own custom image (§4).
 
-### `concatenate_zarr_files` (demo2.py:1257-1348)
+### `concatenate_zarr_files` (demo2.py:1276-1367)
 
 Opens every per-file Zarr with `xr.open_zarr` and concatenates along `time`
 with `xr.concat`, then sorts by `time`. `extract` already sorts `.nat`
@@ -261,7 +268,7 @@ the combined Zarr to `{base_dir}/concatenated.zarr`.
 Returns a `TransformResultsDict` (concatenated path, channel list,
 reprojection metadata, `source_channel_attrs`).
 
-### `load` (demo2.py:1353-1416)
+### `load` (demo2.py:1372-1435)
 
 Uploads the concatenated Zarr directory to S3 via
 `dedl.demo2.s3.s3_helper.upload_directory_to_s3`, under prefix
@@ -275,7 +282,7 @@ Forwards reprojection metadata and `source_channel_attrs` downstream to
 > sourced from `.env` on this VM. See §4 for the Kubernetes-native
 > alternative (Secret injection) already demonstrated in this repo.
 
-### `visualise_one` (mapped, one instance per channel — demo2.py:1421-1570)
+### `visualise_one` (mapped, one instance per channel — demo2.py:1440-1589)
 
 Each mapped instance is fully self-contained:
 
@@ -345,7 +352,7 @@ kept that way so it's unit-testable with plain fixtures
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 
-### `main_flow` (demo2.py:1574-1651)
+### `main_flow` (demo2.py:1593-1670)
 
 Wires everything above together: normalize → `extract` →
 `get_downloaded_nat_files` → `transform_one.partial(...).expand(...)` →
@@ -388,7 +395,7 @@ the MP4 alone (without this doc) still gets the key caveats:
 `brightness_temperature` calibration (float32 Kelvin) for every channel
 except `ch1`-`ch3`, and `radiance` for those three — `_is_thermal_channel`
 (demo2.py:224-232) encodes the same split, and it's what gates the
-city-temperature overlay in `visualise_one` (demo2.py:1520-1522: only passed
+city-temperature overlay in `visualise_one` (demo2.py:1539-1541: only passed
 `EUROPEAN_CAPITALS` when `_is_thermal_channel(channel_name)` is true).
 
 | Channels | Band | Calibration | Has a °C reading? |
@@ -627,8 +634,10 @@ Kubernetes, a retried `@task.kubernetes`/`KubernetesPodOperator` task gets a
 on the shared-storage or S3-routing choice above, not on the retry count
 itself.
 
-**Local dry-run (`dag.test()`, demo2.py:1659-1701).** The active example
-demos the HEALPix reprojection path (`reprojection_crs: "healpix:1024"`,
+**Local dry-run (`dag.test()`, demo2.py:1678-1750).** Two examples run one
+after the other, on the same 30 `ch9` products: an EPSG:4326 run (0.05°,
+`bilinear`, `dask_workers: 0`), then a run that demos the HEALPix
+reprojection path (`reprojection_crs: "healpix:1024"`,
 `reprojection_resampling: "nearest"` — see the inline comments there for why
 HEALPix requires nearest-neighbour resampling) on `ch9` only, with
 `"dask_workers": 16` because `dag.test()` runs the mapped `transform_one`
