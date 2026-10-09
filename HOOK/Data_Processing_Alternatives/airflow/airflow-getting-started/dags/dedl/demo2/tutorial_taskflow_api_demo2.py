@@ -430,6 +430,11 @@ def _build_visualization_annotation_metadata(
     schedule=None,
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
+    # Every run writes to the same local paths (concatenated.zarr,
+    # {channel}_timelapse.mp4 under EODAG__DEDL__DOWNLOAD__OUTPUT_DIR) and the
+    # same channel-based S3 prefix, so overlapping runs would overwrite each
+    # other's outputs. Allow one active run at a time.
+    max_active_runs=1,
     tags=["example"],
     default_args={
         # Covers transient eodag/S3 network failures. execution_timeout is
@@ -1032,14 +1037,16 @@ def tutorial_taskflow_api_demo2(
         # Step 3 : Read MSG data with automatic reader detection
         # -----------------------------------------------------
 
-        # Automatically detect the reader based on the file extension and content.
-        # Request brightness_temperature (Kelvin) calibration for thermal
+        # Name the reader explicitly rather than relying on auto-detection
+        # (docs/defair.md §25 rule 1). Request brightness_temperature (Kelvin) calibration for thermal
         # channels (needed to sample city temperatures downstream) and keep
         # radiance for VIS/NIR channels, where BT is undefined. Passing a
         # per-channel calibration mapping also scopes the read to exactly
         # these channels instead of the reader's 11 defaults.
         calibration_map = _build_channel_calibration_map(channels)
-        dataset = Dataset.from_source(nat_file, calibration=calibration_map)
+        dataset = Dataset.from_source(
+            nat_file, reader="msg15nat", calibration=calibration_map
+        )
 
         print(f"Dataset loaded: {dataset}")
         print(f"\nData variables: {list(dataset.data.data_vars)}")
@@ -1100,6 +1107,18 @@ def tutorial_taskflow_api_demo2(
             print(f"  Grid mapping: {reference_channel.attrs['grid_mapping']}")
 
         # -----------------------------------------------------
+        # Step X0 : Focus on a subset of channels (bands) for further processing
+        # -----------------------------------------------------
+
+        # Filter before cropping/reprojecting (docs/defair.md §12) so later
+        # steps never touch unrequested variables. The calibration mapping
+        # above already scopes the read to these channels; content_filter
+        # makes the selection explicit and records it in the dataset's CF
+        # history. It keeps the "geostationary" grid mapping the kept
+        # channels reference, which spatial_filter/reproject need.
+        dataset = dataset.transform("content_filter", include_vars=channels)
+
+        # -----------------------------------------------------
         # Step X1a : Apply Spatial Filtering to Crop to Europe
         # -----------------------------------------------------
 
@@ -1152,15 +1171,7 @@ def tutorial_taskflow_api_demo2(
         if reproj_data is not ds_europe_reproj.data:
             ds_europe_reproj = Dataset(reproj_data, cdm=ds_europe_reproj.cdm)
 
-        # -----------------------------------------------------
-        # Step X2 : Focus on a subset of channels (bands) for further processing
-        # -----------------------------------------------------
-
-        # Use defair's content_filter transformation (rather than raw xarray
-        # indexing) so the selection is tracked in the dataset's CF history,
-        # same as spatial_filter/reproject above. It only touches data_vars
-        # and restores any coord (e.g. spatial_ref) it would otherwise drop.
-        dataset = ds_europe_reproj.transform("content_filter", include_vars=channels)
+        dataset = ds_europe_reproj
 
         # -----------------------------------------------------
         # Step 6 : Write a cloud-optimized Zarr file with consolidated metadata
@@ -1253,11 +1264,10 @@ def tutorial_taskflow_api_demo2(
         #### Concatenate task: merge per-file Zarr outputs into one time-indexed Zarr
 
         Consumes the outputs of the mapped transform_one task instances and
-        concatenates them along the time dimension using Defair.from_source with
-        concat_dim="time". No re-sort by timestamp is needed here: extract()
-        already sorts .nat files chronologically before transform_one.expand(),
-        and dynamic task mapping preserves that input order in the collected
-        results.
+        concatenates them along the time dimension with xr.concat, then sorts
+        by time. extract() already sorts .nat files chronologically (by
+        filename) and dynamic task mapping preserves that order, but the
+        sort guarantees a monotonic time axis without relying on filenames.
 
         Args:
             transform_results: Outputs of the mapped transform_one task instances
@@ -1293,7 +1303,9 @@ def tutorial_taskflow_api_demo2(
         if zarr_files:
             xr_dsets = [xr.open_zarr(str(p), consolidated=True) for p in zarr_files]
 
-            combined = xr.concat(xr_dsets, dim="time")
+            # sortby: don't rely on extract()'s filename-based ordering for
+            # a monotonic time axis; it's cheap on these cropped datasets.
+            combined = xr.concat(xr_dsets, dim="time").sortby("time")
 
             ds = Dataset(combined)
 
@@ -1652,8 +1664,13 @@ if __name__ == "__main__":
 
     # dag.test with healpix reproject using defair
     # Note: for the HEALPix backend, reprojection_resolution/resolution_unit
-    # below are ignored (AstropyHealpixBackend.reproject() docs it explicitly) —
-    # only the nside in "healpix:<nside>" controls output resolution. nside=64
+    # and the reprojection bounds are ignored (AstropyHealpixBackend.reproject()
+    # docs it explicitly) — only the nside in "healpix:<nside>" controls output
+    # resolution, and the output always covers the whole globe (12 x nside^2
+    # cells, ~12.6M at nside=1024), almost all NaN outside the cropped AOI.
+    # Each per-file Zarr, the concatenated Zarr and the S3 upload carry that
+    # full grid; visualise_one scatters it back onto a Europe raster. Use an
+    # EPSG target when all you need is the Europe MP4 (docs/defair.md §12.5, §18). nside=64
     # is ~0.92 deg (~102km) native pixels, which over this DAG's Europe bbox
     # renders a ~77x42px video. nside=1024 (~0.057 deg, ~6.4km) instead gives a
     # ~1224x665px video, comparable to the non-HEALPix EPSG:4326 default.

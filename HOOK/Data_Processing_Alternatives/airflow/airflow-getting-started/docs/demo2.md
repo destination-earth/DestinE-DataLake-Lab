@@ -46,12 +46,12 @@ receives (XComs), which Airflow turns into extra upstream dependencies.
 Two things look like unnecessary indirection until you know why they're
 there:
 
-- **`get_downloaded_nat_files`** (demo2.py:954-964) exists purely because
+- **`get_downloaded_nat_files`** (demo2.py:959-969) exists purely because
   dynamic task mapping (`.expand()`) only accepts a task's raw `return_value`
   XCom, not a subscript of a dict-returning task. It just re-exposes
   `search_results_dict["downloaded_nat_files"]` so `transform_one` can
   `.expand()` over it.
-- **The `normalize_*` tasks** (demo2.py:608-670) pull validation/coercion that
+- **The `normalize_*` tasks** (demo2.py:613-675) pull validation/coercion that
   used to happen independently inside `extract`/`transform`/`load`/`visualise`
   (repeated work, repeated bugs) into a single upfront pass. Downstream tasks
   just consume the already-normalized value.
@@ -60,7 +60,7 @@ there:
 
 ### Params
 
-Defined in the `@dag(params={...})` block (demo2.py:429-567):
+Defined in the `@dag(params={...})` block (demo2.py:429-572):
 
 | Param | Default | Purpose |
 |---|---|---|
@@ -82,8 +82,17 @@ Defined in the `@dag(params={...})` block (demo2.py:429-567):
 
 `retries=2`, `retry_delay=timedelta(minutes=2)` — covers transient
 eodag/S3 network failures. `execution_timeout` is deliberately left unset
-(demo2.py:434-440): run duration varies too widely with `search_limit` and
+(demo2.py:439-445): run duration varies too widely with `search_limit` and
 `channels` to pick one safe default across deployments.
+
+### `max_active_runs=1`
+
+Every run writes to the same local paths (`concatenated.zarr`,
+`{channel}_timelapse.mp4` under `EODAG__DEDL__DOWNLOAD__OUTPUT_DIR`) and the
+same channel-based S3 prefix (demo2.py:432-437), so two overlapping runs
+would overwrite each other's outputs. Only one run is active at a time;
+further triggers queue. To allow concurrent runs instead, put the `run_id`
+into those paths.
 
 ### `DagParam` resolution
 
@@ -105,7 +114,7 @@ flowchart LR
 ## 3. Task-by-task walkthrough
 
 ### `normalize_search_limit` / `normalize_channels` / `normalize_reprojection_settings`
-(demo2.py:608-670)
+(demo2.py:613-675)
 
 Validate/coerce `search_limit` (must be > 0), dedupe+validate `channels` (no
 path separators, non-empty), and bundle the reprojection AOI/CRS/resampling
@@ -114,7 +123,7 @@ values/dicts (not closures) specifically so the *concrete* runtime values are
 available to `transform_one`/`concatenate_zarr_files`, which run in a
 different task's process than where the params were defined.
 
-### `extract` (demo2.py:673-950)
+### `extract` (demo2.py:678-955)
 
 1. Retrieves DEDL credentials from the Airflow connection `hda_api` via
    `BaseHook.get_connection`.
@@ -162,12 +171,12 @@ per-product download records/success/failure counts (consumed later by
 > (`_get_output_base_dir`, demo2.py:134-164). This is the first link in the
 > shared-local-filesystem chain — see §4.
 
-### `get_downloaded_nat_files` (demo2.py:954-964)
+### `get_downloaded_nat_files` (demo2.py:959-969)
 
 Bridge task — see §1. Just returns `search_results_dict["downloaded_nat_files"]`
 as a raw return value so `transform_one.expand()` can consume it.
 
-### `transform_one` (mapped, one instance per `.nat` file — demo2.py:967-1244)
+### `transform_one` (mapped, one instance per `.nat` file — demo2.py:972-1255)
 
 The task itself only sets up Dask: it runs the per-file work
 (`_transform_one_file`) inside `local_process_cluster(dask_workers)`, which
@@ -176,8 +185,8 @@ is a no-op at the default `dask_workers=0` (see
 
 Per file:
 
-1. Loads the `.nat` file via `defair_data.core.Dataset.from_source` (reader
-   auto-detected from extension/content), passing a per-channel calibration
+1. Loads the `.nat` file via `defair_data.core.Dataset.from_source` with
+   the reader named explicitly (`reader="msg15nat"`), passing a per-channel calibration
    mapping (`_build_channel_calibration_map`). Its keys are DEFAIR's
    canonical SEVIRI channel names (`VIS006`, …, `IR_108`; see
    `_CHANNEL_NATIVE_NAMES` and `docs/defair.md` §9.1), which DEFAIR 0.4
@@ -188,7 +197,10 @@ Per file:
    dataset** — reprojection rebinds every channel's `grid_mapping` to
    `"spatial_ref"`, so the source value (`"geostationary"` for MSG/SEVIRI)
    is only readable before that happens.
-4. Crops to the AOI via `spatial_filter` (fast, no reprojection), then
+4. Keeps only the requested channels via `content_filter` (first, so
+   later steps never touch other variables; the read is already scoped to
+   them, so this mainly records the selection in the CF history), crops to
+   the AOI via `spatial_filter` (fast, no reprojection), then
    reprojects+resamples to the configured CRS/resolution via `.reproject()`.
 5. Restores the `time` coordinate if the reprojection backend dropped it
    (`_restore_dropped_time_coordinate`, demo2.py:263-285). The HEALPix
@@ -199,7 +211,7 @@ Per file:
    timestamp renders as `01/01/1970`. The rioxarray/EPSG:4326 backend
    already preserves the real `time` coordinate, so this step is a no-op
    for it.
-6. Selects the requested channels and writes a consolidated Zarr v2 file
+6. Writes a consolidated Zarr v2 file
    (`change_extension(nat_file, ".zarr")`), then re-opens it to verify
    variables/coordinates match and logs a storage-size comparison against
    the original `.nat`.
@@ -209,14 +221,14 @@ flowchart TD
     W{"dask_workers > 0?"} -->|yes| CL["local_process_cluster:<br/>N worker processes"]
     W -->|no| TH["DEFAIR default:<br/>threaded scheduler"]
     CL --> R
-    TH --> R["Dataset.from_source(nat_file, calibration=<br/>{VIS006: radiance, IR_108: brightness_temperature, ...})"]
+    TH --> R["Dataset.from_source(nat_file, reader=msg15nat,<br/>calibration=<br/>{VIS006: radiance, IR_108: brightness_temperature, ...})"]
     R --> V[Validate requested channels]
     V --> SA["Capture source_channel_attrs<br/>before reprojection overwrites them"]
-    SA --> SF["spatial_filter: crop to AOI"]
+    SA --> CF["content_filter: keep requested channels"]
+    CF --> SF["spatial_filter: crop to AOI"]
     SF --> RP["reproject to EPSG:... or healpix:nside"]
     RP --> RT["Restore time coordinate<br/>if the backend dropped it (HEALPix)"]
-    RT --> CF["content_filter: keep requested channels"]
-    CF --> ZW["to_file: per-file Zarr v2<br/>the lazy graph is computed here"]
+    RT --> ZW["to_file: per-file Zarr v2<br/>the lazy graph is computed here"]
     ZW --> VF["Re-open, verify, size comparison"]
 ```
 
@@ -231,16 +243,17 @@ Returns a `TransformOneResultDict` (zarr path, source `.nat` path, duration,
 > **VM vs Kubernetes:** reads the `.nat` file `extract` wrote to local disk —
 > same shared-filesystem dependency as above. Separately, note that
 > `defair_data`, `xarray`, and `eodag` are imported **inside** the task body,
-> not at module scope (demo2.py:1018-1024) — this keeps DAG parsing cheap on
+> not at module scope (demo2.py:1023-1029) — this keeps DAG parsing cheap on
 > the scheduler regardless of executor, and on Kubernetes it's exactly the
 > boundary along which you'd split this task into its own custom image (§4).
 
-### `concatenate_zarr_files` (demo2.py:1246-1336)
+### `concatenate_zarr_files` (demo2.py:1257-1348)
 
 Opens every per-file Zarr with `xr.open_zarr` and concatenates along `time`
-with `xr.concat`. No re-sort by timestamp is needed here: `extract` already
-sorted `.nat` files chronologically before `transform_one.expand()`, and
-dynamic task mapping preserves input order in the collected results. Takes
+with `xr.concat`, then sorts by `time`. `extract` already sorts `.nat`
+files chronologically by filename and dynamic task mapping preserves that
+order, but the sort guarantees a monotonic time axis without relying on
+filenames. Takes
 `source_channel_attrs` from the first transform result, assuming (like
 `reprojection_crs`/etc.) it's constant across all files in one run. Writes
 the combined Zarr to `{base_dir}/concatenated.zarr`.
@@ -248,7 +261,7 @@ the combined Zarr to `{base_dir}/concatenated.zarr`.
 Returns a `TransformResultsDict` (concatenated path, channel list,
 reprojection metadata, `source_channel_attrs`).
 
-### `load` (demo2.py:1341-1404)
+### `load` (demo2.py:1353-1416)
 
 Uploads the concatenated Zarr directory to S3 via
 `dedl.demo2.s3.s3_helper.upload_directory_to_s3`, under prefix
@@ -262,7 +275,7 @@ Forwards reprojection metadata and `source_channel_attrs` downstream to
 > sourced from `.env` on this VM. See §4 for the Kubernetes-native
 > alternative (Secret injection) already demonstrated in this repo.
 
-### `visualise_one` (mapped, one instance per channel — demo2.py:1409-1558)
+### `visualise_one` (mapped, one instance per channel — demo2.py:1421-1570)
 
 Each mapped instance is fully self-contained:
 
@@ -332,7 +345,7 @@ kept that way so it's unit-testable with plain fixtures
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 
-### `main_flow` (demo2.py:1562-1639)
+### `main_flow` (demo2.py:1574-1651)
 
 Wires everything above together: normalize → `extract` →
 `get_downloaded_nat_files` → `transform_one.partial(...).expand(...)` →
@@ -375,7 +388,7 @@ the MP4 alone (without this doc) still gets the key caveats:
 `brightness_temperature` calibration (float32 Kelvin) for every channel
 except `ch1`-`ch3`, and `radiance` for those three — `_is_thermal_channel`
 (demo2.py:224-232) encodes the same split, and it's what gates the
-city-temperature overlay in `visualise_one` (demo2.py:1508-1510: only passed
+city-temperature overlay in `visualise_one` (demo2.py:1520-1522: only passed
 `EUROPEAN_CAPITALS` when `_is_thermal_channel(channel_name)` is true).
 
 | Channels | Band | Calibration | Has a °C reading? |
@@ -614,7 +627,7 @@ Kubernetes, a retried `@task.kubernetes`/`KubernetesPodOperator` task gets a
 on the shared-storage or S3-routing choice above, not on the retry count
 itself.
 
-**Local dry-run (`dag.test()`, demo2.py:1647-1684).** The active example
+**Local dry-run (`dag.test()`, demo2.py:1659-1701).** The active example
 demos the HEALPix reprojection path (`reprojection_crs: "healpix:1024"`,
 `reprojection_resampling: "nearest"` — see the inline comments there for why
 HEALPix requires nearest-neighbour resampling) on `ch9` only, with

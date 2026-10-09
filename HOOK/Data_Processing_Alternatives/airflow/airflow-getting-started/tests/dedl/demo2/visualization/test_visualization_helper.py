@@ -53,6 +53,15 @@ def _build_healpix_dataarray(nside: int = 2) -> xr.DataArray:
     )
 
 
+def _raster_cell_nearest(raster: xr.DataArray, lon: float, lat: float) -> xr.DataArray:
+    # reproject_healpix_dataarray_to_raster puts lon/lat on the "x"/"y" dims
+    # as plain (non-index) coordinates, so .sel(lon=..., method="nearest")
+    # is not available; look the cell up by position instead.
+    x = int(np.abs(raster["lon"].values - lon).argmin())
+    y = int(np.abs(raster["lat"].values - lat).argmin())
+    return raster.isel(x=x, y=y)
+
+
 def _build_dataset() -> xr.Dataset:
     data = np.arange(24, dtype=float).reshape(3, 2, 4)
     return xr.Dataset(
@@ -181,7 +190,7 @@ def test_reproject_healpix_dataarray_to_raster_assigns_nearest_pixel_values() ->
     lon, lat = hp.healpix_to_lonlat(sample_pixel)
     lon_deg, lat_deg = lon.to("deg").value, lat.to("deg").value
     if -25.0 <= lon_deg <= 45.0 and 34.0 <= lat_deg <= 72.0:
-        nearest = raster.sel(lon=lon_deg, lat=lat_deg, method="nearest").isel(time=0).item()
+        nearest = _raster_cell_nearest(raster, lon_deg, lat_deg).isel(time=0).item()
         assert nearest == sample_pixel
 
 
@@ -222,7 +231,7 @@ def test_reproject_healpix_dataarray_to_raster_corrects_authalic_to_geodetic_lat
         data_array, bounds=(9.0, 43.0, 11.0, 47.0), resolution_degrees=0.1
     )
 
-    nearest = raster.sel(lon=10.0, lat=45.0, method="nearest").isel(time=0).item()
+    nearest = _raster_cell_nearest(raster, 10.0, 45.0).isel(time=0).item()
     assert nearest == 0
 
 
