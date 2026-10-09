@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 import pandas as pd
 import xarray as xr
 
@@ -128,8 +129,8 @@ def test_is_thermal_channel_false_for_visible_channels() -> None:
 
 def test_build_channel_calibration_map_selects_brightness_temperature_for_thermal_channels() -> None:
     assert demo2._build_channel_calibration_map(["ch1", "ch9"]) == {
-        "vis_0.6": "radiance",
-        "ir_10.8": "brightness_temperature",
+        "VIS006": "radiance",
+        "IR_108": "brightness_temperature",
     }
 
 
@@ -139,8 +140,8 @@ def test_build_channel_calibration_map_covers_default_channel_param() -> None:
     calibration_map = demo2._build_channel_calibration_map(default_channels)
     assert len(calibration_map) == len(default_channels)
     assert set(calibration_map.values()) <= {"radiance", "brightness_temperature"}
-    assert calibration_map["vis_0.6"] == "radiance"
-    assert calibration_map["ir_10.8"] == "brightness_temperature"
+    assert calibration_map["VIS006"] == "radiance"
+    assert calibration_map["IR_108"] == "brightness_temperature"
 
 
 def test_build_channel_calibration_map_rejects_unknown_channel() -> None:
@@ -366,3 +367,23 @@ def test_build_visualization_annotation_metadata_falls_back_to_search_bbox() -> 
     )
 
     assert result["bbox"] == [-10.0, 35.0, 30.0, 65.0]
+
+
+def test_normalize_dask_workers_defaults_to_threads() -> None:
+    assert demo2._normalize_dask_workers(0) == 0
+
+
+def test_normalize_dask_workers_caps_at_cpu_count(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("os.cpu_count", lambda: 8)
+    assert demo2._normalize_dask_workers(4) == 4
+    assert demo2._normalize_dask_workers(64) == 8
+
+
+def test_normalize_dask_workers_rejects_negative() -> None:
+    with pytest.raises(ValueError, match="dask_workers"):
+        demo2._normalize_dask_workers(-1)
+
+
+def test_transform_one_receives_normalized_dask_workers() -> None:
+    transform_one = demo2.dag.get_task("transform_one")
+    assert "dask_workers" in transform_one.partial_kwargs["op_kwargs"]

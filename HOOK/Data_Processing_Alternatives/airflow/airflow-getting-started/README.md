@@ -74,12 +74,13 @@ export AIRFLOW_HOME=~/airflow
 
 ```
 
-- Execute the following commands (replacing AIRFLOW_VERSION with latest version e.g. 3.1.3)
+- Execute the following commands (replacing AIRFLOW_VERSION with latest version e.g. 3.3.2)
+  - Latest releases are listed at https://pypi.org/project/apache-airflow/
 
 
-```python
+```bash
 
-AIRFLOW_VERSION=3.1.3
+AIRFLOW_VERSION=3.3.2
 
 # Here we extract the version of Python you have installed.
 PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
@@ -87,10 +88,18 @@ PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.v
 # Here we construct a constraint URL based on the airflow version and python version
 CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
 
-# For example this would install 3.1.3 with python 3.12: https://raw.githubusercontent.com/apache/airflow/constraints-3.1.3/constraints-3.12.txt
+# For example this would install 3.3.2 with python 3.12: https://raw.githubusercontent.com/apache/airflow/constraints-3.3.2/constraints-3.12.txt
 
 uv pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
 
+
+```
+
+- Then install the libraries used by our own DAGs in the /dags folder (e.g. eodag, boto3 and [DEFAIR](https://pypi.org/project/defair/)) from the root of this project
+
+```bash
+
+uv pip install -r requirements.txt
 
 ```
 
@@ -319,6 +328,15 @@ Here is the script sync-dags.sh which is executed as follows
 ./script-symlink-dags.sh
 
 ```
+
+## Demo 2: satellite data with DEFAIR
+
+- The DAG 'tutorial_taskflow_api_demo2' searches and downloads MSG/SEVIRI products from the Destination Earth Data Lake, converts them to Zarr with DEFAIR, uploads them to S3 and renders MP4 time-lapses
+- It needs your credentials in a .env file at the root of this project (copy .env.example to .env and fill it in); ./script-start-airflow.sh loads it when starting Airflow
+- Documentation in the docs folder:
+  - [docs/demo2_overview.md](./docs/demo2_overview.md): the pipeline at a glance
+  - [docs/demo2.md](./docs/demo2.md): task-by-task walkthrough, parameters, and how to speed up HEALPix reprojection with the dask_workers parameter
+  - [docs/defair.md](./docs/defair.md): DEFAIR reference (readers, transformations, Dask, HEALPix)
 
 # Trouble-shooting
 

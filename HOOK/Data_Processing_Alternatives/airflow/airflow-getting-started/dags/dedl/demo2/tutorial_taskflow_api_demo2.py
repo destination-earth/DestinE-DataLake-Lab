@@ -21,21 +21,21 @@ from __future__ import annotations
 # [START import_module]
 import json
 from datetime import timedelta
-from typing import Any
-
-import pendulum
-from airflow.sdk import dag, get_current_context, task, Param
-from airflow.sdk.definitions.param import DagParam
-from dedl.common.tasks.common import show_params
-from dedl.demo2.tasks.reporting import generate_run_report
 
 # [END import_module]
+from typing import Any, Literal, TypedDict
 
-from typing import Literal, TypedDict
+import pendulum
+from airflow.sdk import Param, dag, get_current_context, task
+from airflow.sdk.definitions.param import DagParam
+
+from dedl.common.tasks.common import show_params
+from dedl.demo2.tasks.reporting import generate_run_report
 
 
 class DownloadRecordDict(TypedDict):
     """Data contract: outcome of a single per-product download attempt"""
+
     product_id: str
     title: str
     status: Literal["success", "failed"]
@@ -46,6 +46,7 @@ class DownloadRecordDict(TypedDict):
 
 class SearchResultsDict(TypedDict):
     """Data contract: extract task output"""
+
     num_search_results: int
     downloaded_nat_files: list[str]
     collection_id: str
@@ -57,6 +58,7 @@ class SearchResultsDict(TypedDict):
 
 class TransformOneResultDict(TypedDict):
     """Data contract: transform_one task output (single .nat file)"""
+
     zarr_path: str
     nat_file: str
     duration_seconds: float
@@ -65,6 +67,7 @@ class TransformOneResultDict(TypedDict):
 
 class TransformResultsDict(TypedDict):
     """Data contract: concatenate_zarr_files task output"""
+
     total_num_zarr_files: int
     concatenated_zarr_path: str
     channels: list[str]
@@ -78,6 +81,7 @@ class TransformResultsDict(TypedDict):
 
 class VisualiseOneResultDict(TypedDict):
     """Data contract: visualise_one task output (single channel)"""
+
     channel: str
     video_path: str
     frame_count: int
@@ -88,6 +92,7 @@ class VisualiseOneResultDict(TypedDict):
 
 class LoadResultDict(TypedDict):
     """Data contract: load task output (extends S3 upload result)"""
+
     success: bool
     s3_uri: str
     destination_prefix: str
@@ -102,6 +107,7 @@ class LoadResultDict(TypedDict):
 
 class ReprojectionSettingsDict(TypedDict):
     """Data contract: normalize_reprojection_settings task output"""
+
     bounds: tuple[float, float, float, float]
     crs: str
     resampling: str
@@ -148,6 +154,7 @@ def _get_output_base_dir() -> str:
         str: The base directory path (e.g., /home/eouser/eodag_downloads/msg_hrseviri)
     """
     import os
+
     base_dir = os.environ.get("EODAG__DEDL__DOWNLOAD__OUTPUT_DIR", "").strip()
     if not base_dir:
         raise ValueError(
@@ -197,18 +204,20 @@ def _colormap_for_channel(channel_name: str) -> str:
 # _resolve_channels_and_calibrations/_validate_channel_names, which validate
 # mapping keys against CHANNEL_METADATA) — ch{n} is only restored afterwards
 # via use_channel_names=False. Standard 1-indexed SEVIRI channel order.
+# Since defair 0.4 these are the canonical EUMETSAT SEVIRI identifiers
+# (defair <0.4 used lowercase names such as "ir_10.8", which 0.4 rejects).
 _CHANNEL_NATIVE_NAMES: dict[str, str] = {
-    "ch1": "vis_0.6",
-    "ch2": "vis_0.8",
-    "ch3": "nir_1.6",
-    "ch4": "ir_3.9",
-    "ch5": "ir_6.2",
-    "ch6": "ir_7.3",
-    "ch7": "ir_8.7",
-    "ch8": "ir_9.7",
-    "ch9": "ir_10.8",
-    "ch10": "ir_12.0",
-    "ch11": "ir_13.4",
+    "ch1": "VIS006",
+    "ch2": "VIS008",
+    "ch3": "IR_016",
+    "ch4": "IR_039",
+    "ch5": "WV_062",
+    "ch6": "WV_073",
+    "ch7": "IR_087",
+    "ch8": "IR_097",
+    "ch9": "IR_108",
+    "ch10": "IR_120",
+    "ch11": "IR_134",
 }
 
 
@@ -306,7 +315,9 @@ def _normalize_channels(value: list[str] | DagParam) -> list[str]:
     resolved_value = _resolve_runtime_param(value)
 
     if isinstance(resolved_value, list):
-        normalized_channels = [_normalize_channel(channel) for channel in resolved_value]
+        normalized_channels = [
+            _normalize_channel(channel) for channel in resolved_value
+        ]
     else:
         raise TypeError("channels must be a list of strings")
 
@@ -329,6 +340,16 @@ def _normalize_search_limit(value: int | DagParam) -> int:
     if search_limit <= 0:
         raise ValueError("search_limit must be greater than 0")
     return search_limit
+
+
+def _normalize_dask_workers(value: int | DagParam) -> int:
+    """0 = DEFAIR's default threaded scheduler; capped at the machine's CPU count."""
+    import os
+
+    dask_workers = int(_resolve_runtime_param(value))
+    if dask_workers < 0:
+        raise ValueError("dask_workers must be 0 or greater")
+    return min(dask_workers, os.cpu_count() or 1)
 
 
 def _build_visualization_annotation_metadata(
@@ -459,6 +480,17 @@ def _build_visualization_annotation_metadata(
             title="Download Concurrency",
             description="Number of products to download in parallel from DEDL",
         ),
+        "dask_workers": Param(
+            0,
+            type="integer",
+            minimum=0,
+            title="Dask Worker Processes (transform)",
+            description="0 = DEFAIR's default threaded Dask scheduler (best for EPSG targets). "
+            "N > 0 = each transform_one runs on a local cluster of N single-threaded worker "
+            "processes, which speeds up CPU-bound HEALPix reprojection about 4-5x (threads "
+            "use ~1 core there). Mapped transform_one instances already run in parallel "
+            "under Airflow, so keep (parallel files x N) within the VM's cores.",
+        ),
         "verbose_tutorial_logging": Param(
             True,
             type="boolean",
@@ -532,15 +564,25 @@ def _build_visualization_annotation_metadata(
             description="Unit of reprojection_resolution (e.g. degrees)",
         ),
     },
-
 )
 def tutorial_taskflow_api_demo2(
     search_limit: int = 5,
-    channels: list[str] = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"],
-    search_start: str = None, # "2026-07-12T12:00:00Z",
-    search_end: str = None, # "2026-07-12T17:00:00Z",
+    channels: list[str] = [
+        "ch1",
+        "ch2",
+        "ch3",
+        "ch4",
+        "ch5",
+        "ch6",
+        "ch7",
+        "ch8",
+        "ch9",
+    ],
+    search_start: str = None,  # "2026-07-12T12:00:00Z",
+    search_end: str = None,  # "2026-07-12T17:00:00Z",
     dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
     download_max_workers: int = 4,
+    dask_workers: int = 0,
     verbose_tutorial_logging: bool = True,
     enable_city_temperature_overlay: bool = True,
     enable_country_borders_overlay: bool = True,
@@ -575,6 +617,16 @@ def tutorial_taskflow_api_demo2(
         for values used as .partial()/.expand() inputs downstream.
         """
         return _normalize_search_limit(search_limit)
+
+    @task()
+    def normalize_dask_workers(dask_workers: int) -> int:
+        """
+        #### Normalize task: validate/cap dask_workers once
+
+        Plain int return_value XCom, like normalize_search_limit, so it can be
+        passed to transform_one.partial().
+        """
+        return _normalize_dask_workers(dask_workers)
 
     @task()
     def normalize_channels(channels: list[str]) -> list[str]:
@@ -638,22 +690,22 @@ def tutorial_taskflow_api_demo2(
             SearchResultsDict: Contains num_search_results, downloaded_nat_files list,
                               collection_id, and spatial bbox
         """
+        # ----------------------------------------------------
+        # Example getting credentials from Airflow connection
+        # ----------------------------------------------------
+        from airflow.sdk import BaseHook
+
         from dedl.demo2.eodag_helpers.eodag_helper import (
             clean_directory,
             extract_zip_files,
             filter_and_sort_nat_files,
             find_dedl_collection_by_eodag_id,
             find_eodag_collection_id_by_dedl_id,
-            get_files_with_extension,
             get_collection_search_params,
             get_eodag_collection_info,
+            get_files_with_extension,
             shift_iso_date,
         )
-
-        # ----------------------------------------------------
-        # Example getting credentials from Airflow connection
-        # ----------------------------------------------------
-        from airflow.sdk import BaseHook
 
         conn = BaseHook.get_connection("hda_api")
         username = conn.login
@@ -665,8 +717,8 @@ def tutorial_taskflow_api_demo2(
         # Example initializing EODAG - assuming dedl provider is set up using environment variables
         # ----------------------------------------------------
 
-        from eodag import EODataAccessGateway
         import eodag
+        from eodag import EODataAccessGateway
 
         # Print EODAG version
         print(f"EODAG version: {eodag.__version__}")
@@ -711,7 +763,9 @@ def tutorial_taskflow_api_demo2(
                 f"DEDL collection id(s) for normalized EODAG collection id '{eodag_collection_id}': {retrieved_dedl_collection_id}"
             )
 
-        collection_info = get_eodag_collection_info(eodag_collection_id, dag=eodag_client)
+        collection_info = get_eodag_collection_info(
+            eodag_collection_id, dag=eodag_client
+        )
 
         if verbose_tutorial_logging:
             print("Collection metadata:")
@@ -769,7 +823,9 @@ def tutorial_taskflow_api_demo2(
                 f"Product ids: {[product.properties.get('id', product.properties.get('title')) for product in search_results]}"
             )
 
-            print(f"Downloading {len(search_results)} products individually (parallel)...")
+            print(
+                f"Downloading {len(search_results)} products individually (parallel)..."
+            )
             # Assure output directory is set. e.g. in env file: EODAG__DEDL__DOWNLOAD__OUTPUT_DIR=/home/eouser/eodag_downloads
             import time
             from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -811,9 +867,12 @@ def tutorial_taskflow_api_demo2(
                     }
 
             download_records: list[DownloadRecordDict] = []
-            with ThreadPoolExecutor(max_workers=max(1, int(download_max_workers))) as executor:
+            with ThreadPoolExecutor(
+                max_workers=max(1, int(download_max_workers))
+            ) as executor:
                 futures = [
-                    executor.submit(_download_one, product) for product in search_results
+                    executor.submit(_download_one, product)
+                    for product in search_results
                 ]
                 for future in as_completed(futures):
                     download_records.append(future.result())
@@ -845,7 +904,9 @@ def tutorial_taskflow_api_demo2(
                 f"({num_downloads_failed} failed)."
             )
 
-            print("starting to clean the output directory to ensure extracted files are in the correct location...")
+            print(
+                "starting to clean the output directory to ensure extracted files are in the correct location..."
+            )
             # Note: workaround for an eodag extract issue — some downloaded filenames arrive
             # with malformed Content-Disposition artifacts that break eodag's own extraction.
             # Rename those files, then re-extract only the ones that needed renaming (files
@@ -855,7 +916,9 @@ def tutorial_taskflow_api_demo2(
             print("Cleaned the output directory.")
 
             # Get the list of .nat files from the downloaded folders
-            current_run_nat_files = get_files_with_extension(downloaded_folder_list, ".nat")
+            current_run_nat_files = get_files_with_extension(
+                downloaded_folder_list, ".nat"
+            )
 
             ordered_nat_files = filter_and_sort_nat_files(
                 [str(path) for path in current_run_nat_files]
@@ -903,7 +966,10 @@ def tutorial_taskflow_api_demo2(
     # [START transform]
     @task()
     def transform_one(
-        nat_file: str, channels: list[str], reprojection: ReprojectionSettingsDict
+        nat_file: str,
+        channels: list[str],
+        reprojection: ReprojectionSettingsDict,
+        dask_workers: int = 0,
     ) -> TransformOneResultDict:
         """
         #### Transform task (mapped): spatially filter, reproject, and zarr-encode one .nat file
@@ -920,10 +986,22 @@ def tutorial_taskflow_api_demo2(
             channels: List of channel names to extract (already normalized upstream)
             reprojection: AOI bounds + CRS/resampling/resolution settings
                 (already normalized upstream, see normalize_reprojection_settings)
+            dask_workers: 0 = DEFAIR's default threaded Dask scheduler; N > 0 =
+                compute on a local cluster of N worker processes (see
+                dedl.demo2.dask_helpers.dask_helper.local_process_cluster)
 
         Returns:
             TransformOneResultDict: Path to the per-file Zarr output
         """
+        from dedl.demo2.dask_helpers.dask_helper import local_process_cluster
+
+        with local_process_cluster(dask_workers):
+            return _transform_one_file(nat_file, channels, reprojection)
+
+    def _transform_one_file(
+        nat_file: str, channels: list[str], reprojection: ReprojectionSettingsDict
+    ) -> TransformOneResultDict:
+        """Work done by transform_one for one .nat file (see transform_one)."""
         import time
 
         from dedl.demo2.eodag_helpers.eodag_helper import change_extension
@@ -940,10 +1018,10 @@ def tutorial_taskflow_api_demo2(
         from pathlib import Path
 
         import xarray as xr
+        from defair.logging import setup_logging
         from defair_data.core import Dataset
         from defair_data.readers import list_readers
         from defair_data.writers import list_writers
-        from defair.logging import setup_logging
 
         setup_logging(log_level="INFO")
 
@@ -1113,9 +1191,7 @@ def tutorial_taskflow_api_demo2(
         print(
             f"  Variables match: {set(dataset.data.data_vars) == set(zarr_ds.data_vars)}"
         )
-        print(
-            f"  Coordinates match: {set(dataset.data.coords) == set(zarr_ds.coords)}"
-        )
+        print(f"  Coordinates match: {set(dataset.data.coords) == set(zarr_ds.coords)}")
 
         # Check Zarr storage details
         print("\nZarr Storage:")
@@ -1123,9 +1199,7 @@ def tutorial_taskflow_api_demo2(
             zarr_array = zarr_ds[var]
             print(f"  {var}:")
             print(f"    Chunks: {zarr_array.chunks}")
-            print(
-                f"    Compressor: {zarr_array.encoding.get('compressor', 'default')}"
-            )
+            print(f"    Compressor: {zarr_array.encoding.get('compressor', 'default')}")
 
         # -----------------------------------------------------
         # Step 8 : Check Provenance Tracking and Metadata
@@ -1265,7 +1339,9 @@ def tutorial_taskflow_api_demo2(
 
     # [START load]
     @task()
-    def load(transform_results_dict: TransformResultsDict, channels: list[str]) -> LoadResultDict:
+    def load(
+        transform_results_dict: TransformResultsDict, channels: list[str]
+    ) -> LoadResultDict:
         """
         #### Load task: Upload transformed Zarr dataset to S3
 
@@ -1413,7 +1489,9 @@ def tutorial_taskflow_api_demo2(
 
         country_border_lines = None
         if enable_country_borders_overlay:
-            from dedl.demo2.visualization.country_borders import load_country_border_lines
+            from dedl.demo2.visualization.country_borders import (
+                load_country_border_lines,
+            )
 
             try:
                 country_border_lines = load_country_border_lines()
@@ -1451,7 +1529,9 @@ def tutorial_taskflow_api_demo2(
             max_frames=120,
             colormap_name=_colormap_for_channel(channel_name),
             annotation_metadata=annotation_metadata,
-            city_temperature_overlay=(EUROPEAN_CAPITALS if city_overlay_active else None),
+            city_temperature_overlay=(
+                EUROPEAN_CAPITALS if city_overlay_active else None
+            ),
             country_border_lines=country_border_lines,
         )
 
@@ -1485,6 +1565,7 @@ def tutorial_taskflow_api_demo2(
     # Normalize: validate/coerce search_limit, channels, and reprojection
     # settings once, upfront
     normalized_search_limit: int = normalize_search_limit(search_limit)
+    normalized_dask_workers: int = normalize_dask_workers(dask_workers)
     normalized_channels: list[str] = normalize_channels(channels)
     normalized_reprojection: ReprojectionSettingsDict = normalize_reprojection_settings(
         lat_min=reprojection_lat_min,
@@ -1512,11 +1593,15 @@ def tutorial_taskflow_api_demo2(
     # Transform: crop, reproject, zarr-encode — one mapped task instance per
     # downloaded .nat file, processed in parallel, then concatenated
     transform_results = transform_one.partial(
-        channels=normalized_channels, reprojection=normalized_reprojection
+        channels=normalized_channels,
+        reprojection=normalized_reprojection,
+        dask_workers=normalized_dask_workers,
     ).expand(nat_file=downloaded_nat_files)
 
     transform_results_dict: TransformResultsDict = concatenate_zarr_files(
-        transform_results, channels=normalized_channels, reprojection=normalized_reprojection
+        transform_results,
+        channels=normalized_channels,
+        reprojection=normalized_reprojection,
     )
 
     # Load: upload Zarr to S3
@@ -1578,6 +1663,22 @@ if __name__ == "__main__":
     # where MSG/SEVIRI's oblique-view pixel footprint is sparser than
     # nside=1024's bins. NearestResampler backward-fills empty bins from
     # their nearest filled neighbour and preserves the source min/max.
+    # dask_workers: HEALPix reprojection is CPU-bound and uses ~1 core on
+    # DEFAIR's default threaded scheduler; dag.test() also runs the mapped
+    # transform_one instances one after another, so give each one a local
+    # process cluster. Measured per file (ch9, healpix:1024, 32-core VM):
+    # 0 -> 121 s, 4 -> 44 s, 8 -> 30 s, 16 -> 24 s.
     dag.test(
-        run_conf={"search_limit": 30, "channels": ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9"], "search_start": "2026-07-12T12:00:00Z", "search_end": "2026-07-12T17:00:00Z", "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI", "reprojection_crs": "healpix:1024", "reprojection_resampling": "nearest", "reprojection_resolution": 1024, "reprojection_resolution_unit": "m"},
+        run_conf={
+            "search_limit": 30,
+            "channels": ["ch9"],
+            "search_start": "2026-07-10T12:00:00Z",
+            "search_end": "2026-07-12T17:00:00Z",
+            "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
+            "reprojection_crs": "healpix:1024",
+            "reprojection_resampling": "nearest",
+            "reprojection_resolution": 1024,
+            "reprojection_resolution_unit": "meters",
+            "dask_workers": 16,
+        },
     )
