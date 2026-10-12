@@ -47,9 +47,8 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_product.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb" \
             "DEFAIR/README.md" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
@@ -76,9 +75,8 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_product.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb" \
             "DEFAIR/README.md" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \

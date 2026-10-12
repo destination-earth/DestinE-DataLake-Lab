@@ -15,7 +15,7 @@ This folder contains a collection of examples ranging from introductory tutorial
 
 The official DEFAIR documentation is available within the DestinE Data Lake documentation:
 
-- [DEFAIR documentation](https://destine-data-lake-docs.data.destination-earth.eu/en/latest/working_with_ai_in_the_data_lake/defair/defair.html)
+- [DEFAIR documentation](https://destine-data-lake-docs.data.destination-earth.eu/en/latest/working_with_ai_in_the_data_lake/ai_ready_data_preparation/defair.html)
 
 
 # Examples Overview
@@ -47,9 +47,9 @@ To run these notebooks you will need:
  
 - Python 3.10 or newer
 - A configured DEFAIR environment, either:
-- Locally
-- On [Insula](https://code.insula.destine.eu)
-- On the [DEDL STACK JupyterLab](https://jupyter.central.data.destination-earth.eu) platform
+    - [Locally](#DEFAIR_environment_prepared_locally)
+    - On [Insula](https://code.insula.destine.eu)
+    - On the [DEDL STACK JupyterLab](https://jupyter.central.data.destination-earth.eu) platform
 
 ## DEFAIR environment prepared locally
 
@@ -60,13 +60,14 @@ To run these notebooks you will need:
 Insula provides a pre-configured Jupyter kernel named **Python (datalake-lab)** that can be used to run the notebooks in this repository.
 
 When opening a notebook, simply select **Python (datalake-lab)** from the available kernels.
-
-## Important
  
 Insula provides a pre-configured kernel named **Python (datalake-lab)**.
  
 For most users, **no additional installation is required**. Simply open the notebook and select the **Python (datalake-lab)** kernel from the JupyterLab kernel list.
- 
+
+## ⚠️ Important
+
+The predefined kernels are not yet available in DEDL STACK and Insula.
 Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not available.
 
 ### 1. Create a dedicated environment
@@ -89,7 +90,7 @@ Install required dependencies for these example Notebooks:
      
 ```bash
 
-python -m pip install -r /home/jovyan/datalake-lab-insula/DEFAIR/requirements-insula.txt 
+python -m pip install -r /home/jovyan/datalake-lab-insula/requirements-insula.txt 
 ```
 
 ### 4. Install defair kernel
@@ -117,13 +118,13 @@ If the command executes successfully and prints the installed version, DEFAIR is
 
 DEDL STACK JupyterLab has an already prepared kernel to run the provided DestinE-DataLake-Lab examples that is called **Python (defair)**
 When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
-
-## Important
  
 DEDL STACK JupyterLab provides a pre-configured kernel named **Python (defair)**.
  
 For most users, **no additional installation is required**. Simply open the notebook and select the **Python (defair)** kernel from the JupyterLab kernel list.
- 
+## ⚠️ Important
+
+The predefined kernels are not yet available in DEDL STACK and Insula. 
 Only follow the setup instructions below if the **Python (defair)** kernel is not available.
 
 If the **Python (defair)** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-defair** by following the instructions below.
@@ -150,7 +151,7 @@ Install required dependencies for these example Notebooks:
 
 python -m pip install  "defair[notebooks]==0.4.3" "numpy==2.3.4" "xarray==2025.11.0"
 ```
-> **Note:** some notebooks in this folder requires also the torch and cartopy packages to run. To save space in your JupyterLab server install the torch and cartopy packages packages only when you want to run the notebooks that import the 2 packages
+> **Note:** some notebooks in this folder requires also the torch and cartopy packages to run. To save space in your JupyterLab server install the torch and cartopy packages only when you want to run the notebooks that import the 2 packages
 >
 > ```bash
 > pip install torch cartopy
@@ -184,6 +185,6 @@ If you encounter any issues:
 
 1. Log in to the [DESP platform](https://platform.destine.eu).
 2. Open a support ticket at: https://platform.destine.eu/contact/
-3. When submitting the ticket, select "DEFAIR" as the affected service.
+3. When submitting the ticket, select "Destination Earth Framework for preparing AI-Ready Data (DEFAIR)" as the involved service.
 4. The support team will assist you in diagnosing and resolving the issue.
    
