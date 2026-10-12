@@ -10,6 +10,7 @@ flowchart LR
     B --> C[Transform<br/>read, crop, reproject, write Zarr]
     C --> D[Load<br/>store Zarr in S3]
     D --> E[Visualise<br/>render MP4 timelapse per channel]
+    E --> F[Run report<br/>download, transform and render summary]
 ```
 
 ## 1. Input data
@@ -19,7 +20,8 @@ The workflow begins by searching the DestinE Data Lake for MSG/SEVIRI products. 
 Key ideas:
 - data is discovered from a DEDL collection,
 - matching products are downloaded,
-- the files are organised and sorted for downstream processing.
+- the files are organised and sorted for downstream processing,
+- downloads that fail or yield no `.nat` file are recorded and counted in the run report.
 
 ## 2. Transformation
 
@@ -44,7 +46,7 @@ The transformed Zarr dataset is read back and used to build animated MP4 videos.
 - per-channel rendering,
 - colour mapping based on channel type,
 - optional overlays such as city-temperature markers and country borders,
-- upload of the resulting video files.
+- upload of the resulting video files to S3.
 
 ## 4. What the pipeline produces
 

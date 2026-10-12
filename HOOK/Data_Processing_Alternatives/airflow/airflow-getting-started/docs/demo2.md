@@ -9,7 +9,7 @@ annotated MP4 time-lapse per channel.
 Alongside "what does this task do," every section flags whether that part of
 the code is specific to running Airflow **standalone on a single VM** (this
 project's setup) or would need to change to run on **Airflow on Kubernetes**.
-Section 4 collects all of those callouts in one place, with pointers to the
+Section 5 collects all of those callouts in one place, with pointers to the
 concrete Kubernetes patterns already demonstrated in the sibling
 `../airflow-kubernetes` and `../airflow-kubernetes-dags` projects.
 
@@ -69,7 +69,7 @@ Defined in the `@dag(params={...})` block (demo2.py:429-572):
 | `search_start` / `search_end` | `None` | ISO 8601 search window; if either is empty, falls back to collection metadata (see `extract` below) |
 | `dedl_collection_id` | `EO.EUM.DAT.MSG.HRSEVIRI` | DEDL collection to search |
 | `download_max_workers` | `4` | Parallel download concurrency in `extract` |
-| `dask_workers` | `0` | Dask worker processes per `transform_one` instance. `0` = DEFAIR's default threaded scheduler; set it for HEALPix targets (see [Speeding up HEALPix](#speeding-up-healpix-dask_workers)) |
+| `dask_workers` | `0` | Dask worker processes per `transform_one` instance. `0` = DEFAIR's default threaded scheduler; capped at the VM's CPU count; set it for HEALPix targets (see [Speeding up HEALPix](#speeding-up-healpix-dask_workers)) |
 | `verbose_tutorial_logging` | `True` | Extra demonstration output (collection listing, id-mapping examples) |
 | `enable_city_temperature_overlay` | `True` | Overlay European capital-city markers with sampled brightness temperature on rendered frames (thermal channels only) |
 | `enable_country_borders_overlay` | `True` | Draw European country border/coastline lines on rendered frames, sourced from Natural Earth via cartopy (fetched and cached on first use) |
@@ -113,12 +113,14 @@ flowchart LR
 
 ## 3. Task-by-task walkthrough
 
-### `normalize_search_limit` / `normalize_channels` / `normalize_reprojection_settings`
+### `normalize_search_limit` / `normalize_channels` / `normalize_reprojection_settings` / `normalize_dask_workers`
 (demo2.py:613-675)
 
 Validate/coerce `search_limit` (must be > 0), dedupe+validate `channels` (no
 path separators, non-empty), and bundle the reprojection AOI/CRS/resampling
-params into a single `ReprojectionSettingsDict`. Returned as plain
+params into a single `ReprojectionSettingsDict`. `normalize_dask_workers`
+rejects negative values and caps `dask_workers` at the machine's CPU count
+(`os.cpu_count()`), so asking for more workers than cores is silently reduced. Returned as plain
 values/dicts (not closures) specifically so the *concrete* runtime values are
 available to `transform_one`/`concatenate_zarr_files`, which run in a
 different task's process than where the params were defined.
@@ -131,27 +133,27 @@ different task's process than where the params were defined.
    commented-out block right after it shows the alternative: reading them
    from an Airflow connection `hda_api` with `BaseHook.get_connection` and
    passing them to eodag with `update_providers_config`.
-3. Resolves the DEDL collection id to eodag's normalized id
+2. Resolves the DEDL collection id to eodag's normalized id
    (`find_eodag_collection_id_by_dedl_id`) and fetches collection metadata
    (`get_eodag_collection_info` → `get_collection_search_params`).
-4. Builds the search window: uses `search_start`/`search_end` if the user
+3. Builds the search window: uses `search_start`/`search_end` if the user
    supplied both, otherwise defaults to a short 2-day window from the
    collection's start date (not its full metadata extent — for an
    open-ended collection like HRSEVIRI the metadata end date is "today",
    which would make the default window span years).
-5. Searches, then downloads each result **individually** via a
+4. Searches, then downloads each result **individually** via a
    `ThreadPoolExecutor` (`download_max_workers` workers) rather than
    `dag.download_all()` — `download_all()` swallows per-product errors and
    returns only a shorter list of successful paths with no per-product
    identity or timing; `dag.download()` raises per-product instead, which is
    caught and recorded in a `DownloadRecordDict` (status/duration/error).
-6. Cleans up malformed filenames left by broken `Content-Disposition`
+5. Cleans up malformed filenames left by broken `Content-Disposition`
    headers (`clean_directory`), re-extracts anything that needed renaming
    (`extract_zip_files`), and re-extracts the sibling `<folder>.zip` of any
    downloaded folder that has no `.nat` (`reextract_folders_missing_extension`).
    eodag can leave a folder with only `EOPMetadata.xml` in it and, on later
    runs, return it as "already downloaded" without extracting again.
-7. Marks any download that still has no `.nat` as **failed**
+6. Marks any download that still has no `.nat` as **failed**
    (`fail_download_records_missing_extension`), so the run report counts
    it instead of it silently dropping out, then collects and
    chronologically sorts the `.nat` files (`filter_and_sort_nat_files`).
@@ -179,14 +181,14 @@ per-product download records/success/failure counts (consumed later by
 > **VM vs Kubernetes:** downloads land under
 > `EODAG__DEDL__DOWNLOAD__OUTPUT_DIR`, a local filesystem path
 > (`_get_output_base_dir`, demo2.py:134-164). This is the first link in the
-> shared-local-filesystem chain — see §4.
+> shared-local-filesystem chain — see §5.
 
 ### `get_downloaded_nat_files` (demo2.py:993-1003)
 
 Bridge task — see §1. Just returns `search_results_dict["downloaded_nat_files"]`
 as a raw return value so `transform_one.expand()` can consume it.
 
-### `transform_one` (mapped, one instance per `.nat` file — demo2.py:1006-1289)
+### `transform_one` (mapped, one instance per `.nat` file — demo2.py:1005-1288)
 
 The task itself only sets up Dask: it runs the per-file work
 (`_transform_one_file`) inside `local_process_cluster(dask_workers)`, which
@@ -253,11 +255,11 @@ Returns a `TransformOneResultDict` (zarr path, source `.nat` path, duration,
 > **VM vs Kubernetes:** reads the `.nat` file `extract` wrote to local disk —
 > same shared-filesystem dependency as above. Separately, note that
 > `defair_data`, `xarray`, and `eodag` are imported **inside** the task body,
-> not at module scope (demo2.py:1057-1063) — this keeps DAG parsing cheap on
+> not at module scope (demo2.py:1058-1061) — this keeps DAG parsing cheap on
 > the scheduler regardless of executor, and on Kubernetes it's exactly the
-> boundary along which you'd split this task into its own custom image (§4).
+> boundary along which you'd split this task into its own custom image (§5).
 
-### `concatenate_zarr_files` (demo2.py:1291-1382)
+### `concatenate_zarr_files` (demo2.py:1290-1381)
 
 Opens every per-file Zarr with `xr.open_zarr` and concatenates along `time`
 with `xr.concat`, then sorts by `time`. `extract` already sorts `.nat`
@@ -271,7 +273,7 @@ the combined Zarr to `{base_dir}/concatenated.zarr`.
 Returns a `TransformResultsDict` (concatenated path, channel list,
 reprojection metadata, `source_channel_attrs`).
 
-### `load` (demo2.py:1387-1450)
+### `load` (demo2.py:1386-1450)
 
 Uploads the concatenated Zarr directory to S3 via
 `dedl.demo2.s3.s3_helper.upload_directory_to_s3`, under prefix
@@ -282,10 +284,10 @@ Forwards reprojection metadata and `source_channel_attrs` downstream to
 `visualise_one`.
 
 > **VM vs Kubernetes:** credentials come from plain environment variables,
-> sourced from `.env` on this VM. See §4 for the Kubernetes-native
+> sourced from `.env` on this VM. See §5 for the Kubernetes-native
 > alternative (Secret injection) already demonstrated in this repo.
 
-### `visualise_one` (mapped, one instance per channel — demo2.py:1455-1604)
+### `visualise_one` (mapped, one instance per channel — demo2.py:1454-1604)
 
 Each mapped instance is fully self-contained:
 
@@ -303,10 +305,10 @@ Each mapped instance is fully self-contained:
      is true **and** the channel is thermal (`_is_thermal_channel`; VIS/NIR
      channels ch1-ch3 never get city markers regardless of the flag). Uses
      the static `EUROPEAN_CAPITALS` list from
-     `dedl/visualization/capital_cities.py`.
+     `dedl/demo2/visualization/capital_cities.py`.
    - **Country borders/coastlines** — only when `enable_country_borders_overlay`
      is true, via `load_country_border_lines()`
-     (`dedl/visualization/country_borders.py`, Natural Earth data fetched
+     (`dedl/demo2/visualization/country_borders.py`, Natural Earth data fetched
      through cartopy). Wrapped in a try/except: a fetch failure (no network,
      first-run cache miss, etc.) is logged as a warning and the render falls
      back silently to no borders overlay rather than failing the task.
@@ -355,7 +357,7 @@ kept that way so it's unit-testable with plain fixtures
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 
-### `main_flow` (demo2.py:1608-1685)
+### `main_flow` (demo2.py:1607-1684)
 
 Wires everything above together: normalize → `extract` →
 `get_downloaded_nat_files` → `transform_one.partial(...).expand(...)` →

@@ -12,5 +12,6 @@ tmp/
 # --- Repo tooling & AI coding agent files ---
 .github/
 CLAUDE.md
+AGENTS.md
 .claude/
 .agents/

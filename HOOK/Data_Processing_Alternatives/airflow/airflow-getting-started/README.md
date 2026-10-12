@@ -289,9 +289,9 @@ The main points when using the Taskflow API are:
 - For these Dags to be known to the airflow standalone application
   - We will use the default folder used by airflow found at $HOME/airflow
   - We will assure that our Dags are synchronised with the folder $HOME/airflow/dags/
-    - To do so there is a bash script (sync-dags.sh) at the root of this project that will handle this synchronisation
+    - To do so there is a bash script (script-sync-dags.sh) at the root of this project that will handle this synchronisation
 
-Here is the script sync-dags.sh which is executed as follows
+Here is the script script-sync-dags.sh which is executed as follows
 
 ```bash
 # chmod +x ./script-sync-dags.sh
@@ -333,6 +333,10 @@ Here is the script sync-dags.sh which is executed as follows
 
 - The DAG 'tutorial_taskflow_api_demo2' searches and downloads MSG/SEVIRI products from the Destination Earth Data Lake, converts them to Zarr with DEFAIR, uploads them to S3 and renders MP4 time-lapses
 - It needs your credentials in a .env file at the root of this project (copy .env.example to .env and fill it in); ./script-start-airflow.sh loads it when starting Airflow
+- The .env file must define the DEDL credentials (EODAG__DEDL__AUTH__CREDENTIALS__USERNAME / __PASSWORD), EODAG__DEDL__DOWNLOAD__OUTPUT_DIR (a local folder shared by the tasks) and the S3 settings (S3_ENDPOINT_URL, MY_S3_BUCKET_NAME, MY_S3_ACCESS_KEY_ID, MY_S3_SECRET_ACCESS_KEY); .env.example shows all keys
+- Start Airflow with ./script-start-airflow.sh (it loads .env, then runs airflow standalone)
+- The DAG has parameters you can change when triggering it (search window, channels, number of products, reprojection target, overlays and dask_workers); they are listed in docs/demo2.md
+- Unit tests for the supporting code are in the tests folder; install pytest (not in requirements.txt) and run `pytest` from the project root
 - Documentation in the docs folder:
   - [docs/demo2_overview.md](./docs/demo2_overview.md): the pipeline at a glance
   - [docs/demo2.md](./docs/demo2.md): task-by-task walkthrough, parameters, and how to speed up HEALPix reprojection with the dask_workers parameter
