@@ -109,7 +109,7 @@ uv pip install -r requirements.txt
 
 ```bash
 
-# Start  Airflow Standalone
+# Start  Airflow Standalone (Note: use ./script-start-airflow.sh if you want to load your .env file for demo2)
 airflow standalone
 
 ...
