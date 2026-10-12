@@ -488,8 +488,10 @@ Leave it at `0` for EPSG targets: the regular-grid path is already fast
 processes costs more than it saves.
 
 - **`dag.test()` from VS Code / the command line:** mapped instances run one
-  after another, so give each one most of the machine. The HEALPix
-  `dag.test()` example at the bottom of the DAG file uses `"dask_workers": 16`.
+  after another, so give each one most of the machine (up to the VM's vCPU count, see
+  `nproc`). The HEALPix `dag.test()` example at the bottom of the DAG file
+  uses `"dask_workers": 4` as a safe default; raise it on a larger VM (16 on
+  a 32-vCPU VM gave ~24 s per file instead of ~44 s with 4).
 - **Triggered from the Airflow UI:** `transform_one` instances for different
   files already run in parallel (up to Airflow's `max_active_tasks_per_dag`,
   16 by default), each using about one core on threads. Pick N so that
@@ -501,7 +503,7 @@ processes costs more than it saves.
 flowchart TD
     A{"reprojection_crs<br/>healpix:...?"} -->|"no: EPSG target"| Z["dask_workers = 0<br/>a cluster would be slower"]
     A -->|yes| B{"How is the DAG run?"}
-    B -->|"dag.test(): files one at a time"| C["dask_workers about 16<br/>most of the machine per file"]
+    B -->|"dag.test(): files one at a time"| C["dask_workers up to the vCPU count<br/>most of the machine per file"]
     B -->|"Airflow UI: files in parallel"| D["files at once × N within the cores<br/>e.g. dask_workers = 4"]
 ```
 
@@ -638,12 +640,12 @@ Kubernetes, a retried `@task.kubernetes`/`KubernetesPodOperator` task gets a
 on the shared-storage or S3-routing choice above, not on the retry count
 itself.
 
-**Local dry-run (`dag.test()`, demo2.py:1693-1751).** Two examples on the
+**Local dry-run (`dag.test()`, demo2.py:1693-1753).** Two examples on the
 same 30 `ch9` products: an EPSG:4326 run (0.05°, `bilinear`,
 `dask_workers: 0`), which is active, and a commented-out run that demos the
 HEALPix reprojection path (`reprojection_crs: "healpix:1024"`,
 `reprojection_resampling: "nearest"` — see the inline comments there for why
-HEALPix needs nearest-neighbour resampling), with `"dask_workers": 16`
+HEALPix needs nearest-neighbour resampling), with `"dask_workers": 4` (adapt to your vCPU count)
 because `dag.test()` runs the mapped `transform_one`
 instances one after another (see
 [Speeding up HEALPix](#speeding-up-healpix-dask_workers)). Bypasses the

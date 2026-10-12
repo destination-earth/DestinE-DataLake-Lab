@@ -1734,8 +1734,10 @@ if __name__ == "__main__":
     # - "nearest", not "mean": "mean" leaves cells with no source pixel as
     #   NaN, which shows as patches in the north/east of the AOI, where
     #   MSG/SEVIRI pixels are sparser. "nearest" fills them from a neighbour.
-    # - dask_workers=16: HEALPix reprojection is CPU-bound and uses one core
-    #   by default. Measured per file (32-core VM):
+    # - dask_workers: HEALPix reprojection is CPU-bound and uses one core
+    #   by default. Set it to at most the number of vCPUs on your VM (check
+    #   with `nproc`), leaving some for Airflow and other parallel tasks.
+    #   4 is a safe start on a small VM. Measured per file (32-vCPU VM):
     #   0 -> 121 s, 4 -> 44 s, 8 -> 30 s, 16 -> 24 s.
     # dag.test(
     #     run_conf={
@@ -1746,6 +1748,6 @@ if __name__ == "__main__":
     #         "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
     #         "reprojection_crs": "healpix:1024",
     #         "reprojection_resampling": "nearest",
-    #         "dask_workers": 16,
+    #         "dask_workers": 4,  # adapt to your vCPU count
     #     },
     # )
