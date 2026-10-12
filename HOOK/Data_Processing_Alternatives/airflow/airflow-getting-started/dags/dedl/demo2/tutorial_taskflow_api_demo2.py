@@ -572,7 +572,7 @@ def _build_visualization_annotation_metadata(
 )
 def tutorial_taskflow_api_demo2(
     search_limit: int = 5,
-    channels: list[str] = [
+    channels: list[str] = [  # noqa: B006
         "ch1",
         "ch2",
         "ch3",
@@ -583,8 +583,8 @@ def tutorial_taskflow_api_demo2(
         "ch8",
         "ch9",
     ],
-    search_start: str = None,  # "2026-07-12T12:00:00Z",
-    search_end: str = None,  # "2026-07-12T17:00:00Z",
+    search_start: str | None = None,  # "2026-07-12T12:00:00Z",
+    search_end: str | None = None,  # "2026-07-12T17:00:00Z",
     dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
     download_max_workers: int = 4,
     dask_workers: int = 0,
@@ -678,8 +678,8 @@ def tutorial_taskflow_api_demo2(
     @task()
     def extract(
         search_limit: int,
-        search_start: str = None,
-        search_end: str = None,
+        search_start: str | None = None,
+        search_end: str | None = None,
         dedl_collection_id: str = "EO.EUM.DAT.MSG.HRSEVIRI",
         download_max_workers: int = 4,
         verbose_tutorial_logging: bool = True,
@@ -688,7 +688,8 @@ def tutorial_taskflow_api_demo2(
         #### Extract task: Search and download MSG/SEVIRI products
 
         Uses EODAG library to search for and download products from the DestinE Data Lake (DEDL).
-        Credentials retrieved from Airflow connection 'hda_api'.
+        DEDL credentials come from the EODAG__DEDL__AUTH__CREDENTIALS__* variables in .env
+        (an Airflow connection is an alternative, see the commented-out example below).
         Downloads to EODAG__DEDL__DOWNLOAD__OUTPUT_DIR and returns ordered .nat file list.
 
         Returns:
@@ -696,9 +697,11 @@ def tutorial_taskflow_api_demo2(
                               collection_id, and spatial bbox
         """
         # ----------------------------------------------------
-        # Example getting credentials from Airflow connection
+        # Example initializing EODAG - the dedl provider is set up using environment
+        # variables from .env (EODAG__DEDL__AUTH__CREDENTIALS__USERNAME / __PASSWORD)
         # ----------------------------------------------------
-        from airflow.sdk import BaseHook
+        import eodag
+        from eodag import EODataAccessGateway
 
         from dedl.demo2.eodag_helpers.eodag_helper import (
             clean_directory,
@@ -714,24 +717,35 @@ def tutorial_taskflow_api_demo2(
             shift_iso_date,
         )
 
-        conn = BaseHook.get_connection("hda_api")
-        username = conn.login
-        password = conn.password
-
-        print(f"Retrieved credentials from Airflow connection: {username}, XXXX")
-
-        # ----------------------------------------------------
-        # Example initializing EODAG - assuming dedl provider is set up using environment variables
-        # ----------------------------------------------------
-
-        import eodag
-        from eodag import EODataAccessGateway
-
         # Print EODAG version
         print(f"EODAG version: {eodag.__version__}")
 
         # Initialize EODAG with DestinE provider
         eodag_client = EODataAccessGateway()
+
+        # ----------------------------------------------------
+        # Option (not used): take the DEDL credentials from an Airflow connection
+        # instead of .env. Create a connection named "hda_api" with your DESP
+        # username as login and password as password (Admin > Connections), then
+        # uncomment these lines. Note that get_connection() fails the task if the
+        # connection doesn't exist.
+        # ----------------------------------------------------
+        # from airflow.sdk import BaseHook
+        #
+        # conn = BaseHook.get_connection("hda_api")
+        # eodag_client.update_providers_config(
+        #     dict_conf={
+        #         "dedl": {
+        #             "auth": {
+        #                 "credentials": {
+        #                     "username": conn.login,
+        #                     "password": conn.password,
+        #                 }
+        #             }
+        #         }
+        #     }
+        # )
+        # print(f"Using DEDL credentials from Airflow connection: {conn.login}, XXXX")
         if verbose_tutorial_logging:
             print(eodag_client.available_providers())
 
@@ -1677,24 +1691,22 @@ dag = tutorial_taskflow_api_demo2()
 # [END tutorial]
 if __name__ == "__main__":
 
-    # dag.test with an EPSG:4326 reprojection (the equivalent of the HEALPix
-    # example below on a regular lat/lon grid).
     # dag.test() runs the whole DAG in this one Python process, without the
-    # scheduler or UI (mapped task instances run one after another), so
-    # breakpoints and print() work. run_conf overrides the DAG params for
-    # this run; anything not set keeps its default, including the Europe
-    # AOI bounds (lon -25..45, lat 34..72), which this backend does use.
-    # Same search as the HEALPix example: 30 MSG/SEVIRI products from
+    # scheduler or UI, so breakpoints and print() work. Mapped task instances
+    # run one after another. run_conf overrides DAG params for this run; the
+    # rest keep their defaults (e.g. the Europe AOI, lon -25..45, lat 34..72).
+    # Needs .env (EODAG credentials and settings, S3 settings).
+    #
+    # Both examples below run the same search: 30 MSG/SEVIRI products from
     # 2026-07-10 12:00Z, channel ch9 (IR 10.8 um, brightness temperature).
-    # reprojection_resolution=0.05 deg (~5.6 km N-S, ~3.9 km E-W at 45N) is
-    # the closest match to healpix:1024 (~0.057 deg, ~6.4 km) and to
-    # MSG/SEVIRI's ~4-6 km pixels over central Europe; it gives a
-    # ~1400x760 grid and video. resampling="bilinear" is DEFAIR's choice for
-    # continuous measurements like brightness temperature (docs/defair.md
-    # §12.5); HEALPix only needs "nearest" to avoid empty cells.
-    # dask_workers=0: this reprojection runs in GDAL, not GIL-bound Python,
-    # so DEFAIR's default threaded scheduler is faster than a process cluster.
-    # Needs .env (EODAG/S3 settings) and the hda_api Airflow connection.
+
+    # Example 1 (active): reproject to a regular lat/lon grid (EPSG:4326).
+    # - resolution 0.05 deg (~5.6 km N-S) roughly matches MSG/SEVIRI's
+    #   4-6 km pixels over Europe and healpix:1024; gives a ~1400x760 video.
+    # - "bilinear" is DEFAIR's choice for continuous values such as
+    #   brightness temperature (docs/defair.md §12.5).
+    # - dask_workers=0: this reprojection runs in GDAL, so DEFAIR's default
+    #   threaded scheduler is faster than a process cluster.
     dag.test(
         run_conf={
             "search_limit": 30,
@@ -1710,30 +1722,21 @@ if __name__ == "__main__":
         },
     )
 
-
-    # dag.test with healpix reproject using defair
-    # Note: for the HEALPix backend, reprojection_resolution/resolution_unit
-    # and the reprojection bounds are ignored (AstropyHealpixBackend.reproject()
-    # docs it explicitly) — only the nside in "healpix:<nside>" controls output
-    # resolution, and the output always covers the whole globe (12 x nside^2
-    # cells, ~12.6M at nside=1024), almost all NaN outside the cropped AOI.
-    # Each per-file Zarr, the concatenated Zarr and the S3 upload carry that
-    # full grid; visualise_one scatters it back onto a Europe raster. Use an
-    # EPSG target when all you need is the Europe MP4 (docs/defair.md §12.5, §18).
-    # nside=64 is ~0.92 deg (~102km) native pixels, which over this DAG's Europe bbox
-    # renders a ~77x42px video. nside=1024 (~0.057 deg, ~6.4km) instead gives a
-    # ~1224x665px video, comparable to the non-HEALPix EPSG:4326 default.
-    # resampling="nearest" (not "mean"): MeanResampler leaves any HEALPix bin
-    # with zero contributing source samples as NaN (rendered as artifact
-    # patches), which shows up at the north/east (top/right) of this bbox
-    # where MSG/SEVIRI's oblique-view pixel footprint is sparser than
-    # nside=1024's bins. NearestResampler backward-fills empty bins from
-    # their nearest filled neighbour and preserves the source min/max.
-    # dask_workers: HEALPix reprojection is CPU-bound and uses ~1 core on
-    # DEFAIR's default threaded scheduler; dag.test() also runs the mapped
-    # transform_one instances one after another, so give each one a local
-    # process cluster. Measured per file (ch9, healpix:1024, 32-core VM):
-    # 0 -> 121 s, 4 -> 44 s, 8 -> 30 s, 16 -> 24 s.
+    # Example 2 (commented out): reproject to a HEALPix grid.
+    # - Only the nside in "healpix:<nside>" sets the resolution. The
+    #   resolution, resolution unit and AOI bounds params are ignored.
+    # - The output always covers the whole globe (12 x nside^2 cells, ~12.6M
+    #   at nside=1024), mostly NaN outside the AOI, and the Zarr files and S3
+    #   upload carry that full grid. If you only need the Europe MP4, use an
+    #   EPSG target instead (docs/defair.md §12.5, §18).
+    # - nside=1024 (~6.4 km) gives a ~1224x665 video over Europe, similar to
+    #   Example 1; nside=64 (~102 km) gives only ~77x42.
+    # - "nearest", not "mean": "mean" leaves cells with no source pixel as
+    #   NaN, which shows as patches in the north/east of the AOI, where
+    #   MSG/SEVIRI pixels are sparser. "nearest" fills them from a neighbour.
+    # - dask_workers=16: HEALPix reprojection is CPU-bound and uses one core
+    #   by default. Measured per file (32-core VM):
+    #   0 -> 121 s, 4 -> 44 s, 8 -> 30 s, 16 -> 24 s.
     # dag.test(
     #     run_conf={
     #         "search_limit": 30,
@@ -1743,8 +1746,6 @@ if __name__ == "__main__":
     #         "dedl_collection_id": "EO.EUM.DAT.MSG.HRSEVIRI",
     #         "reprojection_crs": "healpix:1024",
     #         "reprojection_resampling": "nearest",
-    #         "reprojection_resolution": 1024,
-    #         "reprojection_resolution_unit": "meters",
     #         "dask_workers": 16,
     #     },
     # )

@@ -46,7 +46,7 @@ receives (XComs), which Airflow turns into extra upstream dependencies.
 Two things look like unnecessary indirection until you know why they're
 there:
 
-- **`get_downloaded_nat_files`** (demo2.py:978-988) exists purely because
+- **`get_downloaded_nat_files`** (demo2.py:993-1003) exists purely because
   dynamic task mapping (`.expand()`) only accepts a task's raw `return_value`
   XCom, not a subscript of a dict-returning task. It just re-exposes
   `search_results_dict["downloaded_nat_files"]` so `transform_one` can
@@ -123,11 +123,14 @@ values/dicts (not closures) specifically so the *concrete* runtime values are
 available to `transform_one`/`concatenate_zarr_files`, which run in a
 different task's process than where the params were defined.
 
-### `extract` (demo2.py:678-974)
+### `extract` (demo2.py:678-989)
 
-1. Retrieves DEDL credentials from the Airflow connection `hda_api` via
-   `BaseHook.get_connection`.
-2. Initializes `EODataAccessGateway`, sets the `dedl` provider.
+1. Initializes `EODataAccessGateway`, sets the `dedl` provider. eodag reads
+   the DEDL credentials from `.env`
+   (`EODAG__DEDL__AUTH__CREDENTIALS__USERNAME` / `__PASSWORD`). A
+   commented-out block right after it shows the alternative: reading them
+   from an Airflow connection `hda_api` with `BaseHook.get_connection` and
+   passing them to eodag with `update_providers_config`.
 3. Resolves the DEDL collection id to eodag's normalized id
    (`find_eodag_collection_id_by_dedl_id`) and fetches collection metadata
    (`get_eodag_collection_info` → `get_collection_search_params`).
@@ -155,7 +158,7 @@ different task's process than where the params were defined.
 
 ```mermaid
 flowchart TD
-    A["Credentials from Airflow connection hda_api"] --> B["EODataAccessGateway, provider dedl"]
+    A["DEDL credentials from .env"] --> B["EODataAccessGateway, provider dedl"]
     B --> C["Resolve DEDL collection id to eodag id,<br/>fetch collection metadata"]
     C --> D{"search_start and<br/>search_end both set?"}
     D -->|yes| E[Use them]
@@ -178,12 +181,12 @@ per-product download records/success/failure counts (consumed later by
 > (`_get_output_base_dir`, demo2.py:134-164). This is the first link in the
 > shared-local-filesystem chain — see §4.
 
-### `get_downloaded_nat_files` (demo2.py:978-988)
+### `get_downloaded_nat_files` (demo2.py:993-1003)
 
 Bridge task — see §1. Just returns `search_results_dict["downloaded_nat_files"]`
 as a raw return value so `transform_one.expand()` can consume it.
 
-### `transform_one` (mapped, one instance per `.nat` file — demo2.py:991-1274)
+### `transform_one` (mapped, one instance per `.nat` file — demo2.py:1006-1289)
 
 The task itself only sets up Dask: it runs the per-file work
 (`_transform_one_file`) inside `local_process_cluster(dask_workers)`, which
@@ -250,11 +253,11 @@ Returns a `TransformOneResultDict` (zarr path, source `.nat` path, duration,
 > **VM vs Kubernetes:** reads the `.nat` file `extract` wrote to local disk —
 > same shared-filesystem dependency as above. Separately, note that
 > `defair_data`, `xarray`, and `eodag` are imported **inside** the task body,
-> not at module scope (demo2.py:1042-1048) — this keeps DAG parsing cheap on
+> not at module scope (demo2.py:1057-1063) — this keeps DAG parsing cheap on
 > the scheduler regardless of executor, and on Kubernetes it's exactly the
 > boundary along which you'd split this task into its own custom image (§4).
 
-### `concatenate_zarr_files` (demo2.py:1276-1367)
+### `concatenate_zarr_files` (demo2.py:1291-1382)
 
 Opens every per-file Zarr with `xr.open_zarr` and concatenates along `time`
 with `xr.concat`, then sorts by `time`. `extract` already sorts `.nat`
@@ -268,7 +271,7 @@ the combined Zarr to `{base_dir}/concatenated.zarr`.
 Returns a `TransformResultsDict` (concatenated path, channel list,
 reprojection metadata, `source_channel_attrs`).
 
-### `load` (demo2.py:1372-1435)
+### `load` (demo2.py:1387-1450)
 
 Uploads the concatenated Zarr directory to S3 via
 `dedl.demo2.s3.s3_helper.upload_directory_to_s3`, under prefix
@@ -282,7 +285,7 @@ Forwards reprojection metadata and `source_channel_attrs` downstream to
 > sourced from `.env` on this VM. See §4 for the Kubernetes-native
 > alternative (Secret injection) already demonstrated in this repo.
 
-### `visualise_one` (mapped, one instance per channel — demo2.py:1440-1589)
+### `visualise_one` (mapped, one instance per channel — demo2.py:1455-1604)
 
 Each mapped instance is fully self-contained:
 
@@ -352,7 +355,7 @@ kept that way so it's unit-testable with plain fixtures
 success/failure counts and records, per-file transform durations, and
 per-channel visualisation durations/S3 URIs.
 
-### `main_flow` (demo2.py:1593-1670)
+### `main_flow` (demo2.py:1608-1685)
 
 Wires everything above together: normalize → `extract` →
 `get_downloaded_nat_files` → `transform_one.partial(...).expand(...)` →
@@ -395,7 +398,7 @@ the MP4 alone (without this doc) still gets the key caveats:
 `brightness_temperature` calibration (float32 Kelvin) for every channel
 except `ch1`-`ch3`, and `radiance` for those three — `_is_thermal_channel`
 (demo2.py:224-232) encodes the same split, and it's what gates the
-city-temperature overlay in `visualise_one` (demo2.py:1539-1541: only passed
+city-temperature overlay in `visualise_one` (demo2.py:1554-1556: only passed
 `EUROPEAN_CAPITALS` when `_is_thermal_channel(channel_name)` is true).
 
 | Channels | Band | Calibration | Has a °C reading? |
@@ -595,10 +598,11 @@ flowchart TB
     end
 ```
 
-**Credentials.** `extract` calls `BaseHook.get_connection("hda_api")`, and
-`load`/`visualise_one` read plain `os.environ` S3 vars. Both work today
-because the LocalExecutor task shares this VM's process, DB access, and
-`.env`-sourced environment. On Kubernetes, the pattern already demonstrated
+**Credentials.** `extract` (through eodag) and `load`/`visualise_one` read
+plain `os.environ` vars, the DEDL and S3 credentials. This works today
+because the LocalExecutor task shares this VM's process and `.env`-sourced
+environment. The commented-out Airflow-connection option in `extract`
+would also need the task to reach the Airflow metadata DB or API. On Kubernetes, the pattern already demonstrated
 in this repo is Kubernetes `Secret` objects, injected either per-key via
 `airflow.providers.cncf.kubernetes.secret.Secret`
 (`tutorial_taskflow_api_test7_..._s3.py`) or in bulk via `env_from`
@@ -634,13 +638,13 @@ Kubernetes, a retried `@task.kubernetes`/`KubernetesPodOperator` task gets a
 on the shared-storage or S3-routing choice above, not on the retry count
 itself.
 
-**Local dry-run (`dag.test()`, demo2.py:1678-1750).** Two examples run one
-after the other, on the same 30 `ch9` products: an EPSG:4326 run (0.05°,
-`bilinear`, `dask_workers: 0`), then a run that demos the HEALPix
-reprojection path (`reprojection_crs: "healpix:1024"`,
+**Local dry-run (`dag.test()`, demo2.py:1693-1751).** Two examples on the
+same 30 `ch9` products: an EPSG:4326 run (0.05°, `bilinear`,
+`dask_workers: 0`), which is active, and a commented-out run that demos the
+HEALPix reprojection path (`reprojection_crs: "healpix:1024"`,
 `reprojection_resampling: "nearest"` — see the inline comments there for why
-HEALPix requires nearest-neighbour resampling) on `ch9` only, with
-`"dask_workers": 16` because `dag.test()` runs the mapped `transform_one`
+HEALPix needs nearest-neighbour resampling), with `"dask_workers": 16`
+because `dag.test()` runs the mapped `transform_one`
 instances one after another (see
 [Speeding up HEALPix](#speeding-up-healpix-dask_workers)). Bypasses the
 scheduler/executor entirely and always runs in-process, regardless of
