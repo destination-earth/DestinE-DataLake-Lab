@@ -1,6 +1,6 @@
 {
     "type": "Feature",
-    "stac_version": "1.0.0",
+    "stac_version": "1.1.0",
     "stac_extensions": [],
     "id": "EO.XXX.YYY.ZZZ_20241117T120000",
     "geometry": {

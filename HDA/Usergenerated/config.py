@@ -1,7 +1,6 @@
-import os
 import logging
-from typing import Literal
-from enum import StrEnum
+import os
+from enum import Enum
 
 # Can be used if we need the absolute path of the root of the project
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,8 +11,8 @@ APP_LOGGER_FILE_TRUNCATE_SIZE: int = 10 * 1024 * 1024
 APP_LOGGER_FILE_BACKUP_COUNT: int = 5
 APP_LOGGER_LEVEL: int = logging.INFO
 
-# HDA uses stac version 1.0.0 for the moment.
-STAC_VERSION: str = "1.0.0"
+# HDA uses stac version 1.1.0.
+STAC_VERSION: str = "1.1.0"
 
 ITEM_CONFIG_FILE_NAME: str = "item_config.json"
 # optional field that determines if the item_config.json file is optional or not in ITEM folders: values true or false
@@ -42,9 +41,12 @@ S3_ENDPOINT_URL: str = "https://s3.central.data.destination-earth.eu"
 S3_USER_GENERATED_BUCKET_PREFIX: str = "usergenerated-proposal"
 
 
-class ItemFolderNamingConventionType(StrEnum):
+class ItemFolderNamingConventionType(str, Enum):  # (str, Enum) rather than StrEnum (3.11+) for Python 3.10 support
     STANDARD = "standard"
     NON_STANDARD_1 = "non_standard_1"
+
+    def __str__(self) -> str:
+        return self.value
 
 # Default Item Folder Naming Convention: STANDARD
 ITEM_FOLDER_NAMING_CONVENTION_TYPE = ItemFolderNamingConventionType.STANDARD
