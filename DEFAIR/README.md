@@ -37,9 +37,10 @@ The official DEFAIR documentation is available within the DestinE Data Lake docu
 
 - [DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DeepLearning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb) Applies a deep-learning workflow to perform short-term lightning prediction using a DEFAIR-generated data cube.**Goal**: Demonstrate an end-to-end AI workflow, from data preparation to lightning nowcasting.
 
-- [DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb)
- Explores a machine-learning use case focused on predicting lightning-induced fire ignition risk from Earth observation data.
- **Goal**: Show how DEFAIR supports model development for environmental monitoring applications.
+- [DEDL_DEFAIR_Custom_readers_lightning_and_fire](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Custom_readers_lightning_and_fire.ipynb)
+ Writes three custom DEFAIR readers for LSA SAF and H SAF products, then tests whether lightning is followed by more new fires over the Iberian Peninsula, and whether dry weather makes it more dangerous.
+ **Goal**: Show how to extend DEFAIR with your own readers and use an AI-ready cube in an environmental study.
+ The cube it uses is built in [Fire ignition cube preparation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/notebooks_support/DEDL_DEFAIR_Fire_ignition_cube_preparation.ipynb).
 
 ## Prerequisites
  
