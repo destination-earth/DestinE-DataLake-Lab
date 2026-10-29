@@ -61,15 +61,16 @@ To run these notebooks you will need:
 Insula provides a pre-configured Jupyter kernel named **Python (datalake-lab)** that can be used to run the notebooks in this repository.
 
 When opening a notebook, simply select **Python (datalake-lab)** from the available kernels.
- 
-Insula provides a pre-configured kernel named **Python (datalake-lab)**.
+
  
 For most users, **no additional installation is required**. Simply open the notebook and select the **Python (datalake-lab)** kernel from the JupyterLab kernel list.
 
 ## ⚠️ Important
 
-The predefined kernels are not yet available in DEDL STACK and Insula.
-Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not available.
+The predefined kernels will be available soon in DEDL STACK and Insula. 
+Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not yet available.
+
+If the **Python (datalake-lab)** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-datalake-lab** by following the instructions below.
 
 ### 1. Create a dedicated environment
 
@@ -117,18 +118,16 @@ If the command executes successfully and prints the installed version, DEFAIR is
 
 # Runnning these notebooks in DEDL STACK JupyterLab
 
-DEDL STACK JupyterLab has an already prepared kernel to run the provided DestinE-DataLake-Lab examples that is called **Python (defair)**
-When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
+DEDL STACK JupyterLab has an already prepared kernel to run the provided DestinE-DataLake-Lab examples that is called **DEFAIR**
+When opening a DEFAIR notebook, select the **DEFAIR** kernel from the JupyterLab kernel list.
  
-DEDL STACK JupyterLab provides a pre-configured kernel named **Python (defair)**.
- 
-For most users, **no additional installation is required**. Simply open the notebook and select the **Python (defair)** kernel from the JupyterLab kernel list.
+For most users, **no additional installation is required**. Simply open the notebook and select the **DEFAIR** kernel from the JupyterLab kernel list.
 ## ⚠️ Important
 
-The predefined kernels are not yet available in DEDL STACK and Insula. 
-Only follow the setup instructions below if the **Python (defair)** kernel is not available.
+The predefined kernels will be available soon in DEDL STACK and Insula. 
+Only follow the setup instructions below if the **DEFAIR** kernel is not yet available.
 
-If the **Python (defair)** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-defair** by following the instructions below.
+If the **DEFAIR** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-defair** by following the instructions below.
 
 ### 1. Create a dedicated environment
 

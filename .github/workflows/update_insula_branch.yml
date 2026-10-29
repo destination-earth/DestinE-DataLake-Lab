@@ -50,6 +50,14 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
             "DEFAIR/README.md" \
+            "DEFAIR/DEDL_DEFAIR_Custom_readers_lightning_and_fire.ipynb" \
+            "DEFAIR/readers/pyproject.toml" \
+            "DEFAIR/readers/lsa_readers/__init__.py" \
+            "DEFAIR/readers/lsa_readers/hsaf_h61.py" \
+            "DEFAIR/readers/lsa_readers/lsa509_frp.py" \
+            "DEFAIR/readers/lsa_readers/lsa_frm.py" \
+            "DEFAIR/notebooks_support/DEDL_DEFAIR_Fire_ignition_cube_preparation.ipynb" \
+            "DEFAIR/notebooks_support/img/parallax.png" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
             "HDA/insula-requirements.txt" \
@@ -77,7 +85,15 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
-            "DEFAIR/README.md" \
+            "DEFAIR/README.md" \            
+	    "DEFAIR/DEDL_DEFAIR_Custom_readers_lightning_and_fire.ipynb" \
+            "DEFAIR/readers/pyproject.toml" \
+            "DEFAIR/readers/lsa_readers/__init__.py" \
+            "DEFAIR/readers/lsa_readers/hsaf_h61.py" \
+            "DEFAIR/readers/lsa_readers/lsa_frm.py" \
+            "DEFAIR/readers/lsa_readers/lsa509_frp.py" \
+            "DEFAIR/notebooks_support/img/parallax.png" \
+            "DEFAIR/notebooks_support/DEDL_DEFAIR_Fire_ignition_cube_preparation.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
             "HDA/insula-requirements.txt" \
