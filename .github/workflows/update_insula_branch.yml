@@ -46,7 +46,7 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
             "DEFAIR/README.md" \
@@ -60,7 +60,7 @@ jobs:
             "DEFAIR/notebooks_support/img/parallax.png" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
-            "HDA/insula-requirements.txt" \
+            "requirements-insula.txt" \
             "README.md" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
 
@@ -82,7 +82,7 @@ jobs:
             "DEFAIR/DEDL_DEFAIR_Building_heterogeneous_data_cube_using_defair.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_polar_orbiter_products.ipynb" \
-            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb.ipynb" \
+            "DEFAIR/DEDL_DEFAIR_quick_start.ipynb" \
             "DEFAIR/DEDL_DEFAIR_Reading_geostationary_products.ipynb" \
             "DEFAIR/DEDL_DEFAIR_geo_leo_collocation.ipynb" \
             "DEFAIR/README.md" \            
@@ -96,7 +96,7 @@ jobs:
             "DEFAIR/notebooks_support/DEDL_DEFAIR_Fire_ignition_cube_preparation.ipynb" \
             "HDA/REST/HDA-REST-full-version.ipynb" \
             "HDA/README.md" \
-            "HDA/insula-requirements.txt" \
+            "requirements-insula.txt" \
             "README.md" \
             "HDA/PySTAC/HDA-PyStac-Client.ipynb"
 

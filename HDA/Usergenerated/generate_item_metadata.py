@@ -1,14 +1,15 @@
+import json
 import logging
 import os
-import json
-import pystac
 from datetime import datetime
 from pathlib import Path
-from shapely.geometry import box, mapping
-from typing import List, Dict, Any, Optional
+from typing import Any, Optional
 
+import pystac
+from shapely.geometry import box, mapping
 
 from config import (
+    ADDITIONAL_PROPERTY_KEYS,
     APP_LOGGER_NAME,
     IS_OVERWRITE_S3,
     IS_UPLOAD_S3,
@@ -19,18 +20,16 @@ from config import (
     ITEM_FOLDER_LEVEL_MM,
     ITEM_FOLDER_LEVEL_NONE,
     ITEM_FOLDER_LEVEL_YYYY,
-    ADDITIONAL_PROPERTY_KEYS,
     S3_ENDPOINT_URL,
     S3_USER_GENERATED_BUCKET_PREFIX,
     STAC_VERSION,
 )
-
-import usergenerated.logging_config  # import must come before other modules in this project so that logging setup correctly
+import usergenerated.logging_config  # noqa: F401, I001  # sets up logging on import; must stay before the other project imports
 from usergenerated import datetools
 from usergenerated.config import confighelper
+from usergenerated.env_utils import validate_aws_credentials
 from usergenerated.item import itemhelper
 from usergenerated.s3tools import S3Tools
-from usergenerated.env_utils import validate_aws_credentials
 
 
 class ItemGenerator:
@@ -88,7 +87,7 @@ class ItemGenerator:
             self.aws_access_key_id, self.aws_secret_access_key, self.is_overwrite_s3
         )
 
-    def _get_item_folders_by_level(self, folder_level: str) -> List[Path]:
+    def _get_item_folders_by_level(self, folder_level: str) -> list[Path]:
         """
         Retrieve item folder paths based on the specified folder level configuration.
 
@@ -101,7 +100,7 @@ class ItemGenerator:
         Raises:
             ValueError: If an unexpected folder level configuration is provided
         """
-        item_folder_paths: List[Path] = []
+        item_folder_paths: list[Path] = []
 
         if folder_level == ITEM_FOLDER_LEVEL_DD:
             # Navigate: data/YYYY/MM/DD/items
@@ -170,7 +169,7 @@ class ItemGenerator:
             confighelper.get_item_folder_naming_convention_type(collection_config)
         )
         ###### Determine additional property keys from collection config (if any) ######
-        self.additional_property_keys: List[str] = (
+        self.additional_property_keys: list[str] = (
             confighelper.get_config_value(
                 [collection_config], ADDITIONAL_PROPERTY_KEYS, True
             )
@@ -227,12 +226,12 @@ class ItemGenerator:
     def get_item(
         self,
         item_id: str,
-        geometry: Optional[Dict[str, Any]],
-        bbox: Optional[List[float]],
+        geometry: Optional[dict[str, Any]],
+        bbox: Optional[list[float]],
         item_datetime: datetime,
-        item_properties: Dict[str, Any],
+        item_properties: dict[str, Any],
         item_folder_path: Path,
-        config_list: List[Dict[str, Any]],
+        config_list: list[dict[str, Any]],
         collection: pystac.Collection,
     ) -> None:
         """

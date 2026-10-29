@@ -1,1 +1,17 @@
+# --- Python environment & caches ---
 .venv/
+__pycache__/
+
+# --- Secrets / local runtime configuration ---
+# EODAG DEDL credentials, S3 keys, download dir (loaded by script-start-airflow.sh)
+.env
+
+# --- Scratch / temporary files ---
+tmp/
+
+# --- Repo tooling & AI coding agent files ---
+.github/
+CLAUDE.md
+AGENTS.md
+.claude/
+.agents/
