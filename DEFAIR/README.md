@@ -37,9 +37,10 @@ The official DEFAIR documentation is available within the DestinE Data Lake docu
 
 - [DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DeepLearning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Lightning_nowcasting_prediction_with_DL.ipynb) Applies a deep-learning workflow to perform short-term lightning prediction using a DEFAIR-generated data cube.**Goal**: Demonstrate an end-to-end AI workflow, from data preparation to lightning nowcasting.
 
-- [DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb)
- Explores a machine-learning use case focused on predicting lightning-induced fire ignition risk from Earth observation data.
- **Goal**: Show how DEFAIR supports model development for environmental monitoring applications.
+- [DEDL_DEFAIR_Custom_readers_lightning_and_fire](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/DEDL_DEFAIR_Custom_readers_lightning_and_fire.ipynb)
+ Writes three custom DEFAIR readers for LSA SAF and H SAF products, then tests whether lightning is followed by more new fires over the Iberian Peninsula, and whether dry weather makes it more dangerous.
+ **Goal**: Show how to extend DEFAIR with your own readers and use an AI-ready cube in an environmental study.
+ The cube it uses is built in [Fire ignition cube preparation](https://github.com/destination-earth/DestinE-DataLake-Lab/blob/main/DEFAIR/notebooks_support/DEDL_DEFAIR_Fire_ignition_cube_preparation.ipynb).
 
 ## Prerequisites
  
@@ -60,15 +61,16 @@ To run these notebooks you will need:
 Insula provides a pre-configured Jupyter kernel named **Python (datalake-lab)** that can be used to run the notebooks in this repository.
 
 When opening a notebook, simply select **Python (datalake-lab)** from the available kernels.
- 
-Insula provides a pre-configured kernel named **Python (datalake-lab)**.
+
  
 For most users, **no additional installation is required**. Simply open the notebook and select the **Python (datalake-lab)** kernel from the JupyterLab kernel list.
 
 ## ⚠️ Important
 
-The predefined kernels are not yet available in DEDL STACK and Insula.
-Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not available.
+The predefined kernels will be available soon in DEDL STACK and Insula. 
+Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not yet available.
+
+If the **Python (datalake-lab)** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-datalake-lab** by following the instructions below.
 
 ### 1. Create a dedicated environment
 
@@ -116,18 +118,16 @@ If the command executes successfully and prints the installed version, DEFAIR is
 
 # Runnning these notebooks in DEDL STACK JupyterLab
 
-DEDL STACK JupyterLab has an already prepared kernel to run the provided DestinE-DataLake-Lab examples that is called **Python (defair)**
-When opening a DEFAIR notebook, select the **Python (defair)** kernel from the JupyterLab kernel list.
+DEDL STACK JupyterLab has an already prepared kernel to run the provided DestinE-DataLake-Lab examples that is called **DEFAIR**
+When opening a DEFAIR notebook, select the **DEFAIR** kernel from the JupyterLab kernel list.
  
-DEDL STACK JupyterLab provides a pre-configured kernel named **Python (defair)**.
- 
-For most users, **no additional installation is required**. Simply open the notebook and select the **Python (defair)** kernel from the JupyterLab kernel list.
+For most users, **no additional installation is required**. Simply open the notebook and select the **DEFAIR** kernel from the JupyterLab kernel list.
 ## ⚠️ Important
 
-The predefined kernels are not yet available in DEDL STACK and Insula. 
-Only follow the setup instructions below if the **Python (defair)** kernel is not available.
+The predefined kernels will be available soon in DEDL STACK and Insula. 
+Only follow the setup instructions below if the **DEFAIR** kernel is not yet available.
 
-If the **Python (defair)** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-defair** by following the instructions below.
+If the **DEFAIR** kernel is not available, you can create your own dedicated environment and register a custom kernel named **my-defair** by following the instructions below.
 
 ### 1. Create a dedicated environment
 

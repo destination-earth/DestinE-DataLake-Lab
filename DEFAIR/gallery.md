@@ -129,11 +129,11 @@
       <img src="../../img/EUMETSAT-logo.png" alt="Notebook Thumbnail" style="max-width: 100%; max-height: 100%; object-fit: contain;">
     </div>
     <div style="flex: 1;">
-      <strong>DEFAIR Use Case - Explores a machine-learning use case focused on predicting lightning-induced fire ignition risk</strong><br>
-      Explores a machine-learning use case focused on predicting lightning-induced fire ignition risk from Earth observation data. Goal: Show how DEFAIR supports model development for environmental monitoring applications.
+      <strong>DEFAIR Use Case - Custom readers, lightning and fire</strong><br>
+      Writes three custom DEFAIR readers for LSA SAF and H SAF products, then tests whether lightning is followed by more new fires over the Iberian Peninsula. Goal: Show how to extend DEFAIR with your own readers and use an AI-ready cube in an environmental study.
       <div style="margin: 6px 0;">
          <span class="tag">DEFAIR</span><span class="tag">EUMETSAT</span><span class="tag">AI-Ready-data</span><span class="tag">MSG SEVIRI</span><span class="tag">MTG FCI</span><span class="tag">MTG Lightning Imager</span>
       </div>
-      <a href="../../production/DEFAIR/DEDL_DEFAIR_FireIgnition_lightning_with_machine_learning.ipynb" style="text-decoration: none; color: #1d70b8; font-weight: bold;">View Notebook</a>
+      <a href="../../production/DEFAIR/DEDL_DEFAIR_Custom_readers_lightning_and_fire.ipynb" style="text-decoration: none; color: #1d70b8; font-weight: bold;">View Notebook</a>
     </div>
   </div>
