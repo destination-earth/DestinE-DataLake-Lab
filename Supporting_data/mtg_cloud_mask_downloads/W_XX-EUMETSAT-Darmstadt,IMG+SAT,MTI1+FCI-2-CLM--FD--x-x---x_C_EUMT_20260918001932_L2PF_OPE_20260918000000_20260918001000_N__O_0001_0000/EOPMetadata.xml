@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<eum:EarthObservation xmlns="http://www.eumetsat.int/sip" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/2.0" xmlns:ns5="http://www.isotc211.org/2005/gco" xmlns:ns6="http://www.isotc211.org/2005/gmx" xmlns:ns7="http://www.isotc211.org/2005/gmd" xmlns:ns8="http://www.isotc211.org/2005/gts" xmlns:eop="http://www.opengis.net/eop/2.1" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:eum="http://www.eumetsat.int/eop/1.0" xmlns:ns12="http://www.opengis.net/gml" xmlns:ns13="http://www.opengis.net/swe/1.0" xmlns:ns14="http://www.w3.org/2001/SMIL20/" xmlns:ns15="http://www.w3.org/2001/SMIL20/Language" xmlns:eu="http://www.eumetsat.int/sentinel" gml:id="idSIPMetadata_2_1">
+    <gml:boundedBy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    <om:phenomenonTime>
+        <gml:TimePeriod gml:id="phenomenonTime">
+            <gml:beginPosition>2026-09-18T00:00:00.000Z</gml:beginPosition>
+            <gml:endPosition>2026-09-18T00:10:00.000Z</gml:endPosition>
+        </gml:TimePeriod>
+    </om:phenomenonTime>
+    <om:resultTime>
+        <gml:TimeInstant gml:id="resultTime">
+            <gml:timePosition>2026-09-18T00:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+    </om:resultTime>
+    <om:procedure>
+        <eop:EarthObservationEquipment gml:id="procedure">
+            <gml:boundedBy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            <eop:platform>
+                <eop:Platform>
+                    <eop:shortName>MTI1</eop:shortName>
+                    <eop:orbitType>GEO</eop:orbitType>
+                </eop:Platform>
+            </eop:platform>
+            <eop:instrument>
+                <eop:Instrument>
+                    <eop:shortName>FCI</eop:shortName>
+                    <eop:description>Flexible Combined Imager</eop:description>
+                </eop:Instrument>
+            </eop:instrument>
+            <eop:sensor>
+                <eop:Sensor>
+                    <eop:operationalMode>FDC</eop:operationalMode>
+                </eop:Sensor>
+            </eop:sensor>
+            <eop:acquisitionParameters>
+                <eum:Acquisition>
+                    <eum:mtgCoverage>
+                        <eum:MTGCoverage>
+                            <eum:repeatCycleIdentifier>1</eum:repeatCycleIdentifier>
+                            <eum:majorRegionType>FullDisc</eum:majorRegionType>
+                            <eum:majorRegionCoverage>FD</eum:majorRegionCoverage>
+                            <eum:subRegionIdentifier>1</eum:subRegionIdentifier>
+                        </eum:MTGCoverage>
+                    </eum:mtgCoverage>
+                </eum:Acquisition>
+            </eop:acquisitionParameters>
+        </eop:EarthObservationEquipment>
+    </om:procedure>
+    <om:observedProperty nilReason="inapplicable"/>
+    <om:featureOfInterest>
+        <eop:Footprint gml:id="footprint">
+            <gml:boundedBy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            <eop:multiExtentOf nilReason="inapplicable"/>
+            <eop:centerOf>
+                <gml:Point srsName="EPSG:4326" gml:id="centerOf">
+                    <gml:pos>0.0 0.0</gml:pos>
+                </gml:Point>
+            </eop:centerOf>
+        </eop:Footprint>
+    </om:featureOfInterest>
+    <om:result>
+        <eop:EarthObservationResult gml:id="result">
+            <eop:product>
+                <eop:ProductInformation>
+                    <eop:fileName>
+                        <ows:ServiceReference xlink:href="W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD--x-x---x_C_EUMT_20260918001932_L2PF_OPE_20260918000000_20260918001000_N__O_0001_0000">
+                            <ows:Identifier>W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD--x-x---x_C_EUMT_20260918001932_L2PF_OPE_20260918000000_20260918001000_N__O_0001_0000</ows:Identifier>
+                            <ows:RequestMessage/>
+                  </ows:ServiceReference>
+               </eop:fileName>
+                    <eop:version>original</eop:version>
+                    <eop:size uom="KB">8077</eop:size>
+                    <eop:timeliness>NRT</eop:timeliness>
+            </eop:ProductInformation>
+         </eop:product>
+      </eop:EarthObservationResult>
+   </om:result>
+    <eop:metaDataProperty>
+        <eum:EarthObservationMetaData>
+            <eop:identifier>W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD--x-x---x_C_EUMT_20260918001932_L2PF_OPE_20260918000000_20260918001000_N__O_0001_0000</eop:identifier>
+            <eop:parentIdentifier>EO:EUM:DAT:0678</eop:parentIdentifier>
+            <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+            <eop:acquisitionSubType>O</eop:acquisitionSubType>
+            <eop:productType>MTIFCI2CLM</eop:productType>
+            <eop:status>ACQUIRED</eop:status>
+            <eop:downlinkedTo>
+                <eop:DownlinkInformation>
+                    <eop:acquisitionStation codeSpace="urn:eop:EUM:stationCode">MDA</eop:acquisitionStation>
+                </eop:DownlinkInformation>
+            </eop:downlinkedTo>
+            <eop:productQualityStatus>NOMINAL</eop:productQualityStatus>
+            <eop:processing>
+                <eop:ProcessingInformation>
+                    <eop:processingCenter>EUM</eop:processingCenter>
+                    <eop:processingDate>2026-09-18T00:19:32.000Z</eop:processingDate>
+                    <eop:methodVersion>original</eop:methodVersion>
+                    <eop:processorName>L2PF</eop:processorName>
+                    <eop:nativeProductFormat>NC4E</eop:nativeProductFormat>
+                    <eop:processingMode>N</eop:processingMode>
+                </eop:ProcessingInformation>
+            </eop:processing>
+            <eum:granuleType>DP</eum:granuleType>
+            <eum:processingLevel>02</eum:processingLevel>
+            <eum:extraInformation>
+                <eum:locationIndicator>Nominal</eum:locationIndicator>
+            </eum:extraInformation>
+        </eum:EarthObservationMetaData>
+    </eop:metaDataProperty>
+</eum:EarthObservation>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<informationPackage xmlns="http://www.eumetsat.int/sip" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/2.0" xmlns:ns5="http://www.isotc211.org/2005/gco" xmlns:ns6="http://www.isotc211.org/2005/gmx" xmlns:ns7="http://www.isotc211.org/2005/gmd" xmlns:ns8="http://www.isotc211.org/2005/gts" xmlns:eop="http://www.opengis.net/eop/2.1" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:eum="http://www.eumetsat.int/eop/1.0" xmlns:ns12="http://www.opengis.net/gml" xmlns:ns13="http://www.opengis.net/swe/1.0" xmlns:ns14="http://www.w3.org/2001/SMIL20/" xmlns:ns15="http://www.w3.org/2001/SMIL20/Language" xmlns:eu="http://www.eumetsat.int/sentinel">
+    <dataSection>
+        <dataObject ID="W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD--QCK-IMAGE---PNG_C_EUMT_20260918121621_L2PF_OPE_20260918120000_20260918121000_N__O_0073_0000.jpg">
+            <fileType>Browse</fileType>
+            <format>JPEG</format>
+            <size>67378</size>
+            <path>W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD--QCK-IMAGE---PNG_C_EUMT_20260918121621_L2PF_OPE_20260918120000_20260918121000_N__O_0073_0000.jpg</path>
+        </dataObject>
+        <dataObject ID="W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD------NC4E_C_EUMT_20260918121621_L2PF_OPE_20260918120000_20260918121000_N__O_0073_0000.nc">
+            <fileType>Data</fileType>
+            <format>NetCDF</format>
+            <size>4281826</size>
+            <path>W_XX-EUMETSAT-Darmstadt,IMG+SAT,MTI1+FCI-2-CLM--FD------NC4E_C_EUMT_20260918121621_L2PF_OPE_20260918120000_20260918121000_N__O_0073_0000.nc</path>
+            <checksum algorithm="md5">fff74c58bc4d0ac8009530fda11035f9</checksum>
+        </dataObject>
+        <dataObject ID="quicklooks">
+            <fileType>Other</fileType>
+            <format>FILESYSTEM</format>
+            <size>2068756</size>
+            <path>quicklooks</path>
+        </dataObject>
+    </dataSection>
+    <eopmetadataSection>
+        <path>EOPMetadata.xml</path>
+    </eopmetadataSection>
+</informationPackage>
