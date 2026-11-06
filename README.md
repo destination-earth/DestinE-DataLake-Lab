@@ -10,6 +10,7 @@ Destination Earth Data Lake Laboratory, this repository provides example noteboo
 - [Harmonised Data Access](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HDA) (Juypter notebooks examples on how to use HDA for *DestinE Data Portfolio* data access)
 - [STACK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/STACK) (Juypter notebook examples on how to use DASK for near data processing)
 - [HOOK service](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/HOOK) (Juypter notebook examples on how to use HOOK for workflows)
+- [DEFAIR framework](https://github.com/destination-earth/DestinE-DataLake-Lab/tree/main/DEFAIR) (Juypter notebook examples on how to use DEFAIR- Destination Earth Framework for AI-Ready Data)
 
 
 Further information available in DestinE Data Lake documentation: https://destine-data-lake-docs.data.destination-earth.eu/en/latest/index.html
@@ -43,41 +44,58 @@ https://code.insula.destine.eu/hub/
 
 When running the notebooks in Insula, please follow the environment-specific instructions provided below. 
 
-#### DestinE Platform Insula Service Users
-<br>
-To run these notebooks in Insula, create the `my_datalake_lab` environment and kernel by following the steps below.<br>
+## Running the notebooks on Insula
 
-Open a terminal window (File -> New -> Terminal) and run the following commands in sequence:
+Insula provides a pre-configured Jupyter kernel named **Python (datalake-lab)** that can be used to run the notebooks in this repository.
 
-1. Create a virtual environment.: 
+When opening a notebook, simply select **Python (datalake-lab)** from the available kernels.
+ 
+Insula provides a pre-configured kernel named **Python (datalake-lab)**.
+ 
+For most users, **no additional installation is required**. Simply open the notebook and select the **Python (datalake-lab)** kernel from the JupyterLab kernel list.
+
+## ⚠️ Important
+
+The predefined kernels are not yet available in DEDL STACK and Insula.
+Only follow the setup instructions below if the **Python (datalake-lab)** kernel is not available.
+
+### 1. Create a dedicated environment
+
+Open a terminal window (File-> New-> Terminal) and run the following command to create a new environment:
+
+```bash
+python -m venv /home/jovyan/datalake_venv
+```
+
+### 2. Activate the environment
+
+```bash
+source /home/jovyan/datalake_venv/bin/activate
+```
+
+### 3. Install the required dependencies
+
+Install required dependencies for these example Notebooks:
      
-     python -m venv /home/jovyan/my_datalake_lab
+```bash
 
-2. Activate the environment: 
-     
-     source /home/jovyan/my_datalake_lab/bin/activate
+python -m pip install -r /home/jovyan/datalake-lab-insula/requirements-insula.txt 
+```
 
-3. Install the required dependencies:
+### 4. Install defair kernel
 
-     pip install -r /home/jovyan/datalake-lab-insula/HDA/insula-requirements.txt
+```bash
+     python -m ipykernel install --user --name datalake_venv --display-name "my-datalake-lab"
+```
 
-4. Verify the installation:
-     
-     pip list | grep destinelab
+### 5. Run DEFAIR notebooks
 
-     This should give:
+When opening a DEFAIR notebook, select the **"my-datalake-lab"** kernel from the JupyterLab kernel list.
 
-     destinelab         1.14
-
-5. Install the Jupyter kernel:
-
-     python -m ipykernel install --name my_datalake_lab --user
-
-6. **Select the `my_datalake_lab` kernel from the notebook kernel menu.**
 
 > ⚠️ **Kernel update notice**
 >
-> Users who created the `my_datalake_lab` kernel before September 2026 should recreate it by following the installation steps below.
+> Users who created the `my_datalake_lab` kernel before October 2026 should recreate it by following the installation steps below.
 >
 > First, remove the existing kernel:
 >

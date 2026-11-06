@@ -74,12 +74,13 @@ export AIRFLOW_HOME=~/airflow
 
 ```
 
-- Execute the following commands (replacing AIRFLOW_VERSION with latest version e.g. 3.1.3)
+- Execute the following commands (replacing AIRFLOW_VERSION with latest version e.g. 3.3.2)
+  - Latest releases are listed at https://pypi.org/project/apache-airflow/
 
 
-```python
+```bash
 
-AIRFLOW_VERSION=3.1.3
+AIRFLOW_VERSION=3.3.2
 
 # Here we extract the version of Python you have installed.
 PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
@@ -87,10 +88,18 @@ PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.v
 # Here we construct a constraint URL based on the airflow version and python version
 CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
 
-# For example this would install 3.1.3 with python 3.12: https://raw.githubusercontent.com/apache/airflow/constraints-3.1.3/constraints-3.12.txt
+# For example this would install 3.3.2 with python 3.12: https://raw.githubusercontent.com/apache/airflow/constraints-3.3.2/constraints-3.12.txt
 
 uv pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
 
+
+```
+
+- Then install the libraries used by our own DAGs in the /dags folder (e.g. eodag, boto3 and [DEFAIR](https://pypi.org/project/defair/)) from the root of this project
+
+```bash
+
+uv pip install -r requirements.txt
 
 ```
 
@@ -100,7 +109,7 @@ uv pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_U
 
 ```bash
 
-# Start  Airflow Standalone
+# Start  Airflow Standalone (Note: use ./script-start-airflow.sh if you want to load your .env file for demo2)
 airflow standalone
 
 ...
@@ -280,9 +289,9 @@ The main points when using the Taskflow API are:
 - For these Dags to be known to the airflow standalone application
   - We will use the default folder used by airflow found at $HOME/airflow
   - We will assure that our Dags are synchronised with the folder $HOME/airflow/dags/
-    - To do so there is a bash script (sync-dags.sh) at the root of this project that will handle this synchronisation
+    - To do so there is a bash script (script-sync-dags.sh) at the root of this project that will handle this synchronisation
 
-Here is the script sync-dags.sh which is executed as follows
+Here is the script script-sync-dags.sh which is executed as follows
 
 ```bash
 # chmod +x ./script-sync-dags.sh
@@ -306,7 +315,32 @@ Here is the script sync-dags.sh which is executed as follows
 
 - We can see that our own DAG has now been succesfully executed
 
+### Synchronising your own DAGs to Airflow - Symlink method - Simplest
 
+- Alternatively you can use a symlink to the dags folder of airflow standalone application
+  - This is done by executing the following script 'script-symlink-dags.sh' at the root of this project
+  - Once executed, the Dags in the folder /dag/dedl should now be available in the user interface (wait a few moments and refresh the page if needed)
+  - You will not need to re-run the script if you add new Dags to the folder /dag/dedl, they will be automatically available in the airflow standalone application
+
+```bash
+
+# chmod +x ./script-symlink-dags.sh
+./script-symlink-dags.sh
+
+```
+
+## Demo 2: satellite data with DEFAIR
+
+- The DAG 'tutorial_taskflow_api_demo2' searches and downloads MSG/SEVIRI products from the Destination Earth Data Lake, converts them to Zarr with DEFAIR, uploads them to S3 and renders MP4 time-lapses
+- It needs your credentials in a .env file at the root of this project (copy .env.example to .env and fill it in); ./script-start-airflow.sh loads it when starting Airflow
+- The .env file must define the DEDL credentials (EODAG__DEDL__AUTH__CREDENTIALS__USERNAME / __PASSWORD), EODAG__DEDL__DOWNLOAD__OUTPUT_DIR (a local folder shared by the tasks) and the S3 settings (S3_ENDPOINT_URL, MY_S3_BUCKET_NAME, MY_S3_ACCESS_KEY_ID, MY_S3_SECRET_ACCESS_KEY); .env.example shows all keys
+- Start Airflow with ./script-start-airflow.sh (it loads .env, then runs airflow standalone)
+- The DAG has parameters you can change when triggering it (search window, channels, number of products, reprojection target, overlays and dask_workers); they are listed in docs/demo2.md
+- Unit tests for the supporting code are in the tests folder; install pytest (not in requirements.txt) and run `pytest` from the project root
+- Documentation in the docs folder:
+  - [docs/demo2_overview.md](./docs/demo2_overview.md): the pipeline at a glance
+  - [docs/demo2.md](./docs/demo2.md): task-by-task walkthrough, parameters, and how to speed up HEALPix reprojection with the dask_workers parameter
+  - [docs/defair.md](./docs/defair.md): DEFAIR reference (readers, transformations, Dask, HEALPix)
 
 # Trouble-shooting
 

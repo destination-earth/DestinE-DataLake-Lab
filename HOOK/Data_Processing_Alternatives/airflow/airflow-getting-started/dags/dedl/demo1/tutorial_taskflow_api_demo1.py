@@ -23,7 +23,7 @@ import json
 
 import pendulum
 from airflow.sdk import dag, task
-from dedl.tasks.common import show_params
+from dedl.common.tasks.common import show_params
 
 # [END import_module]
 
