@@ -1,0 +1,24 @@
+# Dependencies for EUMETSAT Data Notebooks
+# DestinE Data Lake Lab - EUM_data folder
+
+# DestinE authentication
+destinelab
+
+# Core data processing and HTTP
+requests
+tqdm
+ipython
+
+# Satellite data processing
+satpy
+pyspectral
+pyresample
+
+# Scientific computing and visualization
+xarray
+numpy
+matplotlib
+
+# Jupyter environment (optional - for running notebooks locally)
+jupyter
+jupyterlab
